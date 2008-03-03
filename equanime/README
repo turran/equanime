@@ -1,6 +1,9 @@
-controller (diplay controller, multilayer controller)
-layer
-region
-sync (output)?
-source (input)?
+Equanime aims to be a simple hardware based graphics library for embedded 
+devices.
+
+It might be very similar to what DirectFB is, but without many policies implemented
+inside. For example equanime won't have any concept of window manager or surface
+allocator, not even input devices; just a graphics abstraction layer. This was
+what I expected from DirectFB years ago when it first started, but then it
+followed the same X11 errors: monolithic (which are now "solved" on Xorg).
 
