@@ -14,4 +14,4 @@ rgb.c \
 osd.c
  
 
-libequanime_modules_mp25xxf_la_LIBADD = -lm
+libequanime_modules_mp25xxf_la_LIBADD =
