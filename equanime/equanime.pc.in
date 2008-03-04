@@ -7,5 +7,5 @@ Name: Equanime
 Description: Equanime
 Requires:
 Version: @VERSION@
-Libs: -L${libdir} -lekeko
+Libs: -L${libdir} -lequanime
 Cflags: -I${includedir}
