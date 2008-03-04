@@ -15,7 +15,7 @@ EAPI void equanime_layer_description_get(Equanime_Layer *l, Equanime_Layer_Descr
 /**
  * 
  */
-EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void cb_data)
+EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void *cb_data)
 {
 	
 }
@@ -71,14 +71,12 @@ EAPI void equanime_layer_level_set(Equanime_Layer *l, unsigned int level)
 EAPI void equanime_layer_level_up(Equanime_Layer *l)
 {
 	
-	
 }
 /**
  * 
  */
 EAPI void equanime_layer_level_down(Equanime_Layer *l)
 {
-	
 	
 }
 /**

@@ -1,6 +1,9 @@
 #ifndef EQUANIME_H_
 #define EQUANIME_H_
 
+/* for now */
+#define EAPI
+
 /**
  * 
  */

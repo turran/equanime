@@ -1,6 +1,7 @@
 #include "Equanime.h"
 #include "equanime_private.h"
 
+Equanime_Controller *_c = NULL;
 
 /*============================================================================*
  *                                   API                                      * 
@@ -38,13 +39,8 @@ EAPI void equanime_controller_layers_get(Equanime_Controller *c, void *cb, void 
 void equanime_controller_register(Equanime_Controller_Description *cd)
 {
 	Equanime_Controller *c;
-	int i = 0;
 	
 	c = calloc(1, sizeof(Equanime_Controller));
-	for (i = 0; i < cd->num_layers; i++)
-	{
-		
-	}
-	
+	_c = c;
 }
 

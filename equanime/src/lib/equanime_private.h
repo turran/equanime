@@ -1,6 +1,8 @@
 #ifndef EQUANIME_PRIVATE_H_
 #define EQUANIME_PRIVATE_H_
 
+#include <stdlib.h>
+
 
 struct _Equanime_Layer_Description
 {
