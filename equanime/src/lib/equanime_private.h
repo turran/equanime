@@ -3,6 +3,23 @@
 
 #include <stdlib.h>
 
+#define MAX_NAME_SIZE 64
+#define MAX_MAPS 5
+
+typedef struct _Equanime_Hal_Map
+{
+	unsigned long addr;
+	int size;
+	int mmap_result;
+} Equanime_Hal_Map;
+
+struct _Equanime_Hal
+{
+	char name[MAX_NAME_SIZE];
+	char version[MAX_NAME_SIZE];
+	int num;	
+	Equanime_Hal_Map maps[MAX_MAPS]
+};
 
 struct _Equanime_Layer_Description
 {
