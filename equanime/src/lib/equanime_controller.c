@@ -51,7 +51,7 @@ void equanime_controller_data_set(Equanime_Controller *ec, void *data)
 	
 }
 
-void equanime_controller_data_get(Equanime_Controller *ec, void *data)
+void * equanime_controller_data_get(Equanime_Controller *ec)
 {
 	
 }

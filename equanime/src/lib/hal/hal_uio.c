@@ -4,8 +4,10 @@
 #include <limits.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <fcntl.h>
 #include <sys/types.h>
-
+#include <sys/stat.h>
+#include <sys/mman.h>
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
@@ -36,19 +38,41 @@ static int _read_file(char *filename, char *line)
 	return 1;
 }
 
-static Equanime_Hal_Device * _parse_uio(char *sysfs_dirname)
+static Equanime_Hal_Device * _parse_uio(const char *sysfs_dirname)
 {
+	DIR *dir;
+	struct dirent *entry;
 	int fd;
 	char device[64];
+	int devnum;
 	Equanime_Hal_Device *d;
 	
-	/* fill the device information */
-	//snprintf(device, 64, "/dev/uio%d", num);
 	/* create the new device */
-	//d = calloc(1, sizeof(Equanime_Hal_Device));
+	d = calloc(1, sizeof(Equanime_Hal_Device));
+	/* fill the device information */
+	dir = opendir(sysfs_dirname);
+	if (!dir)
+		goto failed;
+	/* get the device number */
+	sscanf(sysfs_dirname, "/sys/class/uio/uio%d", &devnum);
+	while (entry = readdir(dir))
+	{
+		/* name */
+		/* version */
+		//if (!strcmp(entry-))
+		/* iterate over the maps */
+	}
 	/* open the device */
-	//fd = open(device, O_RDONLY);
+	snprintf(device, 64, "/dev/uio%d", devnum);
+	d->fd = open(device, O_RDONLY);
+	if (d->fd < 0)
+		goto failed;
+	
 	return d;
+	
+failed:
+	free(d);
+	return NULL;
 }
 
 /*============================================================================*

@@ -25,7 +25,7 @@ void mp25xxf_controller_init(void)
 	if (!device) return;
 	
 	/* register the new controller */
-	ec = equanime_controller_register(&mp25xxf_description));
+	ec = equanime_controller_register(&mp25xxf_description);
 	if (!ec) return;
 	
 	equanime_controller_data_set(ec, device);
@@ -43,5 +43,5 @@ void mp25xxf_controller_exit(void)
 	//device = equanime_controller_data_get()
 	//equanime_controller_unregister(&mp25xxf_description);
 	/* close the device */
-	equanime_hal_uio_close(mp25xxf_device);
+	//equanime_hal_uio_close(device);
 }
