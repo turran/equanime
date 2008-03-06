@@ -1,6 +1,7 @@
 #include "Equanime.h"
 #include "equanime_private.h"
 
+/* TODO instead of this hardcoded we should have a list of controllers */
 Equanime_Controller *_c = NULL;
 
 /*============================================================================*
@@ -36,11 +37,21 @@ EAPI void equanime_controller_layers_get(Equanime_Controller *c, void *cb, void 
 /*============================================================================*
  *                                 Global                                     * 
  *============================================================================*/
-void equanime_controller_register(Equanime_Controller_Description *cd)
+Equanime_Controller * equanime_controller_register(Equanime_Controller_Description *cd)
 {
 	Equanime_Controller *c;
 	
 	c = calloc(1, sizeof(Equanime_Controller));
 	_c = c;
+	return c;
 }
 
+void equanime_controller_data_set(Equanime_Controller *ec, void *data)
+{
+	
+}
+
+void equanime_controller_data_get(Equanime_Controller *ec, void *data)
+{
+	
+}

@@ -2,7 +2,8 @@ MAINTAINERCLEANFILES = \
 Makefile.in
 
 AM_CPPFLAGS = \
--I.
+-I. \
+-I$(top_srcdir)/src/lib/
 
 noinst_LTLIBRARIES = libequanime_hal.la
 
