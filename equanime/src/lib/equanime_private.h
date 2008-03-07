@@ -63,15 +63,18 @@ typedef struct _Equanime_Hal_Map
 
 typedef struct _Equanime_Hal_Device
 {
+	int fd;
 	char name[MAX_NAME_SIZE];
 	char version[MAX_NAME_SIZE];
-	int num;
+	int number;
 	Equanime_Hal_Map maps[MAX_MAPS];
-	int fd;
+	int maps_num;
+	
 } Equanime_Hal_Device;
 
 Equanime_Hal_Device * equanime_hal_uio_open(const char *name);
 void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map);
 void equanime_hal_uio_close(Equanime_Hal_Device *d);
+void equanime_hal_uio_dump(Equanime_Hal_Device *d);
 
 #endif /*EQUANIME_PRIVATE_H_*/

@@ -2,6 +2,9 @@
 #include "equanime_private.h"
 #include "mp25xxf.h"
 
+#define DRIVER_NAME "mp25xxf_mlc"
+//#define DRIVER_NAME "uio_dummy"
+
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
@@ -21,7 +24,7 @@ void mp25xxf_controller_init(void)
 	Equanime_Hal_Device *device;
 	
 	/* check if the driver exists */
-	device = equanime_hal_uio_open("mp25xxf_mlc");
+	device = equanime_hal_uio_open(DRIVER_NAME);
 	if (!device) return;
 	
 	/* register the new controller */

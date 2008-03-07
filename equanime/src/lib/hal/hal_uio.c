@@ -57,10 +57,53 @@ static Equanime_Hal_Device * _parse_uio(const char *sysfs_dirname)
 	sscanf(sysfs_dirname, "/sys/class/uio/uio%d", &devnum);
 	while (entry = readdir(dir))
 	{
+		char filename[PATH_MAX];
+		
 		/* name */
+		if (!strcmp(entry->d_name, "name"))
+		{
+			snprintf(filename, PATH_MAX, "%s/%s", sysfs_dirname, entry->d_name);
+			_read_file(filename, d->name);
+		}
 		/* version */
-		//if (!strcmp(entry-))
-		/* iterate over the maps */
+		else if (!strcmp(entry->d_name, "version"))
+		{
+			snprintf(filename, PATH_MAX, "%s/%s", sysfs_dirname, entry->d_name);
+			_read_file(filename, d->version);
+		}
+		/* maps */
+		else if (!strcmp(entry->d_name, "maps"))
+		{
+			DIR *maps_dir;
+			struct dirent *maps_entry;
+			int index = 0;
+			
+			snprintf(filename, PATH_MAX, "%s/%s", sysfs_dirname, entry->d_name);
+			/* iterate over the maps */
+			maps_dir = opendir(filename);
+			if (!maps_dir)
+				goto failed;
+			while (maps_entry = readdir(maps_dir))
+			{
+				char line[32]; /* this is enough to handle a 32bit or 64bit value */
+				
+				if ((!strcmp(maps_entry->d_name, ".")) || (!strcmp(maps_entry->d_name, "..")))
+					continue;
+				/* TODO check that the name is something like mapX */
+				/* get each map's size and offset */
+				snprintf(filename, PATH_MAX, "%s/maps/%s/addr", sysfs_dirname, maps_entry->d_name);
+				if (!_read_file(filename, line))
+					continue;
+				sscanf(line,"0x%lx",&d->maps[index].addr);
+				
+				snprintf(filename, PATH_MAX, "%s/maps/%s/size", sysfs_dirname, maps_entry->d_name);
+				if (!_read_file(filename, line))
+					continue;
+				sscanf(line,"0x%lx",&d->maps[index].size);
+				index++;
+			}
+			d->maps_num = index;
+		}
 	}
 	/* open the device */
 	snprintf(device, 64, "/dev/uio%d", devnum);
@@ -98,6 +141,7 @@ Equanime_Hal_Device * equanime_hal_uio_open(const char *name)
 		
 		if ((!strcmp(uio_de->d_name, ".")) || (!strcmp(uio_de->d_name, "..")))
 			continue;
+		/* TODO check that the name is something like uioX */ 
 		snprintf(uiox_name, PATH_MAX, "/sys/class/uio/%s", uio_de->d_name); 
 		uiox = opendir(uiox_name);
 		if (!uiox) continue;
@@ -118,8 +162,10 @@ Equanime_Hal_Device * equanime_hal_uio_open(const char *name)
 				{
 					Equanime_Hal_Device *d;
 					
-					printf("ok!!! uio found %s\n", name);
 					d = _parse_uio(uiox_name);
+					// for now
+					if (d)
+						equanime_hal_uio_dump(d);
 					return d;
 				}
 			}
@@ -149,4 +195,23 @@ void equanime_hal_uio_close(Equanime_Hal_Device *d)
 {
 	close(d->fd);
 	free(d);
+}
+
+/**
+ * 
+ */
+void equanime_hal_uio_dump(Equanime_Hal_Device *d)
+{
+	Equanime_Hal_Map *m;
+	int i = 0;
+	
+	printf("Name: %s\n", d->name);
+	printf("Version: %s\n", d->version);
+	printf("Maps:\n");
+	
+	for (i = 0; i < d->maps_num; i++)
+	{
+		m = &d->maps[i];
+		printf("\t%d: 0x%lx 0x%lx\n", i, m->addr, m->size);
+	}
 }

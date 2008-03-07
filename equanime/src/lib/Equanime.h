@@ -17,6 +17,12 @@ typedef struct _Equanime_Controller Equanime_Controller;
 typedef struct _Equanime_Controller_Description Equanime_Controller_Description;
 
 
+typedef void (*Equanime_Cb)(void *data, void *user_data);
+
+EAPI void equanime_init(void);
+EAPI void equanime_shutdown(void);
+EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data);
+EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb, void *cb_data);
 /* pixel formats */
 
 #endif /*EQUANIME_H_*/
