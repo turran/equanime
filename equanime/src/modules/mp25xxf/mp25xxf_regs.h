@@ -27,6 +27,17 @@
 
 /* Effect of Video Image */
 #define MLC_YUV_EFECT 				__REGW(MLC_START + 0x2)
+/* [15:10] Reserved */
+#define MLC_YUV_EFECT_VLB_BT 			(1 << 9)
+#define MLC_YUV_EFECT_VLB_TP_MR_H 		(1 << 8)
+#define MLC_YUV_EFECT_VLB_TP_MR_V 		(1 << 7)
+#define MLC_YUV_EFECT_VLB_BT_MR_H 		(1 << 6)
+#define MLC_YUV_EFECT_VLB_BT_MR_V 		(1 << 5)
+#define MLC_YUV_EFECT_VLA_BT 			(1 << 4)
+#define MLC_YUV_EFECT_VLA_TP_MR_H 		(1 << 3)
+#define MLC_YUV_EFECT_VLA_TP_MR_V 		(1 << 2)
+#define MLC_YUV_EFECT_VLA_BT_MR_H 		(1 << 1)
+#define MLC_YUV_EFECT_VLA_BT_MR_V 		(1 << 0)
 
 /* SPU (Sub Picture Unit) */
 #define MLC_SPU_CTRL
@@ -40,81 +51,30 @@
 //Address : C000 291Eh
 #endif /*MP25XXF_REGS_MLC_H_*/
 
-#if 0
-
-
-[15:10] - Reserved -
-[9] R/W MLC_VLB_BT Divide Region B of Video (Y/Cb/Cr) Layer with Top and Bottom Region.
-0 : Disable 1 : Enable
-0
-[8] R/W MLC_VLB_TP_MR_H Horizontal Mirror of Top Region B at Video (Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-[7] R/W MLC_VLB_TP_MR_V Vertical Mirror of Top Region B at Video(Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-[6] R/W MLC_VLB_BT_MR_H Horizontal Mirror of Bottom Region B at Video (Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-[5] R/W MLC_VLB_BT_MR_V Vertical Mirror of Bottom Region B at Video(Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-[4] R/W MLC_VLA_BT Divide Region A of Video (Y/Cb/Cr) Layer with Top and Bottom Region.
-0 : Disable 1 : Enable
-0
-[3] R/W MLC_VLA_TP_MR_H Horizontal Mirror of Top Region A at Video (Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-[2] R/W MLC_VLA_TP_MR_V Vertical Mirror of Top Region A at Video (Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-[1] R/W MLC_VLA_BT_MR_H Horizontal Mirror of Bottom Region A at Video (Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-[0] R/W MLC_VLA_BT_MR_V Vertical Mirror of Bottom Region A at Video (Y/Cb/Cr) Layer.
-0 : Disable 1 : Enable
-0
-
 /* Video Image Control Register */
-#define  MLC_YUV_CNTL 				__REGW(MLC_START + 0x4)
-[15:13] W Reserved Must be 0 -
-[12] R/W MLC_SC2DP_A Input Data Path of Video (Y/Cb/Cr) Layer Region A
-It must be 0 when Region A is not used.
-0 : External Memory 1 : Scale Processor
-0
-[11] R/W MLC_FDC2DP_B Input Data Path of Video (Y/Cb/Cr) Layer Region B
-It must be 0 when Region B is not used.
-0 : External Memory 1 : Frame Dimension Converter
-0
-[10] R/W MLC_VL_PRIO Priority of Region A and Region B at Video (Y/Cb/Cr) Layer.
-0 : Region A 1 : Region B
-0
-[9] W Reserved Must be 0 -
-[8:7] R/W MLC_VLB_TP_STEP Set number of next skip word each time Region B(Top) read one word(32bit)
-from memory. Valid when MLC_FDC2DP_B is ‘0’
-0 : No skip 1 : Skip 1 WORD 2 : Skip 2 WORDs 3 : skip 3 WORDs
-2’b0
-[6:5] R/W MLC_VLB_BT_STEP Set number of next skip word each time Region B(Bottom) read one
-word(32bit) from memory. Valid when MLC_FDC2DP_B is ‘0’
-0 : No skip 1 : Skip 1 WORD 2 : Skip 2 WORDs 3 : skip 3 WORDs
-2’b0
-[4] W Reserved Must be 0 -
-[3:2] R/W MLC_VLA_TP_STEP Set number of next skip word each time Region A(Top) read one word(32bit)
-from memory. Valid when MLC_SC2DP_A is ‘0’
-0 : No skip 1 : Skip 1 WORD 2 : Skip 2 WORDs 3 : skip 3 WORDs
-2’b0
-[1:0] R/W MLC_VLA_BT_STEP Set number of next skip word each time Region A(Bottom) read one
-word(32bit) from memory. Valid when MLC_SC2DP_A is ‘0’
-0 : No skip 1 : Skip 1 WORD 2 : Skip 2 WORDs 3 : skip 3 WORDs
-2’b0
+#define MLC_YUV_CNTL 				__REGW(MLC_START + 0x4)
+/* [15:3] Reserved */
+#define MLC_YUV_CNTL_SC2DP			(1 << 12) /* Input data path for Video Region A */
+#define MLC_YUV_CNTL_SC2DP_EXTMEM		(0) /* External Memory */
+#define MLC_YUV_CNTL_SC2DP_SCALE		(1) /* Scaler */
+#define MLC_YUV_CNTL_FDC2DP			(1 << 11) /* Input data path for Video Region A */
+#define MLC_YUV_CNTL_FDC2DP_EXTMEM		(0) /* External Memory */
+#define MLC_YUV_CNTL_FDC2DP_CONV		(1) /* Frame Dimensin Converter */
+#define MLC_YUV_CNTL_PRIO			(1 << 10) /* Region Priority */
+#define MLC_YUV_CNTL_PRIO_REGIONA		(0)
+#define MLC_YUV_CNTL_PRIO_REGIONB		(0)
+/* [9] Reserved */
+#define MLC_YUV_CNTL_VLB_TP_STEP 		(3 << 7)
+#define MLC_YUV_CNTL_VLB_BT_STEP 		(3 << 5)
+#define MLC_YUV_CNTL_VLA_TP_STEP 		(3 << 2)
+#define MLC_YUV_CNTL_VLA_BT_STEP 		(3 << 0)
+#define MLC_YUV_CNTL_NOSKIP			(0)
+#define MLC_YUV_CNTL_SKIP1			(1)
+#define MLC_YUV_CNTL_SKIP2			(2)
+#define MLC_YUV_CNTL_SKIP3			(3)
 
 /* Scale Factor Register of Region A */
 #define MLC_YUVA_TP_HSC 			__REGW(MLC_START + 0x6)
-[15:12] W Reserved Must be 0 4’b0
-[11:0] R/W MLC_VLA_TP_HSC Horizontal Scale Factor of Top Region A at Video (Y/Cb/Cr) Layer.
-MLC_VLA_TP_HSC = Ratio x 1024
-Scale Down = Ratio > 1
-12’b0
 
 /* Scale Factor Register of Region A */
 #define  MLC_YUVA_BT_HSC			__REGW(MLC_START + 0x8)
@@ -241,27 +201,13 @@ Scale Down = Ratio > 1
 
 /* Alpha Blending Value Register */
 #define MLC_STL_ALPHAL 				__REGW(MLC_START + 0x5e)
-[15:12] - Reserved -
-[11:8] R/W MLC_STL3_ALPHA Alpha Value of Region 3 at Still Image (RGB) Layer.
-Must be 15 when MLC_STL3_MIXMUX = 1.
-4’b0
-[7:4] R/W MLC_STL2_ALPHA Alpha Value of Region 2 at Still Image (RGB) Layer.
-Must be 15 when MLC_STL2_MIXMUX = 1.
-4’b0
-[3:0] R/W MLC_STL1_ALPHA Alpha Value of Region 1 at Still Image (RGB) Layer.
-Must be 15 when MLC_STL1_MIXMUX = 1.
-4’b0
-
-
-/* Alpha Blending Value Register (MLC_STL_ALPHAH) */
+#define MLC_STL_ALPHAH_3 			(15 << 8)
+#define MLC_STL_ALPHAH_2 			(15 << 4)
+#define MLC_STL_ALPHAH_1 			(15 << 0)
+/* Alpha Blending Value Register */
 #define MLC_STL_ALPHAH 				__REGW(MLC_START + 0x60)
-[15:8] - Reserved -
-[7:4] R/W MLC_STL5_ALPHA Alpha Value of Region 5 at Still Image (RGB) Layer.
-Must be 15 when MLC_STL5_MIXMUX = 1.
-4’b0
-[3:0] R/W MLC_STL4_ALPHA Alpha Value of Region 4 at Still Image (RGB) Layer.
-Must be 15 when MLC_STL4_MIXMUX = 1.
-4’b0
+#define MLC_STL_ALPHAH_5 			(15 << 4)
+#define MLC_STL_ALPHAH_4 			(15 << 0)
 
 /* Coordinate Register of Still Image(RGB) Layer 1 */
 #define MLC_STL1_STX 				__REGW(MLC_START + 0x62)
@@ -300,62 +246,37 @@ Must be 15 when MLC_STL4_MIXMUX = 1.
 #define MLC_STL_VSCL 				__REGW(MLC_START + 0x88)
 #define MLC_STL_VSCH 				__REGW(MLC_START + 0x8a) 
 
-/* Horizontal Width Register of Still Image(RGB) Layer (MLC_STL_HW) */
-Address : C000 290Ch
-[15] - Reserved -
-[14:0] R/W MLC_STL_HW Horizontal Pixel Width of Still Image (RGB) Layer
-When MLC_STL_BPP = 24 bpp, MLC_VLA_TP_HW = Pixel Width x 3
-When MLC_STL_BPP = 16 bpp, MLC_VLA_TP_HW = Pixel Width x 2
-When MLC_STL_BPP = 8 bpp, MLC_VLA_TP_HW = Pixel Width x 1
-When MLC_STL_BPP = 4 bpp, MLC_VLA_TP_HW = Pixel Width / 2
-15’b0
+/* Horizontal Width Register of Still Image(RGB) Layer */
+#define MLC_STL_HW 				__REGW(MLC_START + 0x8c) /* [14:0] */
 
-/* Source Address of Still Image (RGB) Layer (MLC_STL_OADRL, MLC_STL_OADRH) */
-Address : C000 290Eh / C000 2910h
-[15:0] R/W MLC_STL_OADRL 16’b0
-[15:0] R/W MLC_STL_OADRH
-Odd Field Source Address of Still Image (RGB) Layer
-16’b0
+/* Source Address of Still Image (RGB) Layer */
+#define MLC_STL_OADRL				__REGW(MLC_START + 0x8e)
+#define MLC_STL_OADRH				__REGW(MLC_START + 0x90)
+#define MLC_STL_EADRL				__REGW(MLC_START + 0x92)
+#define MLC_STL_EADRH				__REGW(MLC_START + 0x94)
 
-/* Source Address of Still Image( RGB) Layer (MLC_STL_EADRL, MLC_STL_EADRH) */
-Address : C000 2912h / C000 2914h
-[15:0] R/W MLC_STL_EADRL 16’b0
-[15:0] R/W MLC_STL_EADRH
-Even Field Source Address of Still Image (RGB) Layer.
-16’b0
-/* Source Address of OSD (MLC_OSD_OADRL, MLC_OSD_OADRH) */
-Address : C000 2916h / C000 2918h
-[15:0] R/W MLC_OSD_OADRL 16’b0
-[15:0] R/W MLC_OSD_OADRH
-Odd Field Source Address of OSD
-16’b0
+/* Source Address of OSD */
+#define MLC_OSD_OADRL				__REGW(MLC_START + 0x96)
+#define MLC_OSD_OADRH				__REGW(MLC_START + 0x98)
+#define MLC_OSD_EADRL				__REGW(MLC_START + 0x9a)
+#define MLC_OSD_EADRH				__REGW(MLC_START + 0x9c)
 
-/* Source Address of OSD (MLC_OSD_EADRL, MLC_OSD_EADRH) */
-Address : C000 291Ah / C000 291Ch
-[15:0] R/W MLC_OSD_EADRL 16’b0
-[15:0] R/W MLC_OSD_EADRH
-Even Field Source Address of OSD
-16’b0
+/* Hardware Cursor Control Register */
+#define MLC_HWC_CNTR 				__REGW(MLC_START + 0x9e)
+#define MLC_HWC_CNTR_FALPH 			(15 << 12) /* Foreground Alpha */
+#define MLC_HWC_CNTR_BALPH 			(15 << 8) /* Background Alpha */
+/* [7] Reserved */
+#define MLC_HWC_CNTR_SZ 			(63 << 0) /* Cursor Size */
+#define MLC_HWC_CNTR_SZ_32 			(0x20) /* 32x32 */
+#define MLC_HWC_CNTR_SZ_32 			(0x40) /* 64x64 */
 
-/* Hardware Cursor Control Register (MLC_HWC_CNTR) */
-Address : C000 291Eh
-[15:12] R/W MLC_HWC_FALPH Foreground Alpha Value of Hardware Cursor 4’b0
-[11:8] R/W MLC_HWC_BALPH Background Alpha Value of Hardware Cursor 4’b0
-[7] - Reserved -
-[6:0] R/W MLC_HWC_SZ Cursor Pixel Size
-0x20 : 32x32 pixel 0x40 : 64x64 pixel the other : Reserved
-7’b0
-
-/* Hardware Cursor Horizontal Starting Position Register (MLC_HWC_STX) */
-Address : C000 2920h
-[15:12] - Reserved -
-[11:0] R/W MLC_HWC_STX Horizontal Starting Position of Hardware Cursor 12’b0
+/* Hardware Cursor Horizontal Starting Position Register */
+#define MLC_HWC_STX 				__REGW(MLC_START + 0xa0) /* [11:0] */
 
 /* Hardware Cursor Vertical Starting Position Register (MLC_HWC_STY) */
-Address : C000 2922h
-[15:12] - Reserved -
-[11:0] R/W MLC_HWC_STY Vertical Starting Position of Hardware Cursor 12’b0
+#define MLC_HWC_STY 				__REGW(MLC_START + 0xa2) /* [11:0] */
 
+#if 0
 /* Hardware Cursor Foreground Color(GR) Register (MLC_HWC_FGR) */
 Address : C000 2924h
 [15:8] R/W MLC_HWC_FG Foreground Color (Green) of Hardware Cursor 8’b0

@@ -16,6 +16,18 @@ struct _Equanime_Controller_Description
 	Equanime_Controller_Functions fncs;
 };
 
+/**
+ * TODO define possible layer options, like:
+ */
+
+enum
+{
+	EQUANIME_LAYER_VISIBILITY 	= (1 << 0),
+	EQUANIME_LAYER_POSITION 	= (1 << 1),
+	EQUANIME_LAYER_SIZE	 	= (1 << 2),
+	EQUANIME_LAYER_LEVEL		= (1 << 3),
+};
+
 typedef struct _Equanime_Layer_Functions
 {
 	int (*probe)(Equanime_Layer *l);
@@ -26,6 +38,7 @@ struct _Equanime_Layer_Description
 {
 	const char *cname; /** Controller name */
 	const char *name; /** Layer name */
+	int flags; /** Layer flags */ 
 	Equanime_Layer_Functions fncs;
 };
 
@@ -33,6 +46,12 @@ struct _Equanime_Layer
 {
 	Equanime_Controller *controller;
 	const Equanime_Layer_Description *desc;
+	int x;
+	int y;
+	int w;
+	int h;
+	int level;
+	unsigned char hidden;
 	void *data;
 };
 
