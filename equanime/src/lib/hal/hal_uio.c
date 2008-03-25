@@ -1,6 +1,3 @@
-#include "Equanime.h"
-#include "equanime_private.h"
-
 #include <limits.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -8,6 +5,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
+
+#include "equanime_common.h"
+#include "Equanime.h"
+#include "Equanime_Module.h"
+
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
@@ -117,14 +119,13 @@ failed:
 	free(d);
 	return NULL;
 }
-
 /*============================================================================*
- *                                 Global                                     * 
+ *                                   API                                      * 
  *============================================================================*/
 /**
  * 
  */
-Equanime_Hal_Device * equanime_hal_uio_open(const char *name)
+EAPI Equanime_Hal_Device * equanime_hal_uio_open(const char *name)
 {
 	DIR *uio;
 	struct dirent *uio_de;
@@ -178,7 +179,7 @@ Equanime_Hal_Device * equanime_hal_uio_open(const char *name)
 /**
  * 
  */
-void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map)
+EAPI void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map)
 {
 	void *addr;
 	
@@ -191,7 +192,7 @@ void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map)
 /**
  * 
  */
-void equanime_hal_uio_close(Equanime_Hal_Device *d)
+EAPI void equanime_hal_uio_close(Equanime_Hal_Device *d)
 {
 	close(d->fd);
 	free(d);
@@ -200,7 +201,7 @@ void equanime_hal_uio_close(Equanime_Hal_Device *d)
 /**
  * 
  */
-void equanime_hal_uio_dump(Equanime_Hal_Device *d)
+EAPI void equanime_hal_uio_dump(Equanime_Hal_Device *d)
 {
 	Equanime_Hal_Map *m;
 	int i = 0;

@@ -2,8 +2,10 @@ MAINTAINERCLEANFILES = \
 Makefile.in
 
 AM_CPPFLAGS = \
+-I$(top_srcdir)/src/include \
 -I. \
--I$(top_srcdir)/src/lib/
+-I$(top_srcdir)/src/lib/ \
+@EINA_CFLAGS@
 
 noinst_LTLIBRARIES = libequanime_hal.la
 

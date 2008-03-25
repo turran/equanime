@@ -3,22 +3,23 @@ MAINTAINERCLEANFILES = Makefile.in
 SUBDIRS = hal
 
 AM_CPPFLAGS = \
+-I$(top_srcdir)/src/include \
 -I. \
--I$(top_srcdir)/src/modules/mp25xxf
+-I$(top_srcdir)/src/modules/mp25xxf \
+@EINA_CFLAGS@
 
 lib_LTLIBRARIES = libequanime.la
-
-include_HEADERS = \
-Equanime.h
 
 libequanime_la_SOURCES = \
 equanime_controller.c \
 equanime_layer.c \
+equanime_module.c \
 equanime_region.c
 
 libequanime_la_LIBADD = \
 $(top_srcdir)/src/modules/libequanime_modules.la \
-$(top_srcdir)/src/lib/hal/libequanime_hal.la
+$(top_srcdir)/src/lib/hal/libequanime_hal.la \
+@EINA_LIBS@
 
 libequanime_la_DEPENDENCIES = \
 $(top_srcdir)/src/modules/libequanime_modules.la \

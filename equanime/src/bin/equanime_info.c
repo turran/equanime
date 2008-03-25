@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+#include "Eina.h"
 #include "Equanime.h"
 
 void _layer_cb(Equanime_Layer *l, void *data)

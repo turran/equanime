@@ -1,5 +1,4 @@
 #include "Equanime.h"
-#include "equanime_private.h"
 #include "mp25xxf.h"
 
 #define DRIVER_NAME "mp25xxf_mlc"

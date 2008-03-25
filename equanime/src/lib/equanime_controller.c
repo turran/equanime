@@ -1,9 +1,9 @@
+#include "equanime_common.h"
 #include "Equanime.h"
+#include "Equanime_Module.h"
 #include "equanime_private.h"
 
-/* TODO instead of this hardcoded we should have a list of controllers */
-Equanime_Controller **_controllers;
-int _num_controllers;
+static Equanime_Controller *_controllers = NULL;
 
 /*============================================================================*
  *                                   API                                      * 
@@ -30,6 +30,7 @@ EAPI void equanime_shutdown(void)
  */
 EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data)
 {
+#if 0
 	Equanime_Controller *c, **cs;
 	int i;
 		
@@ -40,6 +41,7 @@ EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data)
 		cb(c, cb_data);
 		cs++;
 	}
+#endif
 }
 
 /**
@@ -58,51 +60,59 @@ EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb,
 		ls++;
 	}
 }
-/*============================================================================*
- *                                 Global                                     * 
- *============================================================================*/
+
 /**
  * 
  */
-void equanime_controller_register(Equanime_Controller_Description *cd)
+EAPI void equanime_controller_register(Equanime_Controller_Description *cd, Equanime_Controller_Functions *cf)
 {
 	Equanime_Controller *c;
 	
 	c = calloc(1, sizeof(Equanime_Controller));
 	c->desc = cd;
+	c->fncs = cf;
 	/* call the probe function */
-	if (!(c->desc->fncs.probe(c)))
+	if (!(c->fncs->probe(c)))
 	{
 		free(c);
 		return;
 	}
-	printf("Controller registered\n");
 	/* add the controller to the list of controllers */
-	_controllers = realloc(_controllers, sizeof(Equanime_Controller *) * (_num_controllers + 1));
-	_controllers[_num_controllers] = c;
-	_num_controllers++;
+	_controllers = eina_inlist_append(_controllers, c);
 }
-
 /**
  * 
  */
-void equanime_controller_unregister(Equanime_Controller_Description *cd)
+EAPI void equanime_controller_unregister(Equanime_Controller_Description *cd)
 {
 	/* TODO Do nothing for now, we should remove the controller from the list
 	 * of controllers and then free the controller itself */
 }
-
-void equanime_controller_layer_register(const char *name, Equanime_Layer *l)
-{
-	
-}
-
-void equanime_controller_data_set(Equanime_Controller *ec, void *data)
+/**
+ * 
+ */
+EAPI void equanime_controller_data_set(Equanime_Controller *ec, void *data)
 {
 	ec->data = data;
 }
-
-void * equanime_controller_data_get(Equanime_Controller *ec)
+/**
+ * 
+ */
+EAPI void * equanime_controller_data_get(Equanime_Controller *ec)
 {
 	return ec->data;
+}
+/*============================================================================*
+ *                                 Global                                     * 
+ *============================================================================*/
+
+void equanime_controller_layer_register(const char *name, Equanime_Layer *l)
+{
+	Equanime_Controller *c;
+		
+	/* find the controller with the same name */
+	/* add the layer to the list of layers */
+	/* increment the number of layers */
+	l->controller = c;
+	//c->desc->num_layers++;
 }

@@ -37,7 +37,7 @@ case "$host_os" in
 esac
 AC_SUBST(create_shared_lib)
 
-#PKG_CHECK_MODULES(EINA, [eina >= 0.0.1])
+PKG_CHECK_MODULES(EINA, [eina >= 0.0.1])
 
 ## Make the debug preprocessor configurable
 
@@ -50,6 +50,7 @@ src/modules/mp25xxf/Makefile
 src/lib/Makefile
 src/lib/hal/Makefile
 src/bin/Makefile
+src/include/Makefile
 ],[
 ])
 

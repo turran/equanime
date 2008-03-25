@@ -1,4 +1,6 @@
+#include "equanime_common.h"
 #include "Equanime.h"
+#include "Equanime_Module.h"
 #include "equanime_private.h"
 
 #define CHECK_FLAG(l, f) if (!(l->desc->flags & f)) return;
@@ -125,31 +127,51 @@ EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l)
 	return l->controller;
 }
 
+/**
+ * 
+ */
+EAPI void * equanime_layer_ptr_get(Equanime_Layer *l)
+{
+	return l->ptr;
+}
 /*============================================================================*
  *                                 Global                                     * 
  *============================================================================*/
 /**
  *
  */
-void equanime_layer_register(Equanime_Layer_Description *ld)
+void equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_Functions *lf)
 {
 	Equanime_Layer *l;
 	
-	//l = calloc(1, sizeof(Equanime_Layer));
-	/* find the controller with the same name as the description cname */
-	
-	//l->controller = c;
-	//l->desc = ld;
-	/* add a new layer to the controller */
-	//c->layers = realloc(c->layers, sizeof(Equanime_Layer) * c->desc->num_layers + 1);
-	//c->layers[c->desc->num_layers] = l;
-	//c->desc->num_layers++;
-	
+	l = malloc(sizeof(Equanime_Layer));
+	equanime_controller_layer_register(ld->cname, l);
+	l->desc = ld;
 }
 /**
  * 
  */
 void equanime_layer_unregister(Equanime_Layer_Description *ld)
 {
+	Equanime_Layer *l;
 	
+	/* TODO remove the layer from the controller */
+	l = equanime_controller_layer_unregister(ld->cname);
+	free(l);
+}
+
+/**
+ * 
+ */
+void equanime_layer_data_set(Equanime_Layer *l, void *data)
+{
+	l->data = data;
+}
+
+/**
+ * 
+ */
+void * equanime_layer_data_get(Equanime_Layer *l)
+{
+	return l->data;
 }
