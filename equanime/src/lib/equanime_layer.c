@@ -134,36 +134,34 @@ EAPI void * equanime_layer_ptr_get(Equanime_Layer *l)
 {
 	return l->ptr;
 }
-/*============================================================================*
- *                                 Global                                     * 
- *============================================================================*/
 /**
  *
  */
-void equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_Functions *lf)
+EAPI int equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_Functions *lf)
 {
 	Equanime_Layer *l;
 	
 	l = malloc(sizeof(Equanime_Layer));
 	equanime_controller_layer_register(ld->cname, l);
 	l->desc = ld;
+	return 1;
 }
 /**
  * 
  */
-void equanime_layer_unregister(Equanime_Layer_Description *ld)
+EAPI void equanime_layer_unregister(Equanime_Layer_Description *ld)
 {
 	Equanime_Layer *l;
 	
 	/* TODO remove the layer from the controller */
 	l = equanime_controller_layer_unregister(ld->cname);
-	free(l);
+	//free(l);
 }
 
 /**
  * 
  */
-void equanime_layer_data_set(Equanime_Layer *l, void *data)
+EAPI void equanime_layer_data_set(Equanime_Layer *l, void *data)
 {
 	l->data = data;
 }
@@ -171,7 +169,11 @@ void equanime_layer_data_set(Equanime_Layer *l, void *data)
 /**
  * 
  */
-void * equanime_layer_data_get(Equanime_Layer *l)
+EAPI void * equanime_layer_data_get(Equanime_Layer *l)
 {
 	return l->data;
 }
+
+/*============================================================================*
+ *                                 Global                                     * 
+ *============================================================================*/

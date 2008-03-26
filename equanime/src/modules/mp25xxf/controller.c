@@ -1,8 +1,11 @@
+#include "Eina.h"
 #include "Equanime.h"
+#include "Equanime_Module.h"
+
 #include "mp25xxf.h"
 
-#define DRIVER_NAME "mp25xxf_mlc"
-//#define DRIVER_NAME "uio_dummy"
+//#define DRIVER_NAME "mp25xxf_mlc"
+#define DRIVER_NAME "uio_dummy" // useful for testing the uio interface
 
 /*============================================================================*
  *                                  Local                                     * 
@@ -33,18 +36,22 @@ static int _probe(Equanime_Controller *c)
 static Equanime_Controller_Description mp25xxf_description = 
 {
 	.name = "MagicEyes MP25XXF",
-	.fncs = {
-		.probe = &_probe,
-		.remove = &_remove,
-	},
 };
 
-static int module_init(void)
+static Equanime_Controller_Functions mp25xxf_functions =
 {
-	equanime_controller_register(&mp25xxf_description);
+	.probe = &_probe,
+	.remove = &_remove,		
+};
+/*============================================================================*
+ *                                 Global                                     * 
+ *============================================================================*/
+int module_init(void)
+{
+	return equanime_controller_register(&mp25xxf_description, &mp25xxf_functions);
 }
 
-static void module_exit(void)
+void module_exit(void)
 {
 	equanime_controller_unregister(&mp25xxf_description);
 }

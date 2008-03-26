@@ -17,12 +17,11 @@ equanime_module.c \
 equanime_region.c
 
 libequanime_la_LIBADD = \
-$(top_srcdir)/src/modules/libequanime_modules.la \
 $(top_srcdir)/src/lib/hal/libequanime_hal.la \
-@EINA_LIBS@
+@EINA_LIBS@ \
+-ldl
 
 libequanime_la_DEPENDENCIES = \
-$(top_srcdir)/src/modules/libequanime_modules.la \
 $(top_srcdir)/src/lib/hal/libequanime_hal.la 
 
 libequanime_la_LDFLAGS = @create_shared_lib@ -version-info @version_info@

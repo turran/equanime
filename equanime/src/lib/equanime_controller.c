@@ -63,7 +63,7 @@ EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb,
 /**
  * 
  */
-EAPI void equanime_controller_register(Equanime_Controller_Description *cd, Equanime_Controller_Functions *cf)
+EAPI int equanime_controller_register(Equanime_Controller_Description *cd, Equanime_Controller_Functions *cf)
 {
 	Equanime_Controller *c;
 	
@@ -74,10 +74,11 @@ EAPI void equanime_controller_register(Equanime_Controller_Description *cd, Equa
 	if (!(c->fncs->probe(c)))
 	{
 		free(c);
-		return;
+		return 0;
 	}
 	/* add the controller to the list of controllers */
 	_controllers = eina_inlist_append(_controllers, c);
+	return 1;
 }
 /**
  * 

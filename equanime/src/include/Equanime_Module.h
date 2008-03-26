@@ -14,13 +14,13 @@ typedef struct _Equanime_Layer_Functions
 	void (*remove)(Equanime_Layer *l);
 } Equanime_Layer_Functions;
 
-EAPI void equanime_controller_register(Equanime_Controller_Description *cd, Equanime_Controller_Functions *cf);
+EAPI int equanime_controller_register(Equanime_Controller_Description *cd, Equanime_Controller_Functions *cf);
 EAPI void equanime_controller_unregister(Equanime_Controller_Description *cd);
 
 EAPI void equanime_controller_data_set(Equanime_Controller *ec, void *data);
 EAPI void * equanime_controller_data_get(Equanime_Controller *ec);
 
-EAPI void equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_Functions *lf);
+EAPI int equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_Functions *lf);
 EAPI void equanime_layer_unregister(Equanime_Layer_Description *ld);
 
 
