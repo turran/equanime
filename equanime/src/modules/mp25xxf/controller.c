@@ -39,16 +39,12 @@ static Equanime_Controller_Description mp25xxf_description =
 	},
 };
 
-
-/*============================================================================*
- *                                 Global                                     * 
- *============================================================================*/
-void mp25xxf_controller_module_init(void)
+static int module_init(void)
 {
 	equanime_controller_register(&mp25xxf_description);
 }
 
-void mp25xxf_controller_module_exit(void)
+static void module_exit(void)
 {
 	equanime_controller_unregister(&mp25xxf_description);
 }

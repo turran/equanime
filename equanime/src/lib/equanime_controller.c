@@ -3,64 +3,63 @@
 #include "Equanime_Module.h"
 #include "equanime_private.h"
 
+/*============================================================================*
+ *                                  Local                                     * 
+ *============================================================================*/
 static Equanime_Controller *_controllers = NULL;
-
+static Equanime_Layer *_layers = NULL;
+static int _init = 0;
 /*============================================================================*
  *                                   API                                      * 
  *============================================================================*/
+/**
+ * 
+ */
 EAPI void equanime_init(void)
 {
-	/* try to load every controller */
-	mp25xxf_controller_module_init();
-	/* then load every layer module */
-	mp25xxf_rgb_module_init();
+	if (_init) return;
+	
+	_init++;
+	equanime_module_load_all();
 }
-
+/**
+ * 
+ */
 EAPI void equanime_shutdown(void)
 {
-	/* unload every module */
-	/* first the controllers */
-	mp25xxf_controller_module_exit();
-	/* then the layers */
-	mp25xxf_rgb_module_exit();
+	if (_init == 1)
+	{
+		equanime_module_unload_all();
+	}
+	_init--;
 }
-
 /**
  * 
  */
 EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data)
 {
-#if 0
-	Equanime_Controller *c, **cs;
-	int i;
-		
-	cs = _controllers;
-	for (i = 0; i < _num_controllers; i++)
+	Eina_Inlist *l;
+	
+	for (l = (Eina_Inlist *)_controllers; l; l = l->next)
 	{
-		c = *cs;
+		Equanime_Controller *c = (Equanime_Controller *)l;
 		cb(c, cb_data);
-		cs++;
 	}
-#endif
 }
-
 /**
  * 
  */
 EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb, void *cb_data)
 {
-	Equanime_Layer *l, **ls;
-	int i;
-	
-	ls = c->layers;
-	for (i = 0; i < c->num_layers; i++)
+	Eina_Inlist *l;
+		
+	for (l = (Eina_Inlist *)_layers; l; l = l->next)
 	{
-		l = *ls;
-		cb(l, cb_data);
-		ls++;
+		Equanime_Layer *y = (Equanime_Layer *)l;
+		if (y->controller == c)
+			cb(y, cb_data);
 	}
 }
-
 /**
  * 
  */
@@ -105,7 +104,9 @@ EAPI void * equanime_controller_data_get(Equanime_Controller *ec)
 /*============================================================================*
  *                                 Global                                     * 
  *============================================================================*/
-
+/**
+ * 
+ */
 void equanime_controller_layer_register(const char *name, Equanime_Layer *l)
 {
 	Equanime_Controller *c;
@@ -115,4 +116,11 @@ void equanime_controller_layer_register(const char *name, Equanime_Layer *l)
 	/* increment the number of layers */
 	l->controller = c;
 	//c->desc->num_layers++;
+}
+/**
+ * 
+ */
+void equanime_controller_layer_unregister(void)
+{
+	
 }

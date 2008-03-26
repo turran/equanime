@@ -23,16 +23,14 @@ static Equanime_Layer_Description mp25xxf_rgb_description =
 		.remove = &_remove,	
 	},
 };
-/*============================================================================*
- *                                 Global                                     * 
- *============================================================================*/
-void mp25xxf_rgb_module_init(void)
+
+static int module_init(void)
 {
 	/* register the new layer */
 	equanime_layer_register(&mp25xxf_rgb_description);
 }
 
-void mp25xxf_rgb_module_exit(void)
+static void module_exit(void)
 {
 	/* unregister the layer */
 	equanime_layer_unregister(&mp25xxf_rgb_description);
