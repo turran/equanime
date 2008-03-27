@@ -2,18 +2,23 @@
 #include "Equanime.h"
 #include "Equanime_Module.h"
 #include "equanime_private.h"
-
+/**
+ * A layer ...
+ * 
+ */
+/*============================================================================*
+ *                                  Local                                     * 
+ *============================================================================*/
 #define CHECK_FLAG(l, f) if (!(l->desc->flags & f)) return;
-
 /*============================================================================*
  *                                   API                                      * 
  *============================================================================*/
 /**
  * 
  */
-EAPI void equanime_layer_description_get(Equanime_Layer *l, Equanime_Layer_Description *ld)
+EAPI Equanime_Layer_Description * equanime_layer_description_get(Equanime_Layer *l)
 {
-	
+	return l->desc;
 }
 /**
  * 

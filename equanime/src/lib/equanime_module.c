@@ -9,13 +9,13 @@
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
-typedef struct _Equanime_Module
+typedef struct _Module
 {
 	Eina_Inlist list;
 	int type;
 	void *handle;
 	
-} Equanime_Module;
+} Module;
 
 enum
 {
@@ -24,7 +24,7 @@ enum
 	EQUANIME_MODULES
 };
 
-static Equanime_Module *_modules = NULL;
+static Module *_modules = NULL;
 
 typedef int (*Module_Init)(void);
 typedef void (*Module_Shutdown)(void);
@@ -50,7 +50,7 @@ static void _module_load(const char *path, int type)
 			char file[PATH_MAX];
 			void *dl_handle;
 			Module_Init dl_mopen;
-			Equanime_Module *m;
+			Module *m;
 			
 			snprintf(file, PATH_MAX, "%s/%s", path, de->d_name);
 			
@@ -73,7 +73,7 @@ static void _module_load(const char *path, int type)
 			}
 			
 			/* everything went ok, add it to the list of modules */
-			m = malloc(sizeof(Equanime_Module));
+			m = malloc(sizeof(Module));
 			m->type = type;
 			m->handle = dl_handle;
 			_modules = eina_inlist_append(_modules, m);
@@ -88,7 +88,7 @@ static void _module_unload(int type)
 	
 	for (l = (Eina_Inlist*)_modules; l; l = l->next)
 	{
-		Equanime_Module *m = (Equanime_Module *)l;
+		Module *m = (Module *)l;
 		if (m->type == type)
 		{
 			Module_Shutdown sd;

@@ -2,7 +2,11 @@
 #include "Equanime.h"
 #include "Equanime_Module.h"
 #include "equanime_private.h"
-
+/**
+ * A controller is in charge of controlling the global output, disabling and
+ * enabling specific layers and change their priority.
+ * 
+ */
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
@@ -111,7 +115,7 @@ EAPI void * equanime_controller_data_get(Equanime_Controller *ec)
 void equanime_controller_layer_register(const char *name, Equanime_Layer *l)
 {
 	Equanime_Controller *c;
-		
+	/* check that the name exists on the list of layers, if so register it */
 	/* find the controller with the same name */
 	/* add the layer to the list of layers */
 	/* increment the number of layers */

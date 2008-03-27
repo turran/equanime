@@ -36,6 +36,11 @@ static int _probe(Equanime_Controller *c)
 static Equanime_Controller_Description mp25xxf_description = 
 {
 	.name = "MagicEyes MP25XXF",
+	.lnames = {
+		"OSD",
+		"RGB",
+		"Cursor"
+	},
 };
 
 static Equanime_Controller_Functions mp25xxf_functions =

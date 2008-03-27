@@ -1,18 +1,40 @@
 #ifndef EQUANIME_MODULE_H_
 #define EQUANIME_MODULE_H_
 
-typedef struct _Equanime_Controller_Functions
+typedef struct _Equanime_Controller_Functions Equanime_Controller_Functions;
+typedef struct _Equanime_Layer_Functions  Equanime_Layer_Functions;
+
+/**
+ * Functions every controller module should implement
+ */
+struct _Equanime_Controller_Functions
 {
 	int (*probe)(Equanime_Controller *c);
 	void (*remove)(Equanime_Controller *c);
-} Equanime_Controller_Functions;
+	/* possible functions:
+	 * enable a layer
+	 * change a layer priority
+	 * if the above cases are correct then the controller should know
+	 * every layer name or something.
+	 */
+};
 
 
-typedef struct _Equanime_Layer_Functions
+/**
+ * Functions every layer module should implement
+ */
+struct _Equanime_Layer_Functions
 {
 	int (*probe)(Equanime_Layer *l);
 	void (*remove)(Equanime_Layer *l);
-} Equanime_Layer_Functions;
+	/* possible functions:
+	 * position_set
+	 * size_set
+	 * ptr_get (to map the memory where the fb is)
+	 * format_set
+	 * 
+	 */
+};
 
 EAPI int equanime_controller_register(Equanime_Controller_Description *cd, Equanime_Controller_Functions *cf);
 EAPI void equanime_controller_unregister(Equanime_Controller_Description *cd);
@@ -51,8 +73,5 @@ EAPI Equanime_Hal_Device * equanime_hal_uio_open(const char *name);
 EAPI void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map);
 EAPI void equanime_hal_uio_close(Equanime_Hal_Device *d);
 EAPI void equanime_hal_uio_dump(Equanime_Hal_Device *d);
-
-
-
 
 #endif /*EQUANIME_MODULE_H_*/
