@@ -32,4 +32,8 @@ struct _Equanime_Controller
 	void *data;
 };
 
+void equanime_controller_layer_register(Equanime_Controller *ec, Equanime_Layer *el);
+Equanime_Controller * equanime_controller_name_get_by(const char *name);
+
+
 #endif /*EQUANIME_PRIVATE_H_*/

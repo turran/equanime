@@ -47,7 +47,8 @@ EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data)
 	for (l = (Eina_Inlist *)_controllers; l; l = l->next)
 	{
 		Equanime_Controller *c = (Equanime_Controller *)l;
-		cb(c, cb_data);
+		if (!cb(c, cb_data))
+			return;
 	}
 }
 /**
@@ -61,7 +62,8 @@ EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb,
 	{
 		Equanime_Layer *y = (Equanime_Layer *)l;
 		if (y->controller == c)
-			cb(y, cb_data);
+			if (!cb(y, cb_data))
+				return;
 	}
 }
 /**
@@ -106,21 +108,42 @@ EAPI void * equanime_controller_data_get(Equanime_Controller *ec)
 {
 	return ec->data;
 }
+/**
+ * 
+ */
+EAPI Equanime_Controller_Description * equanime_controller_description_get(Equanime_Controller *ec)
+{
+	return ec->desc;
+	
+}
 /*============================================================================*
  *                                 Global                                     * 
  *============================================================================*/
 /**
  * 
  */
-void equanime_controller_layer_register(const char *name, Equanime_Layer *l)
+void equanime_controller_layer_register(Equanime_Controller *ec, Equanime_Layer *el)
+{
+	ec->num_layers++;
+	_layers = eina_inlist_append(_layers, el);
+}
+
+Equanime_Controller * equanime_controller_name_get_by(const char *name)
 {
 	Equanime_Controller *c;
-	/* check that the name exists on the list of layers, if so register it */
-	/* find the controller with the same name */
-	/* add the layer to the list of layers */
-	/* increment the number of layers */
-	l->controller = c;
-	//c->desc->num_layers++;
+		
+	Eina_Inlist *l;
+			
+	for (l = (Eina_Inlist *)_controllers; l; l = l->next)
+	{
+		Equanime_Controller *c = (Equanime_Controller *)l;
+		if (!strcmp(c->desc->name, name))
+		{
+			/* increment the number of layers */
+			return c;
+		}
+	}
+	return NULL;
 }
 /**
  * 

@@ -4,8 +4,8 @@
 
 #include "mp25xxf.h"
 
-//#define DRIVER_NAME "mp25xxf_mlc"
-#define DRIVER_NAME "uio_dummy" // useful for testing the uio interface
+#define DRIVER_NAME "mp25xxf_mlc"
+//#define DRIVER_NAME "uio_dummy" // useful for testing the uio interface
 
 /*============================================================================*
  *                                  Local                                     * 
@@ -36,11 +36,6 @@ static int _probe(Equanime_Controller *c)
 static Equanime_Controller_Description mp25xxf_description = 
 {
 	.name = "MagicEyes MP25XXF",
-	.lnames = {
-		"OSD",
-		"RGB",
-		"Cursor"
-	},
 };
 
 static Equanime_Controller_Functions mp25xxf_functions =

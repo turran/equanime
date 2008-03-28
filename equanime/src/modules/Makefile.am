@@ -1,4 +1,4 @@
-SUBDIRS = mp25xxf
+SUBDIRS = mp25xxf dm320
 
 MAINTAINERCLEANFILES = \
 Makefile.in

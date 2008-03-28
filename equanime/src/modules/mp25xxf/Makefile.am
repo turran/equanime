@@ -36,5 +36,5 @@ mp2520f_rgb_la_DEPENDENCIES = $(top_builddir)/config.h
 mp2520f_osd_la_SOURCES       = osd
 mp2520f_osd_la_LIBADD        = $(top_builddir)/src/lib/libequanime.la
 mp2520f_osd_la_LDFLAGS       = @create_shared_lib@ -module -avoid-version
-mp2520f_osdr_la_DEPENDENCIES = $(top_builddir)/config.h
+mp2520f_osd_la_DEPENDENCIES = $(top_builddir)/config.h
 

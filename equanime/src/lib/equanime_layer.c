@@ -145,10 +145,19 @@ EAPI void * equanime_layer_ptr_get(Equanime_Layer *l)
 EAPI int equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_Functions *lf)
 {
 	Equanime_Layer *l;
+	Equanime_Controller *c;
+	
+	c = equanime_controller_name_get_by(ld->cname);
+	if (!c)
+	{
+		return 0;
+	}
 	
 	l = malloc(sizeof(Equanime_Layer));
-	equanime_controller_layer_register(ld->cname, l);
 	l->desc = ld;
+	l->controller = c;
+	equanime_controller_layer_register(c, l);
+	
 	return 1;
 }
 /**
