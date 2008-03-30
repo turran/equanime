@@ -17,8 +17,7 @@
  *============================================================================*/
 #define CONTROLLER_NAME "Texas Instruments DM320"
 
-//#define DRIVER_NAME "dm320_osd"
-#define DRIVER_NAME "uio_dummy" // useful for testing the uio interface
+#define DRIVER_NAME "dm320_osd"
 
 enum
 {

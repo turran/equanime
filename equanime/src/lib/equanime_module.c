@@ -106,10 +106,31 @@ static void _module_unload(int type)
  *============================================================================*/
 void equanime_module_load_all(void)
 {
+	char *mpath;
+	char *path;
+	
+	
+	path = getenv("EQUANIME_DIR");
+	if (!path)
+	{
+		path = strdup("/usr/local/lib/equanime");
+	}
+	/* find the directory where equanime is libequanime.so/../equanime/ */
+#if 0
+	Dl_info equanime_dl;
+	if (dladdr(equanime_module_load_all, &equanime_dl))
+	{
+		printf("path = %s\n", equanime_dl.dli_fname);
+	}
+#endif
+	mpath = malloc(strlen(path) + strlen("controller") + 1);
+	mpath = strcat(path, "/controller");
+	
 	/* try to load every controller */
-	_module_load("/usr/local/lib/equanime/controller", EQUANIME_MODULE_CONTROLLER);
+	printf("%s\n", mpath);
+	_module_load(mpath, EQUANIME_MODULE_CONTROLLER);
 	/* try to load every layer */
-	_module_load("/usr/local/lib/equanime/layer", EQUANIME_MODULE_LAYER);	
+	//_module_load("/usr/local/lib/equanime/layer", EQUANIME_MODULE_LAYER);	
 }
 
 void equanime_module_unload_all(void)
