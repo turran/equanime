@@ -64,6 +64,7 @@ struct _Equanime_Input
 };
 
 void equanime_controller_layer_register(Equanime_Controller *ec, Equanime_Layer *el);
+void equanime_controller_layer_unregister(Equanime_Layer *el);
 Equanime_Controller * equanime_controller_name_get_by(const char *name);
 
 

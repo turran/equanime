@@ -3,6 +3,7 @@
 
 typedef struct _Equanime_Controller_Functions Equanime_Controller_Functions;
 typedef struct _Equanime_Layer_Functions  Equanime_Layer_Functions;
+typedef struct _Equanime_Region_Functions  Equanime_Region_Functions;
 
 /**
  * Functions every controller module should implement based on the description

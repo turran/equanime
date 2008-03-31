@@ -17,7 +17,7 @@ Equanime_Region *_regions = NULL;
 /**
  * 
  */
-EAPI Equanime_Layer_Description * equanime_layer_description_get(Equanime_Layer *l)
+EAPI const Equanime_Layer_Description * equanime_layer_description_get(Equanime_Layer *l)
 {
 	return l->desc;
 }
@@ -174,7 +174,15 @@ EAPI int equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_
 	
 	l = malloc(sizeof(Equanime_Layer));
 	l->desc = ld;
+	l->fncs = lf;
 	l->controller = c;
+	/* call the probe function */
+	printf("mmm\n");
+	if (!(l->fncs->probe(l)))
+	{
+		free(l);
+		return 0;
+	}
 	equanime_controller_layer_register(c, l);
 	
 	return 1;
@@ -187,7 +195,7 @@ EAPI void equanime_layer_unregister(Equanime_Layer_Description *ld)
 	Equanime_Layer *l;
 	
 	/* TODO remove the layer from the controller */
-	l = equanime_controller_layer_unregister(ld->cname);
+	//l = equanime_controller_layer_unregister(ld->cname);
 	//free(l);
 }
 

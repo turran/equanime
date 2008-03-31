@@ -4,13 +4,13 @@
 #include "Equanime.h"
 
 const char *layer_flags[] = {
-		{"VISIBILITY"},
-		{"POSITION"},
-		{"SIZE"},
-		{"LEVEL"},
+	"VISIBILITY",
+	"POSITION",
+	"SIZE",
+	"LEVEL",
 };
 
-static void _layer_desc_dump(Equanime_Layer_Description *ld)
+static void _layer_desc_dump(const Equanime_Layer_Description *ld)
 {
 	int i = 0;
 	int flags = ld->flags;
@@ -32,16 +32,24 @@ static void _layer_desc_dump(Equanime_Layer_Description *ld)
 int _layer_cb(Equanime_Layer *l, void *data)
 {
 	int *num = data;
+	char *ptr;
+	int i;
 	
 	printf("Layer %d\n", *num);
 	*num = *num + 1;
 	_layer_desc_dump(equanime_layer_description_get(l));
+	printf("ok!!\n");
+	ptr = equanime_layer_ptr_get(l);
+	printf("%p\n", ptr);
+	
+	for (i = 0; i < 100; i++)
+		*ptr = i; 
 	
 	return 1;
 }
 
 
-static void _controller_desc_dump(Equanime_Controller_Description *cd)
+static void _controller_desc_dump(const Equanime_Controller_Description *cd)
 {
 	printf("\t- name = %s\n", cd->name);
 }

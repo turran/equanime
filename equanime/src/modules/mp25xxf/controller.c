@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "Eina.h"
 #include "Equanime.h"
@@ -97,18 +98,21 @@ static int layer_probe(Equanime_Layer *el)
 {
 	Layer *l;
 	Controller *c;
-	Equanime_Layer_Description *eld;
+	Equanime_Layer_Description *ld;
 	
 	c = equanime_controller_data_get(equanime_layer_controller_get(el));
 	
 	l = malloc(sizeof(Layer));
 	/* check the name and match it to the id */
-	if (!strcmp(eld->name, "RGB"))
+	ld = equanime_layer_description_get(el);
+	printf("probing\n");
+	if (!strcmp(ld->name, "RGB"))
 	{
 		
 		l->id = MP25XXF_RGB;
 		/* map the memory */
 		l->addr = equanime_hal_uio_map(c->device, 1);
+		printf("l->addr = %x\n", l->addr);
 	}
 	else
 	{

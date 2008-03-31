@@ -83,12 +83,12 @@ EAPI void equanime_init(void);
 EAPI void equanime_shutdown(void);
 EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data);
 EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb, void *cb_data);
-EAPI Equanime_Controller_Description * equanime_controller_description_get(Equanime_Controller *c);
+EAPI const Equanime_Controller_Description * equanime_controller_description_get(Equanime_Controller *c);
 /**
  * 
  * Layer
  */
-EAPI Equanime_Layer_Description * equanime_layer_description_get(Equanime_Layer *l);
+EAPI const Equanime_Layer_Description * equanime_layer_description_get(Equanime_Layer *l);
 EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void *cb_data);
 EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h);
 EAPI void equanime_layer_position_set(Equanime_Layer *l, int x, int y);

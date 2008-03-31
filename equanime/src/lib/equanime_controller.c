@@ -111,7 +111,7 @@ EAPI void * equanime_controller_data_get(Equanime_Controller *ec)
 /**
  * 
  */
-EAPI Equanime_Controller_Description * equanime_controller_description_get(Equanime_Controller *ec)
+EAPI const Equanime_Controller_Description * equanime_controller_description_get(Equanime_Controller *ec)
 {
 	return ec->desc;
 	
@@ -127,7 +127,18 @@ void equanime_controller_layer_register(Equanime_Controller *ec, Equanime_Layer 
 	ec->num_layers++;
 	_layers = eina_inlist_append(_layers, el);
 }
-
+/**
+ * 
+ */
+void equanime_controller_layer_unregister(Equanime_Layer *el)
+{
+	// itearate over the list of layers and get it
+	//el->controller->num_layers--;
+	//_layers = eina_inlist_remove(_layers, el);	
+}
+/**
+ * 
+ */
 Equanime_Controller * equanime_controller_name_get_by(const char *name)
 {
 	Equanime_Controller *c;
@@ -144,11 +155,4 @@ Equanime_Controller * equanime_controller_name_get_by(const char *name)
 		}
 	}
 	return NULL;
-}
-/**
- * 
- */
-void equanime_controller_layer_unregister(void)
-{
-	
 }
