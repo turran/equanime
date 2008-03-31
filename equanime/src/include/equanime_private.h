@@ -1,6 +1,9 @@
 #ifndef EQUANIME_PRIVATE_H_
 #define EQUANIME_PRIVATE_H_
 
+/**
+ * 
+ */
 struct _Equanime_Layer
 {
 	Eina_Inlist list;
@@ -16,12 +19,26 @@ struct _Equanime_Layer
 	void *data;
 	void *ptr;
 };
-
+/**
+ * 
+ */
 struct _Equanime_Region
 {
-	
+	Eina_Inlist list;
+	Equanime_Layer *layer;
+	const Equanime_Region_Description *desc;
+	const Equanime_Region_Functions *fncs;
+	int x;
+	int y;
+	int w;
+	int h;
+	int level;
+	unsigned char hidden;
+	void *data;
 };
-
+/**
+ * 
+ */
 struct _Equanime_Controller
 {
 	Eina_Inlist list;
@@ -30,6 +47,20 @@ struct _Equanime_Controller
 	const Equanime_Controller_Description *desc;
 	const Equanime_Controller_Functions *fncs;
 	void *data;
+};
+/**
+ * 
+ */
+struct _Equanime_Output
+{
+	
+};
+/**
+ * 
+ */
+struct _Equanime_Input
+{
+	
 };
 
 void equanime_controller_layer_register(Equanime_Controller *ec, Equanime_Layer *el);

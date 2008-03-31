@@ -3,9 +3,30 @@
 #include "Eina.h"
 #include "Equanime.h"
 
+const char *layer_flags[] = {
+		{"VISIBILITY"},
+		{"POSITION"},
+		{"SIZE"},
+		{"LEVEL"},
+};
+
 static void _layer_desc_dump(Equanime_Layer_Description *ld)
 {
+	int i = 0;
+	int flags = ld->flags;
+	
 	printf("\t- name = %s\n", ld->name);
+	printf("\t- flags = ");
+	while (flags)
+	{
+		if (flags & 1)
+		{
+			printf("%s ", layer_flags[i]);
+		}
+		flags = flags >> 1;
+		i++;
+	}
+	printf("\n");
 }
 
 int _layer_cb(Equanime_Layer *l, void *data)

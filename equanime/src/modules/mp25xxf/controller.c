@@ -5,7 +5,12 @@
 #include "Equanime_Module.h"
 
 #include "mp25xxf.h"
-
+/**
+ * The size of the layers is determined by the display controller configuration
+ * we should map/unmap the memory of each layer if the size changes, maybe
+ * we need a driver that allcoates/deallocates dma memory regions in kernel?
+ * 
+ */
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
@@ -54,7 +59,6 @@ static int controller_probe(Equanime_Controller *ec)
 	if (!c->device)
 	{
 		free(c);
-		printf("??\n");
 		return 0;
 	}
 	/* map the registers */
@@ -126,20 +130,35 @@ static void layer_remove(Equanime_Layer *el)
 	free(l);
 }
 
+static void * layer_ptr_get(Equanime_Layer *el)
+{
+	Layer *l;
+			
+	l = equanime_layer_data_get(el);
+	return l->addr;
+}
+
+static int layer_visibility_set(Equanime_Layer *el, int show)
+{
+	Layer *l;
+	
+	l = equanime_layer_data_get(el);
+	/* TODO enable/disable all regions? */
+	return 1;
+}
+
 static Equanime_Layer_Description mp25xxf_rgb_description = 
 {
 	.cname = "MagicEyes MP25XXF",
 	.name = "RGB",
-	.flags = EQUANIME_LAYER_VISIBILITY |
-		EQUANIME_LAYER_POSITION | 
-		EQUANIME_LAYER_SIZE |
-		EQUANIME_LAYER_LEVEL,
+	.flags = EQUANIME_LAYER_VISIBILITY,
 };
 
 static Equanime_Layer_Functions mp25xxf_layer_functions =
 {
 	.probe = &layer_probe,
-	.remove = &layer_remove,		
+	.remove = &layer_remove,
+	.ptr_get = &layer_ptr_get,
 };
 /*============================================================================*
  *                                 Global                                     * 

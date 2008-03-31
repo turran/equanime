@@ -12,9 +12,8 @@
 typedef struct _Module
 {
 	Eina_Inlist list;
-	int type;
-	void *handle;
-	
+	Eina_Module *module;
+	int type;	
 } Module;
 
 enum
@@ -29,57 +28,30 @@ static Module *_modules = NULL;
 typedef int (*Module_Init)(void);
 typedef void (*Module_Shutdown)(void);
 
-/* change this to only receive the type */
-static void _module_load(const char *path, int type)
+void _module_load_all_cb(Eina_Module *em, void *data)
 {
-	struct dirent *de;
-	DIR *d;
+	Module_Init dl_mopen;
+	Module *m;
 	
-	d = opendir(path);
-	if (!d) return;
-	
-	while (de = readdir(d))
+	/* if the module isnt loaded correctly dont add it 
+	 * to the list of modules */
+	dl_mopen = eina_module_symbol_get(em, "module_init");		
+	if (!dl_mopen)
 	{
-		int length;
-		
-		length = strlen(de->d_name);
-		if (length < 4) /* x.so */
-			continue;
-		if (!strcmp(de->d_name + length - 3, ".so"))
-		{
-			char file[PATH_MAX];
-			void *dl_handle;
-			Module_Init dl_mopen;
-			Module *m;
-			
-			snprintf(file, PATH_MAX, "%s/%s", path, de->d_name);
-			
-			dl_handle = dlopen(file, RTLD_LAZY);
-			if (!dl_handle) continue;
-			
-			/* if the module isnt loaded correctly dont add it 
-			 * to the list of modules */
-			
-			dl_mopen = dlsym(dl_handle, "module_init");
-			if (!dl_mopen)
-			{
-				dlclose(dl_handle);
-				continue;
-			}
-			if (!dl_mopen())
-			{
-				dlclose(dl_handle);
-				continue;
-			}
-			
-			/* everything went ok, add it to the list of modules */
-			m = malloc(sizeof(Module));
-			m->type = type;
-			m->handle = dl_handle;
-			_modules = eina_inlist_append(_modules, m);
-		}
+		eina_module_unload(em);
+		return;
 	}
-	closedir(d);	
+	if (!dl_mopen())
+	{
+		eina_module_unload(em);
+		return;
+	}
+				
+	/* everything went ok, add it to the list of modules */
+	m = malloc(sizeof(Module));
+	m->type = *(int *)data;
+	m->module = em;
+	_modules = eina_inlist_append(_modules, m);
 }
 
 static void _module_unload(int type)
@@ -93,10 +65,10 @@ static void _module_unload(int type)
 		{
 			Module_Shutdown sd;
 			
-			sd = dlsym(m->handle, "module_exit");
+			sd = eina_module_symbol_get(m->module, "module_exit");
 			sd();
 			printf("removing %d\n", type);
-			dlclose(m->handle);
+			eina_module_unload(m->module);
 		}
 	}
 }
@@ -108,6 +80,7 @@ void equanime_module_load_all(void)
 {
 	char *mpath;
 	char *path;
+	int type;
 	
 	
 	path = getenv("EQUANIME_DIR");
@@ -128,7 +101,8 @@ void equanime_module_load_all(void)
 	
 	/* try to load every controller */
 	printf("%s\n", mpath);
-	_module_load(mpath, EQUANIME_MODULE_CONTROLLER);
+	type = EQUANIME_MODULE_CONTROLLER;
+	eina_module_load_all(mpath, &_module_load_all_cb, &type);
 	/* try to load every layer */
 	//_module_load("/usr/local/lib/equanime/layer", EQUANIME_MODULE_LAYER);	
 }

@@ -111,7 +111,10 @@ static Equanime_Hal_Device * _parse_uio(const char *sysfs_dirname)
 	snprintf(device, 64, "/dev/uio%d", devnum);
 	d->fd = open(device, O_RDONLY);
 	if (d->fd < 0)
+	{
+		fprintf(stderr, "The sysfs entry exist, but no the /dev entry, mknod?\n");
 		goto failed;
+	}
 	
 	return d;
 	

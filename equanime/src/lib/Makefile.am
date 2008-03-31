@@ -5,7 +5,6 @@ SUBDIRS = hal
 AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \
 -I. \
--I$(top_srcdir)/src/modules/mp25xxf \
 @EINA_CFLAGS@
 
 lib_LTLIBRARIES = libequanime.la

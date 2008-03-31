@@ -5,7 +5,8 @@ typedef struct _Equanime_Controller_Functions Equanime_Controller_Functions;
 typedef struct _Equanime_Layer_Functions  Equanime_Layer_Functions;
 
 /**
- * Functions every controller module should implement
+ * Functions every controller module should implement based on the description
+ * flags
  */
 struct _Equanime_Controller_Functions
 {
@@ -18,21 +19,35 @@ struct _Equanime_Controller_Functions
 	 * every layer name or something.
 	 */
 };
-
-
 /**
- * Functions every layer module should implement
+ * Functions every layer module should implement based on the description
+ * flags
  */
 struct _Equanime_Layer_Functions
 {
 	int (*probe)(Equanime_Layer *l);
 	void (*remove)(Equanime_Layer *l);
+	int (*size_set)(Equanime_Layer *l, int w, int h);
+	int (*position_set)(Equanime_Layer *l, int x, int y);
+	int (*visibility_set)(Equanime_Layer *l, int show);
+	void *(*ptr_get)(Equanime_Layer *l);
 	/* possible functions:
-	 * position_set
-	 * size_set
-	 * ptr_get (to map the memory where the fb is)
 	 * format_set
-	 * 
+	 */
+};
+/**
+ * Functions every region module should implement based on the description
+ * flags
+ */
+struct _Equanime_Region_Functions
+{
+	int (*probe)(Equanime_Layer *l);
+	void (*remove)(Equanime_Layer *l);
+	/* possible functions:
+	 * enable a layer
+	 * change a layer priority
+	 * if the above cases are correct then the controller should know
+	 * every layer name or something.
 	 */
 };
 

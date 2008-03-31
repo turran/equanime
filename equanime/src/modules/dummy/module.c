@@ -16,38 +16,32 @@
  *============================================================================*/
 static int controller_probe(Equanime_Controller *ec)
 {
-	Controller *c;
-		
-	c = malloc(sizeof(Controller));
+	Equanime_Hal_Device *device;
 	/* check if the driver exists */
-	c->device = equanime_hal_uio_open(DRIVER_NAME);
-	if (!c->device)
-	{
-		free(c);
+	device = equanime_hal_uio_open(DRIVER_NAME);
+	if (!device)
 		return 0;
-	}
-	equanime_controller_data_set(ec, c);
+	equanime_controller_data_set(ec, device);
 	
 	return 1;
 }
 
 static void controller_remove(Equanime_Controller *ec)
 {
-	Controller *c;
-			
+	Equanime_Hal_Device *device;
+	
 	/* unregister the controller */
-	c = equanime_controller_data_get(ec);
+	device = equanime_controller_data_get(ec);
 	/* close the device */
-	equanime_hal_uio_close(c->device);
-	free(c);
+	equanime_hal_uio_close(device);
 }
 
-static Equanime_Controller_Description dm320_description = 
+static Equanime_Controller_Description dummy_description = 
 {
 	.name = CONTROLLER_NAME,
 };
 
-static Equanime_Controller_Functions dm320_functions =
+static Equanime_Controller_Functions dummy_functions =
 {
 	.probe = &controller_probe,
 	.remove = &controller_remove,		
@@ -59,13 +53,13 @@ static Equanime_Controller_Functions dm320_functions =
 int module_init(void)
 {
 	/* register the controller */
-	if (!equanime_controller_register(&dm320_description, &dm320_functions))
+	if (!equanime_controller_register(&dummy_description, &dummy_functions))
 		return 0;
-	return 0;
+	return 1;
 }
 
 void module_exit(void)
 {
-	equanime_controller_unregister(&dm320_description);
+	equanime_controller_unregister(&dummy_description);
 }
 

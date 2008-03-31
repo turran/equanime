@@ -5,8 +5,6 @@
  *                        Multi Layer Controller (MLC)                        * 
  *============================================================================*/
 
-/* Cursor Layer (2bpp) */
-/* YUV */
 /* Overlay Control Register */
 #define MLC_OVLAY_CNTR 				__REGW(MLC_START + 0x0)
 //[15:14] R/W Reserved Must be 0 2’b0
@@ -38,18 +36,6 @@
 #define MLC_YUV_EFECT_VLA_TP_MR_V 		(1 << 2)
 #define MLC_YUV_EFECT_VLA_BT_MR_H 		(1 << 1)
 #define MLC_YUV_EFECT_VLA_BT_MR_V 		(1 << 0)
-
-/* SPU (Sub Picture Unit) */
-#define MLC_SPU_CTRL
-//Address : C000 2974h
-/* RGB Layer (8/16/24 bpp) */
-#define MLC_STL_CNTL
-//Address : C000 28DAh
-/* OSD */
-/* Cursor */
-#define MLC_HWC_CNTR
-//Address : C000 291Eh
-#endif /*MP25XXF_REGS_MLC_H_*/
 
 /* Video Image Control Register */
 #define MLC_YUV_CNTL 				__REGW(MLC_START + 0x4)
@@ -276,42 +262,31 @@
 /* Hardware Cursor Vertical Starting Position Register (MLC_HWC_STY) */
 #define MLC_HWC_STY 				__REGW(MLC_START + 0xa2) /* [11:0] */
 
+/* Hardware Cursor Foreground Color(GR) Register */
+#define MLC_HWC_FGR 				__REGW(MLC_START + 0xa4)
+#define MLC_HWC_FGR_G 				(0xff << 8)
+#define MLC_HWC_FGR_R 				(0xff << 0)
+
+/* Hardware Cursor Foreground Color(B) Register */
+#define MLC_HWC_FB 				__REGW(MLC_START + 0xa6)
+#define MLC_HWC_FB_B 				(0xff << 0)
+
+/* Hardware Cursor Background Color(GR) Register */
+#define MLC_HWC_BGR 				__REGW(MLC_START + 0xa8)
+#define MLC_HWC_BGR_G 				(0xff << 8)
+#define MLC_HWC_BGR_R 				(0xff << 0)
+
+/* Hardware Cursor Background Color(B) Register */
+#define MLC_HWC_BB 				__REGW(MLC_START + 0xaa)
+#define MLC_HWC_BB_B 				(0xff << 0)
+
+/* Source Address of Hardware Cursor */
+#define MLC_HWC_OADRL				__REGW(MLC_START + 0xac)
+#define MLC_HWC_OADRH				__REGW(MLC_START + 0xae)
+#define MLC_HWC_EADRL				__REGW(MLC_START + 0xb0)
+#define MLC_HWC_EADRH				__REGW(MLC_START + 0xb2)
+
 #if 0
-/* Hardware Cursor Foreground Color(GR) Register (MLC_HWC_FGR) */
-Address : C000 2924h
-[15:8] R/W MLC_HWC_FG Foreground Color (Green) of Hardware Cursor 8’b0
-[7:0] R/W MLC_HWC_FR Foreground Color (Red) of Hardware Cursor 8’b0
-
-/* Hardware Cursor Foreground Color(B) Register (MLC_HWC_FB) */
-Address : C000 2926h
-[15:8] - Reserved -
-[7:0] R/W MLC_HWC_FB Foreground Color (Blue) of Hardware Cursor 8’b0
-
-
-/* Hardware Cursor Background Color(GR) Register (MLC_HWC_BGR) */
-Address : C000 2928h
-[15:8] R/W MLC_HWC_BG Background Color (Green) of Hardware Cursor 8’b0
-[7:0] R/W MLC_HWC_BR Background Color (Red) of Hardware Cursor 8’b0
-
-/* Hardware Cursor Background Color(B) Register (MLC_HWC_BB) */
-Address : C000 292Ah
-[15:8] - Reserved -
-[7:0] R/W MLC_HWC_BB Background Color (Blue) of Hardware Cursor 8’b0
-
-/* Source Address of Hardware Cursor (MLC_HWC_OADRL, MLC_HWC_OADRH) */
-Address : C000 292Ch / C000 292Eh
-[15:0] R/W MLC_HWC_OADRL 16’b0
-[15:0] R/W MLC_HWC_OADRH
-Odd Field Source Address of Hardware Cursor
-16’b0
-
-/* Source Address of Hardware Cursor (MLC_HWC_EADRL, MLC_HWC_EADRH) */
-Address : C000 2930h / C000 2932h
-[15:0] R/W MLC_HWC_EADRL 16’b0
-[15:0] R/W MLC_HWC_EADRH
-Even Field Source Address of Hardware Cursor
-16’b0
-
 /* Luminance Enhancement Control Register (MLC_LUMA_ENH) */
 Address : C000 2934h
 [15:11] - Reserved -

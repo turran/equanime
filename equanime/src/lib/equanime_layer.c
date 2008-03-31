@@ -10,6 +10,7 @@
  *                                  Local                                     * 
  *============================================================================*/
 #define CHECK_FLAG(l, f) if (!(l->desc->flags & f)) return;
+Equanime_Region *_regions = NULL;
 /*============================================================================*
  *                                   API                                      * 
  *============================================================================*/
@@ -34,6 +35,13 @@ EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void *cb_data)
 EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h)
 {
 	CHECK_FLAG(l, EQUANIME_LAYER_SIZE)
+	if ((w == l->w) && (h == l->h))
+		return;
+	if (l->fncs->size_set(l, w, h))
+	{
+		l->w = w;
+		l->h = h;
+	}
 }
 
 /**
@@ -43,8 +51,13 @@ EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h)
 EAPI void equanime_layer_position_set(Equanime_Layer *l, int x, int y)
 {
 	CHECK_FLAG(l, EQUANIME_LAYER_POSITION)
-	/* call the function */
-	/* update the value */
+	if ((x == l->x) && (y == l->y))
+		return;
+	if (l->fncs->position_set(l, x, y))
+	{
+		l->x = x;
+		l->y = y;
+	}
 	l->x = x;
 	l->y = y;
 }
@@ -108,6 +121,9 @@ EAPI void equanime_layer_level_down(Equanime_Layer *l)
 EAPI void equanime_layer_hide(Equanime_Layer *l)
 {
 	CHECK_FLAG(l, EQUANIME_LAYER_VISIBILITY)
+	if (l->hidden) return;
+	if (l->fncs->visibility_set(l, 0))
+			l->hidden = 1;
 }
 /**
  * 
@@ -115,6 +131,9 @@ EAPI void equanime_layer_hide(Equanime_Layer *l)
 EAPI void equanime_layer_show(Equanime_Layer *l)
 {
 	CHECK_FLAG(l, EQUANIME_LAYER_VISIBILITY)
+	if (!l->hidden) return;
+	if (l->fncs->visibility_set(l, 1))
+		l->hidden = 0;
 }
 /**
  * 
@@ -137,7 +156,7 @@ EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l)
  */
 EAPI void * equanime_layer_ptr_get(Equanime_Layer *l)
 {
-	return l->ptr;
+	return l->fncs->ptr_get(l);
 }
 /**
  *

@@ -48,6 +48,7 @@ src/Makefile
 src/modules/Makefile
 src/modules/mp25xxf/Makefile
 src/modules/dm320/Makefile
+src/modules/dummy/Makefile
 src/lib/Makefile
 src/lib/hal/Makefile
 src/bin/Makefile
