@@ -109,7 +109,7 @@ static Equanime_Hal_Device * _parse_uio(const char *sysfs_dirname)
 	}
 	/* open the device */
 	snprintf(device, 64, "/dev/uio%d", devnum);
-	d->fd = open(device, O_RDONLY);
+	d->fd = open(device, O_RDWR);
 	if (d->fd < 0)
 	{
 		fprintf(stderr, "The sysfs entry exist, but no the /dev entry, mknod?\n");
@@ -186,7 +186,7 @@ EAPI void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map)
 {
 	void *addr;
 	
-	addr = mmap(NULL, d->maps[map].size, PROT_READ, MAP_SHARED, d->fd, map*getpagesize());
+	addr = mmap(NULL, d->maps[map].size, PROT_READ | PROT_WRITE, MAP_SHARED, d->fd, map * getpagesize());
 	if (addr == MAP_FAILED)
 		return NULL;
 	return addr;

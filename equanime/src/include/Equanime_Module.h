@@ -108,17 +108,17 @@ static inline unsigned int readl(const volatile void *addr)
 	return *(volatile unsigned int *) addr;
 }
 
-static inline void writeb(unsigned char b, volatile void *addr)
+static inline void writeb(volatile void *addr, unsigned char b)
 {
 	*(volatile unsigned char *) addr = b;
 }
 
-static inline void writew(unsigned short s, volatile void *addr)
+static inline void writew(volatile void *addr, unsigned short s)
 {
 	*(volatile unsigned short *) addr = s;
 }
 
-static inline void writel(unsigned int i, volatile void *addr)
+static inline void writel(volatile void *addr, unsigned int i)
 {
 	*(volatile unsigned int *) addr = i;
 }

@@ -40,11 +40,15 @@ int _layer_cb(Equanime_Layer *l, void *data)
 	_layer_desc_dump(equanime_layer_description_get(l));
 	printf("ok!!\n");
 	ptr = equanime_layer_ptr_get(l);
-	printf("%p\n", ptr);
-	
+	printf("reading\n");
+	/*
+	for (i = 0; i < 100; i++)
+		printf("%x\n", *ptr);
+	*/
+	printf("writing\n");
 	for (i = 0; i < 100; i++)
 		*ptr = i; 
-	
+	memset(ptr, 5, 0x38400);	
 	return 1;
 }
 

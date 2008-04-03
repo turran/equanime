@@ -43,7 +43,7 @@ struct _Controller
 {
 	Equanime_Hal_Device *device;
 	Layer *layers[MP25XXF_LAYERS];
-	void *regs;
+	unsigned char *regs;
 };
 
 
@@ -63,7 +63,21 @@ static int controller_probe(Equanime_Controller *ec)
 		return 0;
 	}
 	/* map the registers */
+	printf("mapping\n");
 	c->regs = equanime_hal_uio_map(c->device, 0);
+	printf("Register at = %p\n", c->regs);
+	{
+		int i;
+
+		for (i = 0; i <  0x141; i++)
+		{
+			writew(c->regs + i, i);
+			printf("%x %x\n", (unsigned short int *)c->regs + i, 
+			readw(c->regs + i));
+			//*((unsigned char *)c->regs + i));
+			//*(unsigned short int *)(c->regs) = i;
+		}
+	}
 
 	equanime_controller_data_set(ec, c);
 	return 1;
@@ -98,7 +112,7 @@ static int layer_probe(Equanime_Layer *el)
 {
 	Layer *l;
 	Controller *c;
-	Equanime_Layer_Description *ld;
+	const Equanime_Layer_Description *ld;
 	
 	c = equanime_controller_data_get(equanime_layer_controller_get(el));
 	

@@ -14,5 +14,4 @@ equanime_info.c
 
 equanime_info_LDADD = \
 $(top_builddir)/src/lib/libequanime.la \
-@EINA_LIBS@ \
--ldl
+@EINA_LIBS@

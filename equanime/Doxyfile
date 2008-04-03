@@ -1,7 +1,7 @@
 PROJECT_NAME           = Equanime
 PROJECT_NUMBER         =
 OUTPUT_DIRECTORY       = doc
-INPUT                  = ./src/lib
+INPUT                  = ./src/lib ./src/include
 IMAGE_PATH             = doc/img
 OUTPUT_LANGUAGE        = English
 GENERATE_HTML          = YES

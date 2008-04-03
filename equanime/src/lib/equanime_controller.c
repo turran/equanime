@@ -12,31 +12,9 @@
  *============================================================================*/
 static Equanime_Controller *_controllers = NULL;
 static Equanime_Layer *_layers = NULL;
-static int _init = 0;
 /*============================================================================*
  *                                   API                                      * 
  *============================================================================*/
-/**
- * 
- */
-EAPI void equanime_init(void)
-{
-	if (_init) return;
-	
-	_init++;
-	equanime_module_load_all();
-}
-/**
- * 
- */
-EAPI void equanime_shutdown(void)
-{
-	if (_init == 1)
-	{
-		equanime_module_unload_all();
-	}
-	_init--;
-}
 /**
  * 
  */

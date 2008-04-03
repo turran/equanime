@@ -1,6 +1,10 @@
 #ifndef MP25XXF_REGS_H_
 #define MP25XXF_REGS_H_
 
+/* to keep compatibility between this file and the kernel header */
+#define __REGW
+#define MLC_START
+
 /*============================================================================*
  *                        Multi Layer Controller (MLC)                        * 
  *============================================================================*/
