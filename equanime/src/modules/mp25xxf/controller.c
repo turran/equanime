@@ -69,9 +69,10 @@ static int controller_probe(Equanime_Controller *ec)
 	{
 		int i;
 
+		memset(c->regs, 5, 0x141);
 		for (i = 0; i <  0x141; i++)
 		{
-			writew(c->regs + i, i);
+			//writew(c->regs + i, i);
 			printf("%x %x\n", (unsigned short int *)c->regs + i, 
 			readw(c->regs + i));
 			//*((unsigned char *)c->regs + i));
