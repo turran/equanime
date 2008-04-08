@@ -72,7 +72,7 @@ typedef struct _Equanime_Hal_Map
 {
 	unsigned long addr;
 	int size;
-	int mmap_result;
+	void *ptr;
 } Equanime_Hal_Map;
 
 typedef struct _Equanime_Hal_Device
@@ -83,14 +83,13 @@ typedef struct _Equanime_Hal_Device
 	int number;
 	Equanime_Hal_Map maps[MAX_MAPS];
 	int maps_num;
-	
 } Equanime_Hal_Device;
 
 EAPI Equanime_Hal_Device * equanime_hal_uio_open(const char *name);
 EAPI void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map);
+EAPI void equanime_hal_uio_unmap(Equanime_Hal_Device *d, int map);
 EAPI void equanime_hal_uio_close(Equanime_Hal_Device *d);
 EAPI void equanime_hal_uio_dump(Equanime_Hal_Device *d);
-
 
 /* write, read */
 static inline unsigned char readb(const volatile void *addr)

@@ -13,6 +13,27 @@
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
+#define MAX_NAME_SIZE 64
+#define MAX_MAPS 5
+
+typedef struct _Uio_Map
+{
+	unsigned long addr;
+	int size;
+	int mmap_result;
+} Uio_Map;
+
+typedef struct _Uio_Device
+{
+	int fd;
+	char name[MAX_NAME_SIZE];
+	char version[MAX_NAME_SIZE];
+	int number;
+	Uio_Map maps[MAX_MAPS];
+	int maps_num;
+	
+} Uio_Device;
+
 static int _read_file(char *filename, char *line)
 {
 	char *s;
@@ -184,12 +205,15 @@ EAPI Equanime_Hal_Device * equanime_hal_uio_open(const char *name)
  */
 EAPI void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map)
 {
+	/* instead of passing the index, pass the address and iterate over the
+	 * list of maps the one that matches the address ? */
 	void *addr;
 	
 	addr = mmap(NULL, d->maps[map].size, PROT_READ | PROT_WRITE, MAP_SHARED, d->fd, map * getpagesize());
 	if (addr == MAP_FAILED)
 		return NULL;
-	return addr;
+	d->maps[map].ptr = addr;
+	return addr + (d->maps[map].addr & (getpagesize() - 1));
 }
 
 /**
@@ -200,7 +224,13 @@ EAPI void equanime_hal_uio_close(Equanime_Hal_Device *d)
 	close(d->fd);
 	free(d);
 }
-
+/**
+ * 
+ */
+EAPI void equanime_hal_uio_unmap(Equanime_Hal_Device *d, int map)
+{
+	munmap(d->maps[map].ptr, d->maps[map].size);
+}
 /**
  * 
  */
