@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "Eina.h"
+#include "Enesim.h"
 #include "Equanime.h"
 
 Equanime_Layer *rgb = NULL;
@@ -18,7 +19,10 @@ int _layer_cb(Equanime_Layer *l, void *data)
 	Equanime_Layer_Description *ld;
 	
 	ld = equanime_layer_description_get(l);
-	/* check if it supports RGB */
+	/* check if it supports RGB, if so, setup the correct
+	 * layer configuration */
+	rgb = ld;
+	 
 	return 1;
 }
 
@@ -27,7 +31,6 @@ int _controller_cb(Equanime_Controller *c, void *data)
 	Equanime_Controller_Description *cd;
 	
 	cd = equanime_controller_description_get(c);
-	
 	equanime_controller_layers_get(c, (Equanime_Cb)_layer_cb, NULL);
 	
 	return 1;
@@ -35,7 +38,12 @@ int _controller_cb(Equanime_Controller *c, void *data)
 
 static void _play(void)
 {
+	Equanime_Surface *es;
+	Enesim_Surface *s;
+	
 	/* if we have an rgb layer */
+	es = equanime_layer_surface_get(l);
+	s = equanime_surface_enesim_surface_get(s);
 	/* if we have a yuv layer */
 }
 
