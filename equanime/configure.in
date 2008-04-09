@@ -38,6 +38,13 @@ esac
 AC_SUBST(create_shared_lib)
 
 PKG_CHECK_MODULES(EINA, [eina >= 0.0.1])
+PKG_CHECK_MODULES(ENESIM, [enesim >= 0.0.1])
+
+EQUANIME_CFLAGS="$EINA_CFLAGS $ENESIM_CFLAGS"
+EQUANIME_LIBS="$EINA_LIBS $ENESIM_LIBS"
+AC_SUBST(EQUANIME_CFLAGS)
+AC_SUBST(EQUANIME_LIBS)
+
 
 ## Make the debug preprocessor configurable
 
@@ -69,8 +76,6 @@ echo "------------------------------------------------------------------------"
 echo
 echo
 echo "Configuration Options Summary:"
-echo
-echo "  Build example...........: $have_sdl"
 echo
 echo "Installation Path.........: $prefix"
 echo

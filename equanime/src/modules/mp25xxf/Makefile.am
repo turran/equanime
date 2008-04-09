@@ -4,8 +4,7 @@ Makefile.in
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
-@EINA_CFLAGS@
-
+@EQUANIME_CFLAGS@
 
 controllerdir = $(libdir)/equanime/controller
 controller_LTLIBRARIES = mp2520f.la

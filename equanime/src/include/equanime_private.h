@@ -63,6 +63,15 @@ struct _Equanime_Input
 	
 };
 
+/**
+ * 
+ */
+struct _Equanime_Surface
+{
+	Enesim_Surface *es;
+	/* type of surface, virtual, physical, vram, ram, etc, etc */
+};
+
 void equanime_controller_layer_register(Equanime_Controller *ec, Equanime_Layer *el);
 void equanime_controller_layer_unregister(Equanime_Layer *el);
 Equanime_Controller * equanime_controller_name_get_by(const char *name);

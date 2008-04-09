@@ -4,7 +4,7 @@ Makefile.in
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
-@EINA_CFLAGS@
+@EQUANIME_CFLAGS@
 
 
 dummydir = $(libdir)/equanime/controller

@@ -5,7 +5,7 @@ SUBDIRS = hal
 AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \
 -I. \
-@EINA_CFLAGS@
+@EQUANIME_CFLAGS@
 
 lib_LTLIBRARIES = libequanime.la
 
@@ -18,7 +18,7 @@ equanime_region.c
 
 libequanime_la_LIBADD = \
 $(top_srcdir)/src/lib/hal/libequanime_hal.la \
-@EINA_LIBS@
+@EQUANIME_LIBS@
 
 libequanime_la_DEPENDENCIES = \
 $(top_srcdir)/src/lib/hal/libequanime_hal.la 

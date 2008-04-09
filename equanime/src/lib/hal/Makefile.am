@@ -4,7 +4,7 @@ Makefile.in
 AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \
 -I. \
-@EINA_CFLAGS@
+@EQUANIME_CFLAGS@
 
 noinst_LTLIBRARIES = libequanime_hal.la
 

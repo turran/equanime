@@ -1,4 +1,5 @@
 #include "Eina.h"
+#include "Enesim.h"
 #include "Equanime.h"
 #include "Equanime_Module.h"
 

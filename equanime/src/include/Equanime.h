@@ -120,6 +120,22 @@ typedef struct _Equanime_Controller_Description Equanime_Controller_Description;
 EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data);
 EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb, void *cb_data);
 EAPI const Equanime_Controller_Description * equanime_controller_description_get(Equanime_Controller *c);
+
+/**
+ * @}
+ * @defgroup Equanime_Surface_Group Surfaces
+ * @{
+ */
+typedef struct _Equanime_Surface Equanime_Surface; /**< Opaque handler */
+EAPI Enesim_Surface * equanime_surface_surface_get(Equanime_Surface *);
+
+/* TODO pixel formats (FOURCC similar to what videodev2.h has */
+#define FOURCC(a, b, c, d)          \
+	(((unsigned int)(a) << 0) | \
+	((unsigned int)(b) << 8)  | \
+	((unsigned int)(c) << 16) | \
+	((unsigned int)(d) << 24))
+
 /**
  * @}
  * @defgroup Equanime_Layer_Group Layers
@@ -144,13 +160,7 @@ EAPI void equanime_layer_show(Equanime_Layer *l);
 EAPI void equanime_layer_visibility_get(Equanime_Layer *l, unsigned char *hidden);
 EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l);
 EAPI void * equanime_layer_ptr_get(Equanime_Layer *l);
-
-/* TODO pixel formats (FOURCC similar to what videodev2.h has */
-#define FOURCC(a, b, c, d)          \
-	(((unsigned int)(a) << 0) | \
-	((unsigned int)(b) << 8)  | \
-	((unsigned int)(c) << 16) | \
-	((unsigned int)(d) << 24))
+EAPI Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l);
 /** 
  * @}
  * @}
