@@ -102,7 +102,7 @@ struct _Equanime_Controller_Description
 };
 
 typedef int (*Equanime_Cb)(void *data, void *user_data); /**< */
-/** 
+/**
  * @defgroup Equanime_Core_Group Core
  * @{
  */
@@ -126,15 +126,20 @@ EAPI const Equanime_Controller_Description * equanime_controller_description_get
  * @defgroup Equanime_Surface_Group Surfaces
  * @{
  */
-typedef struct _Equanime_Surface Equanime_Surface; /**< Opaque handler */
-EAPI Enesim_Surface * equanime_surface_surface_get(Equanime_Surface *);
 
-/* TODO pixel formats (FOURCC similar to what videodev2.h has */
-#define FOURCC(a, b, c, d)          \
-	(((unsigned int)(a) << 0) | \
-	((unsigned int)(b) << 8)  | \
-	((unsigned int)(c) << 16) | \
-	((unsigned int)(d) << 24))
+/**
+ * 
+ */
+typedef enum
+{
+	EQUANIME_SURFACE_ONSCREEN, /**< Visible graphics memory */
+	EQUANIME_SURFACE_OFFSCREEN, /**< Non visible graphics memory */
+	EQUANIME_SURFACE_VIRTUAL, /**< Virtual space */
+} Equanime_Surface_Type;
+
+typedef struct _Equanime_Surface Equanime_Surface; /**< Opaque handler */
+EAPI const Enesim_Surface * equanime_surface_surface_get(const Equanime_Surface *);
+EAPI Equanime_Surface_Type equanime_surface_type_get(const Equanime_Surface *);
 
 /**
  * @}
@@ -150,7 +155,7 @@ EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void *cb_data)
 EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h);
 EAPI void equanime_layer_position_set(Equanime_Layer *l, int x, int y);
 EAPI void equanime_layer_geometry_get(Equanime_Layer *l, int *x, int *y, int *w, int *h);
-EAPI void equanime_layer_format_set(Equanime_Layer *l, void *f);
+EAPI void equanime_layer_format_set(Equanime_Layer *l, Enesim_Surface_Format sfmt);
 EAPI void equanime_layer_level_get(Equanime_Layer *l, unsigned int *level);
 EAPI void equanime_layer_level_set(Equanime_Layer *l, unsigned int level);
 EAPI void equanime_layer_level_up(Equanime_Layer *l);
@@ -159,9 +164,8 @@ EAPI void equanime_layer_hide(Equanime_Layer *l);
 EAPI void equanime_layer_show(Equanime_Layer *l);
 EAPI void equanime_layer_visibility_get(Equanime_Layer *l, unsigned char *hidden);
 EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l);
-EAPI void * equanime_layer_ptr_get(Equanime_Layer *l);
-EAPI Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l);
-/** 
+EAPI const Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l);
+/**
  * @}
  * @}
  */

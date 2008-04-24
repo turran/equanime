@@ -16,8 +16,11 @@ struct _Equanime_Layer
 	int h;
 	int level;
 	unsigned char hidden;
+	Enesim_Surface_Format format;
 	void *data;
-	void *ptr;
+	void *ptr; /* TODO remove this? */
+	Equanime_Surface *surface;
+	unsigned int surface_ref; /* number of times the surface has been get */
 };
 /**
  * 
@@ -69,7 +72,7 @@ struct _Equanime_Input
 struct _Equanime_Surface
 {
 	Enesim_Surface *es;
-	/* type of surface, virtual, physical, vram, ram, etc, etc */
+	Equanime_Surface_Type type;
 };
 
 void equanime_controller_layer_register(Equanime_Controller *ec, Equanime_Layer *el);

@@ -39,11 +39,7 @@ int _layer_cb(Equanime_Layer *l, void *data)
 	printf("Layer %d\n", *num);
 	*num = *num + 1;
 	_layer_desc_dump(equanime_layer_description_get(l));
-	ptr = equanime_layer_ptr_get(l);
-	if (ptr)
-	{
-		memset(ptr, 5, 0x38400);
-	}
+	
 	return 1;
 }
 

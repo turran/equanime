@@ -75,7 +75,7 @@ EAPI void equanime_layer_geometry_get(Equanime_Layer *l, int *x, int *y, int *w,
 /**
  * 
  */
-EAPI void equanime_layer_format_set(Equanime_Layer *l, void *f)
+EAPI void equanime_layer_format_set(Equanime_Layer *l, Enesim_Surface_Format fmt)
 {
 	
 	
@@ -152,12 +152,60 @@ EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l)
 }
 
 /**
+ * Get the layer surface.
+ * TODO What happens if a layer changes resolution, size, format ?
+ * we should check that the surface is released?
+ */
+EAPI const Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l)
+{
+	Equanime_Surface *s;
+	
+	if (!l->surface)
+	{
+		Enesim_Surface *es;
+		Enesim_Surface_Data sdata;
+		
+		s = calloc(1, sizeof(Equanime_Surface));
+		l->surface = s;
+		/* switch for every format */
+		switch (l->format)
+		{
+		/* Enesim_Surface_Format f, int w, int h, Enesim_Surface_Data *sdata */
+		case ENESIM_SURFACE_ARGB8888:
+			sdata.argb8888.plane0 = l->fncs->ptr_get(l);
+			break;
+		case ENESIM_SURFACE_ARGB8888_PRE:
+			sdata.argb8888_pre.plane0 = l->fncs->ptr_get(l);
+			break;
+		case ENESIM_SURFACE_RGB565:
+			sdata.rgb565.plane0 = l->fncs->ptr_get(l);
+			sdata.rgb565.plane1 = malloc(sizeof(*sdata.rgb565.plane1) * l->w * l->h);
+			break;
+#if 0
+		case ENESIM_SURFACE_RGB888:
+			sdata.rgb888.plane0 = l->fncs->ptr_get(l);
+			sdata.rgb888.plane1 = malloc(sizeof(*sdata.rgb8888.plane1) * l->w * l->h);
+			break;
+		case ENESIM_SURFACE_A8:
+			sdata.a8.plane0 = l->fncs->ptr_get(l);
+			break;
+#endif
+		}
+		es = enesim_surface_new(l->format, l->w, l->h, &sdata);
+	}
+	l->surface_ref++;
+	
+	return s;
+}
+/**
  * 
  */
-EAPI void * equanime_layer_ptr_get(Equanime_Layer *l)
+EAPI void equanime_layer_surface_release(Equanime_Layer *l)
 {
-	return l->fncs->ptr_get(l);
+	if (l->surface_ref)
+		l->surface_ref--;
 }
+	
 /**
  *
  */

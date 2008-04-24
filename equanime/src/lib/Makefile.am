@@ -14,7 +14,8 @@ equanime_controller.c \
 equanime_core.c \
 equanime_layer.c \
 equanime_module.c \
-equanime_region.c
+equanime_region.c \
+equanime_surface.c
 
 libequanime_la_LIBADD = \
 $(top_srcdir)/src/lib/hal/libequanime_hal.la \

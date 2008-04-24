@@ -44,6 +44,7 @@ static void _play(void)
 	/* if we have an rgb layer */
 	es = equanime_layer_surface_get(l);
 	s = equanime_surface_enesim_surface_get(s);
+	/* do some tests */
 	/* if we have a yuv layer */
 }
 
