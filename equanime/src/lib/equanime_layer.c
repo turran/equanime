@@ -165,7 +165,7 @@ EAPI const Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l)
 		Enesim_Surface *es;
 		Enesim_Surface_Data sdata;
 		
-		s = calloc(1, sizeof(Equanime_Surface));
+		s = equanime_surface_new();
 		l->surface = s;
 		/* switch for every format */
 		switch (l->format)
