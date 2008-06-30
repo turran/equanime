@@ -13,7 +13,7 @@ typedef struct _Module
 {
 	Eina_Inlist list;
 	Eina_Module *module;
-	int type;	
+	int type;
 } Module;
 
 enum
