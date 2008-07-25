@@ -299,7 +299,7 @@ Address : C000 2934h
 4 : 1.5 5 : 1.625 6 : 1.75 7 : 1.875
 3’b0
 [7:0] R/W MLC_BRIGHT Brightness Control
-2's compliment : - 128 ~ +127
+twos compliment : - 128 ~ +127
 8’b0
 
 /* Chrominance Enhancement Control Register (MLC_HUECB1AB) */
@@ -307,7 +307,7 @@ Address : C000 2936h
 [15:8] R/W MLC_HUECB1A 8’h40
 [7:0] R/W MLC_HUECB1B
 1st quadrant Blue control : Decimal Point = [S.1.6]
-(B-Y)' = (B-Y) x HUECB1_A + (R-Y) x HUECB1_B
+(B-Y) = (B-Y) x HUECB1_A + (R-Y) x HUECB1_B
 8’b0
 
 /* Chrominance Enhancement Control Register (MLC_HUECR1AB) */
@@ -315,7 +315,7 @@ Address : C000 2938h
 [15:8] R/W MLC_HUECR1A 8’b0
 [7:0] R/W MLC_HUECR1B
 1st quadrant Red control : Decimal Point = [S.1.6]
-(R-Y)' = (B-Y) x HUECR1_A + (R-Y) x HUECR1_B
+(R-Y) = (B-Y) x HUECR1_A + (R-Y) x HUECR1_B
 8’h40
 
 /* Chrominance Enhancement Control Register (MLC_HUECB2AB) */
@@ -323,7 +323,7 @@ Address : C000 293Ah
 [15:8] R/W MLC_HUECB2A 8’h40
 [7:0] R/W MLC_HUECB2B
 2nd quadrant Blue control : Decimal Point = [S.1.6]
-(B-Y)' = (B-Y) x HUECB2_A + (R-Y) x HUECB2_B
+(B-Y) = (B-Y) x HUECB2_A + (R-Y) x HUECB2_B
 8’b0
 
 /* Chrominance Enhancement Control Register (MLC_HUECR2AB) */
@@ -331,7 +331,7 @@ Address : C000 293Ch
 [15:8] R/W MLC_HUECR2A 8’b0
 [7:0] R/W MLC_HUECR2B
 2nd quadrant Red control : Decimal Point = [S.1.6]
-(R-Y)' = (B-Y) x HUECR2_A + (R-Y) x HUECR2_B
+(R-Y) = (B-Y) x HUECR2_A + (R-Y) x HUECR2_B
 8’h40
 
 /* Chrominance Enhancement Control Register (MLC_HUECB3AB) */
@@ -339,7 +339,7 @@ Address : C000 293Eh
 [15:8] R/W MLC_HUECB3A 8’h40
 [7:0] R/W MLC_HUECB3B
 3rd quadrant Blue control : Decimal Point = [S.1.6]
-(B-Y)' = (B-Y) x HUECB3_A + (R-Y) x HUECB3_B
+(B-Y) = (B-Y) x HUECB3_A + (R-Y) x HUECB3_B
 8’b0
 
 /* Chrominance Enhancement Control Register (MLC_HUECR3AB) */
@@ -347,7 +347,7 @@ Address : C000 2940h
 [15:8] R/W MLC_HUECR3A 8’b0
 [7:0] R/W MLC_HUECR3B
 3rd quadrant Red control : Decimal Point = [S.1.6]
-(R-Y)' = (B-Y) x HUECR3_A + (R-Y) x HUECR3_B
+(R-Y) = (B-Y) x HUECR3_A + (R-Y) x HUECR3_B
 8’h40
 
 /* Chrominance Enhancement Control Register (MLC_HUECB4AB) */
@@ -355,7 +355,7 @@ Address : C000 2942h
 [15:8] R/W MLC_HUECB4A 8’h40
 [7:0] R/W MLC_HUECB4B
 4th quadrant Blue control : Decimal Point = [S.1.6]
-(B-Y)' = (B-Y) x HUECB4_A + (R-Y) x HUECB4_B
+(B-Y) = (B-Y) x HUECB4_A + (R-Y) x HUECB4_B
 8’b0
 
 /* Chrominance Enhancement Control Register (MLC_HUECR4AB) */
@@ -363,7 +363,7 @@ Address : C000 2944h
 [15:8] R/W MLC_HUECR4A 8’b0
 [7:0] R/W MLC_HUECR4B
 4th quadrant Red control : Decimal Point = [S.1.6]
-(R-Y)' = (B-Y) x HUECR4_A + (R-Y) x HUECR4_B
+(R-Y) = (B-Y) x HUECR4_A + (R-Y) x HUECR4_B
 8’h40
 
 /* Dither Control Register (MLC_DITHER) */
