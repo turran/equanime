@@ -3,17 +3,14 @@
 #include "Equanime.h"
 #include "Equanime_Module.h"
 
-
-
-
 /*============================================================================*
- *                                  Local                                     * 
+ *                                  Local                                     *
  *============================================================================*/
 #define CONTROLLER_NAME "Dummy UIO"
 #define DRIVER_NAME "uio_dummy" // useful for testing the uio interface
 
 /*============================================================================*
- *                               Controller                                   * 
+ *                               Controller                                   *
  *============================================================================*/
 static int controller_probe(Equanime_Controller *ec)
 {
@@ -23,21 +20,21 @@ static int controller_probe(Equanime_Controller *ec)
 	if (!device)
 		return 0;
 	equanime_controller_data_set(ec, device);
-	
+
 	return 1;
 }
 
 static void controller_remove(Equanime_Controller *ec)
 {
 	Equanime_Hal_Device *device;
-	
+
 	/* unregister the controller */
 	device = equanime_controller_data_get(ec);
 	/* close the device */
 	equanime_hal_uio_close(device);
 }
 
-static Equanime_Controller_Description dummy_description = 
+static Equanime_Controller_Description dummy_description =
 {
 	.name = CONTROLLER_NAME,
 };
@@ -45,11 +42,11 @@ static Equanime_Controller_Description dummy_description =
 static Equanime_Controller_Functions dummy_functions =
 {
 	.probe = &controller_probe,
-	.remove = &controller_remove,		
+	.remove = &controller_remove,
 };
 
 /*============================================================================*
- *                                 Global                                     * 
+ *                                 Global                                     *
  *============================================================================*/
 int module_init(void)
 {

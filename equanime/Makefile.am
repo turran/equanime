@@ -17,7 +17,7 @@ stamp-h.in \
 build-stamp \
 configure-stamp \
 depcomp \
-equanime.pc 
+equanime.pc
 
 EXTRA_DIST = \
 AUTHORS \

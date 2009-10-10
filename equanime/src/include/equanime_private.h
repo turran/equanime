@@ -2,6 +2,43 @@
 #define EQUANIME_PRIVATE_H_
 
 /**
+ *
+ */
+struct _Equ_Rotator
+{
+	Equ_Angle angle;
+};
+
+/**
+ *
+ */
+struct _Equ_Scaler
+{
+	uint32_t sw, sh, dw, dh;
+};
+
+struct _Equ_Csc
+{
+	Equ_Format sf;
+	Equ_Format df;
+};
+
+typedef struct _Equ_Component_Data
+{
+	Equ_Component_Type type;
+	void *data;
+} Equ_Component_Data;
+
+typedef struct _Equ_Component_Backend
+{
+	Equ_Component_Data data[EQU_COMPONENT_TYPES];
+	/* TODO add the setup */
+	/* TODO add the run */
+} Equ_Component_Backend;
+
+
+
+/**
  * 
  */
 struct _Equanime_Layer
@@ -16,10 +53,10 @@ struct _Equanime_Layer
 	int h;
 	int level;
 	unsigned char hidden;
-	Enesim_Surface_Format format;
+	//Enesim_Surface_Format format;
 	void *data;
 	void *ptr; /* TODO remove this? */
-	Equanime_Surface *surface;
+	//Equanime_Surface *surface;
 	unsigned int surface_ref; /* number of times the surface has been get */
 };
 /**

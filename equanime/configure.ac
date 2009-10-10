@@ -3,7 +3,7 @@ rm -f config.cache
 
 AC_INIT(equanime, 0.0.1, enlightenment-devel@lists.sourceforge.net)
 AC_PREREQ(2.52)
-AC_CONFIG_SRCDIR(configure.in)
+AC_CONFIG_SRCDIR(configure.ac)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_ISC_POSIX
@@ -37,7 +37,7 @@ case "$host_os" in
 esac
 AC_SUBST(create_shared_lib)
 
-PKG_CHECK_MODULES(EINA, [eina >= 0.0.1])
+PKG_CHECK_MODULES(EINA, [eina-0 >= 0.0.1])
 PKG_CHECK_MODULES(ENESIM, [enesim >= 0.0.1])
 PKG_CHECK_MODULES(LIBUIO, [libuio >= 0.0.1])
 

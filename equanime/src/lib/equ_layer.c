@@ -4,7 +4,7 @@
 #include "equanime_private.h"
 /**
  * A layer ...
- * 
+ *
  */
 /*============================================================================*
  *                                  Local                                     * 
@@ -15,22 +15,22 @@ Equanime_Region *_regions = NULL;
  *                                   API                                      * 
  *============================================================================*/
 /**
- * 
+ *
  */
 EAPI const Equanime_Layer_Description * equanime_layer_description_get(Equanime_Layer *l)
 {
 	return l->desc;
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void *cb_data)
 {
-	
+
 }
 /**
- * 
- * 
+ *
+ *
  */
 EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h)
 {
@@ -45,8 +45,8 @@ EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h)
 }
 
 /**
- * 
- * 
+ *
+ *
  */
 EAPI void equanime_layer_position_set(Equanime_Layer *l, int x, int y)
 {
@@ -62,8 +62,8 @@ EAPI void equanime_layer_position_set(Equanime_Layer *l, int x, int y)
 	l->y = y;
 }
 /**
- * 
- * 
+ *
+ *
  */
 EAPI void equanime_layer_geometry_get(Equanime_Layer *l, int *x, int *y, int *w, int *h)
 {
@@ -73,28 +73,30 @@ EAPI void equanime_layer_geometry_get(Equanime_Layer *l, int *x, int *y, int *w,
 	if (h) *h = l->h;
 }
 /**
- * 
+ *
  */
+#if 0
 EAPI void equanime_layer_format_set(Equanime_Layer *l, Enesim_Surface_Format fmt)
 {
-	
-	
+
+
 }
+#endif
 /**
- *  
+ *
  */
 EAPI void equanime_layer_level_get(Equanime_Layer *l, unsigned int *level)
 {
 	if (level) *level = l->level;
 }
 /**
- *  
+ *
  */
 EAPI void equanime_layer_level_set(Equanime_Layer *l, unsigned int level)
 {
 	CHECK_FLAG(l, EQUANIME_LAYER_LEVEL)
 	/* check if the layer with level == level is active or visible */
-	/* if so hide it */ 
+	/* if so hide it */
 	/* call the function */
 	/* update the value */
 	l->level = level;
@@ -102,21 +104,21 @@ EAPI void equanime_layer_level_set(Equanime_Layer *l, unsigned int level)
 	 *  update that with the current */
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_level_up(Equanime_Layer *l)
 {
 	/* call level set with l->level + 1 */
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_level_down(Equanime_Layer *l)
 {
 	/* call level set with l->level - 1 */
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_hide(Equanime_Layer *l)
 {
@@ -126,7 +128,7 @@ EAPI void equanime_layer_hide(Equanime_Layer *l)
 			l->hidden = 1;
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_show(Equanime_Layer *l)
 {
@@ -136,7 +138,7 @@ EAPI void equanime_layer_show(Equanime_Layer *l)
 		l->hidden = 0;
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_visibility_get(Equanime_Layer *l, unsigned char *hidden)
 {
@@ -144,7 +146,7 @@ EAPI void equanime_layer_visibility_get(Equanime_Layer *l, unsigned char *hidden
 }
 
 /**
- * 
+ *
  */
 EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l)
 {
@@ -159,12 +161,12 @@ EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l)
 EAPI const Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l)
 {
 	Equanime_Surface *s;
-	
+#if 0
 	if (!l->surface)
 	{
 		Enesim_Surface *es;
 		Enesim_Surface_Data sdata;
-		
+
 		s = equanime_surface_new();
 		l->surface = s;
 		/* switch for every format */
@@ -181,7 +183,6 @@ EAPI const Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l)
 			sdata.rgb565.plane0 = l->fncs->ptr_get(l);
 			sdata.rgb565.plane1 = malloc(sizeof(*sdata.rgb565.plane1) * l->w * l->h);
 			break;
-#if 0
 		case ENESIM_SURFACE_RGB888:
 			sdata.rgb888.plane0 = l->fncs->ptr_get(l);
 			sdata.rgb888.plane1 = malloc(sizeof(*sdata.rgb8888.plane1) * l->w * l->h);
@@ -189,23 +190,23 @@ EAPI const Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l)
 		case ENESIM_SURFACE_A8:
 			sdata.a8.plane0 = l->fncs->ptr_get(l);
 			break;
-#endif
 		}
 		es = enesim_surface_new(l->format, l->w, l->h, &sdata);
 	}
 	l->surface_ref++;
-	
+#endif
+
 	return s;
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_surface_release(Equanime_Layer *l)
 {
 	if (l->surface_ref)
 		l->surface_ref--;
 }
-	
+
 /**
  *
  */
@@ -213,13 +214,13 @@ EAPI int equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_
 {
 	Equanime_Layer *l;
 	Equanime_Controller *c;
-	
+
 	c = equanime_controller_name_get_by(ld->cname);
 	if (!c)
 	{
 		return 0;
 	}
-	
+
 	l = malloc(sizeof(Equanime_Layer));
 	l->desc = ld;
 	l->fncs = lf;
@@ -232,23 +233,23 @@ EAPI int equanime_layer_register(Equanime_Layer_Description *ld, Equanime_Layer_
 		return 0;
 	}
 	equanime_controller_layer_register(c, l);
-	
+
 	return 1;
 }
 /**
- * 
+ *
  */
 EAPI void equanime_layer_unregister(Equanime_Layer_Description *ld)
 {
 	Equanime_Layer *l;
-	
+
 	/* TODO remove the layer from the controller */
 	//l = equanime_controller_layer_unregister(ld->cname);
 	//free(l);
 }
 
 /**
- * 
+ *
  */
 EAPI void equanime_layer_data_set(Equanime_Layer *l, void *data)
 {
@@ -256,7 +257,7 @@ EAPI void equanime_layer_data_set(Equanime_Layer *l, void *data)
 }
 
 /**
- * 
+ *
  */
 EAPI void * equanime_layer_data_get(Equanime_Layer *l)
 {
@@ -264,5 +265,5 @@ EAPI void * equanime_layer_data_get(Equanime_Layer *l)
 }
 
 /*============================================================================*
- *                                 Global                                     * 
+ *                                 Global                                     *
  *============================================================================*/

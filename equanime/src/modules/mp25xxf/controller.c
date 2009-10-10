@@ -11,10 +11,10 @@
  * The size of the layers is determined by the display controller configuration
  * we should map/unmap the memory of each layer if the size changes, maybe
  * we need a driver that allcoates/deallocates dma memory regions in kernel?
- * 
+ *
  */
 /*============================================================================*
- *                                  Local                                     * 
+ *                                  Local                                     *
  *============================================================================*/
 #define DRIVER_NAME "mp25xxf_mlc"
 
@@ -51,12 +51,12 @@ struct _Controller
 
 
 /*============================================================================*
- *                               Controller                                   * 
+ *                               Controller                                   *
  *============================================================================*/
 static int controller_probe(Equanime_Controller *ec)
 {
 	Controller *c;
-		
+
 	c = malloc(sizeof(Controller));
 	/* check if the driver exists */
 	c->device = equanime_hal_uio_open(DRIVER_NAME);
@@ -68,14 +68,14 @@ static int controller_probe(Equanime_Controller *ec)
 	/* map the registers */
 	c->regs = equanime_hal_uio_map(c->device, 0);
 	equanime_controller_data_set(ec, c);
-	
+
 	return 1;
 }
 
 static void controller_remove(Equanime_Controller *ec)
 {
 	Controller *c;
-			
+
 	/* unregister the controller */
 	c = equanime_controller_data_get(ec);
 	/* close the device */
@@ -83,7 +83,7 @@ static void controller_remove(Equanime_Controller *ec)
 	free(c);
 }
 
-static Equanime_Controller_Description mp25xxf_description = 
+static Equanime_Controller_Description mp25xxf_description =
 {
 	.name = "MagicEyes MP25XXF",
 };
@@ -91,27 +91,27 @@ static Equanime_Controller_Description mp25xxf_description =
 static Equanime_Controller_Functions mp25xxf_functions =
 {
 	.probe = &controller_probe,
-	.remove = &controller_remove,		
+	.remove = &controller_remove,
 };
 
 /*============================================================================*
- *                                  Layer                                     * 
+ *                                  Layer                                     *
  *============================================================================*/
 static int layer_probe(Equanime_Layer *el)
 {
 	Layer *l;
 	Controller *c;
 	const Equanime_Layer_Description *ld;
-	
+
 	c = equanime_controller_data_get(equanime_layer_controller_get(el));
-	
+
 	l = malloc(sizeof(Layer));
 	l->addr = NULL;
 	/* check the name and match it to the id */
 	ld = equanime_layer_description_get(el);
 	if (!strcmp(ld->name, "RGB"))
 	{
-		
+
 		l->id = MP25XXF_RGB;
 		/* map the memory */
 		l->addr = equanime_hal_uio_map(c->device, 1);
@@ -138,7 +138,7 @@ static int layer_probe(Equanime_Layer *el)
 static void layer_remove(Equanime_Layer *el)
 {
 	Layer *l;
-	
+
 	l = equanime_layer_data_get(el);
 	l->c->layers[l->id] = NULL;
 	free(l);
@@ -147,7 +147,7 @@ static void layer_remove(Equanime_Layer *el)
 static void * layer_ptr_get(Equanime_Layer *el)
 {
 	Layer *l;
-			
+
 	l = equanime_layer_data_get(el);
 	return l->addr;
 }
@@ -155,7 +155,7 @@ static void * layer_ptr_get(Equanime_Layer *el)
 static int layer_visibility_set(Equanime_Layer *el, int show)
 {
 	Layer *l;
-	
+
 	l = equanime_layer_data_get(el);
 	/* TODO enable/disable all regions? */
 	return 1;
@@ -189,7 +189,7 @@ static Equanime_Layer_Functions mp25xxf_layer_functions =
 	.ptr_get = &layer_ptr_get,
 };
 /*============================================================================*
- *                                 Global                                     * 
+ *                                 Global                                     *
  *============================================================================*/
 int module_init(void)
 {

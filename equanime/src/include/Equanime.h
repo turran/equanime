@@ -4,25 +4,26 @@
 /**
  * @mainpage Equanime
  * @section intro Introduction
- * Equanime aims to be a simple hardware based graphics library for embedded 
+ * Equanime aims to be a simple hardware based media library for embedded
  * devices.
- * It might be very similar to what DirectFB is, but without many policies implemented
- * inside. For example equanime won't have any concept of window manager or surface
- * allocator, not even input devices; just a graphics abstraction layer. This was
- * what I expected from DirectFB years ago when it first started, but then it
- * followed the same X11 errors: monolithic (which are now "solved" on Xorg).
- * 
+ *
+ * Host
+ * +-----> Controller
+ *         +-----> Layer
+ *                 +-----> Region
+ * +-----> Component
+ *
  * Drivers:
- * - mp25xxf: MagicEyes (www.mesdigital.com) based SoC. Note that you *need* 
+ * - mp25xxf: MagicEyes (www.mesdigital.com) based SoC. Note that you *need*
  * the code.google.com/p/gp2x-linux26 kernel :)
  * - dm320: Texas Instruments DM320 based SoC.
  * - dummy: UIO dummy driver.
- * 
+ *
  * @file
  * @brief Equanime API
  * @defgroup Equanime_Group API
  * @{
- * 
+ *
  * @todo
  * - Support for outputs and inputs. The controller will have one output
  * in case it can only display the layer information on one crt/tv/panel/whatever
@@ -32,12 +33,42 @@
  * - Define alpha blending between layers
  * - Define the concept of regions, layers with no regions in hw means one region
  *   in sw with the size and properties of the layer but can't change anything?
+ * - Support for differnt hw blocks: Colorspace converter, Resizer, Rotator, etc
  */
 
 typedef struct _Equanime_Region Equanime_Region; /**< Opaque handler */
 typedef struct _Equanime_Region_Description Equanime_Region_Description; /**< Opaque handler */
 typedef struct _Equanime_Output Equanime_Output; /**< Opaque handler */
 typedef struct _Equanime_Input Equanime_Input; /**< Opaque handler */
+
+typedef struct _Equ_Component Equ_Component;
+typedef struct _Equ_Rotator Equ_Rotator;
+typedef struct _Equ_Scaler Equ_Scaler;
+typedef struct _Equ_Csc Equ_Csc;
+
+
+typedef enum _Equ_Format
+{
+	EQU_FORMATS,
+} Equ_Format;
+
+typedef enum _Equ_Angle
+{
+	EQU_ANGLE_0,
+	EQU_ANGLE_90,
+	EQU_ANGLE_180,
+	EQU_ANGLE_270,
+	EQU_ANGLES,
+} Equ_Angle;
+
+typedef enum _Equ_Component_Type
+{
+	EQU_COMPONENT_SCALER,
+	EQU_COMPONENT_ROTATOR,
+	EQU_COMPONENT_CSC,
+	EQU_COMPONENT_TYPES,
+} Equ_Component_Type;
+
 
 /**
  * TODO define possible layer options, like:
@@ -52,7 +83,7 @@ typedef enum
 	EQUANIME_LAYER_BLEND		= (1 << 5),
 } Equanime_Layer_Flags;
 /**
- * 
+ *
  */
 typedef enum
 {
@@ -64,7 +95,7 @@ typedef enum
 	EQUANIME_REGION_BLEND		= (1 << 5),
 } Equanime_Region_Flags;
 /**
- * 
+ *
  */
 typedef enum
 {
@@ -75,26 +106,26 @@ typedef enum
 
 
 /**
- * 
+ *
  */
 struct _Equanime_Region_Description
 {
 	const char *cname; /** Controller name */
 	const char *name; /** Layer name */
-	int flags; /** Layer flags */ 
+	int flags; /** Layer flags */
 };
 /**
- * 
+ *
  */
 struct _Equanime_Layer_Description
 {
 	const char *cname; /** Controller name */
 	const char *name; /** Layer name */
-	int flags; /** Layer flags */ 
+	int flags; /** Layer flags */
 	const int *formats; /** Supported pixel formats */
 };
 /**
- * 
+ *
  */
 struct _Equanime_Controller_Description
 {
@@ -109,7 +140,7 @@ typedef int (*Equanime_Cb)(void *data, void *user_data); /**< */
 EAPI void equanime_init(void);
 EAPI void equanime_shutdown(void);
 /**
- * @} 
+ * @}
  * @defgroup Equanime_Controllers_Group Controllers
  * @{
  */
@@ -128,7 +159,7 @@ EAPI const Equanime_Controller_Description * equanime_controller_description_get
  */
 
 /**
- * 
+ *
  */
 typedef enum
 {
@@ -155,7 +186,7 @@ EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void *cb_data)
 EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h);
 EAPI void equanime_layer_position_set(Equanime_Layer *l, int x, int y);
 EAPI void equanime_layer_geometry_get(Equanime_Layer *l, int *x, int *y, int *w, int *h);
-EAPI void equanime_layer_format_set(Equanime_Layer *l, Enesim_Surface_Format sfmt);
+//EAPI void equanime_layer_format_set(Equanime_Layer *l, Enesim_Surface_Format sfmt);
 EAPI void equanime_layer_level_get(Equanime_Layer *l, unsigned int *level);
 EAPI void equanime_layer_level_set(Equanime_Layer *l, unsigned int level);
 EAPI void equanime_layer_level_up(Equanime_Layer *l);
