@@ -5,4 +5,5 @@ SUBDIRS = \
 mp25xxf \
 mp2520f \
 mp2530f \
-dm320
+dm320 \
+dm6446

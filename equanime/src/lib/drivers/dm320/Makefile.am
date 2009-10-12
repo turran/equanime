@@ -6,10 +6,9 @@ AM_CPPFLAGS = \
 -I. \
 @EQUANIME_CFLAGS@
 
-noinst_LTLIBRARIES = libequanime_mp2530f.la
+noinst_LTLIBRARIES = libequanime_dm320.la
 
-libequanime_mp2530f_la_SOURCES = \
-mp2530f_host.c \
-mp2530f_rotator.c
+libequanime_dm320_la_SOURCES = \
+controller.c
 
-libequanime_mp2530f_la_LIBADD =
+libequanime_dm320_la_LIBADD =
