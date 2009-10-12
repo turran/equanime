@@ -31,15 +31,15 @@ typedef struct _Equ_Component_Data
 
 typedef struct _Equ_Component_Backend
 {
-	Equ_Component_Data data[EQU_COMPONENT_TYPES];
-	/* TODO add the setup */
-	/* TODO add the run */
+	Equ_Component_Data *data[EQU_COMPONENT_TYPES];
+	Eina_Bool (*setup)(Equ_Component *c);
+	void (*run)(Equ_Component *c);
 } Equ_Component_Backend;
 
 
 
 /**
- * 
+ *
  */
 struct _Equanime_Layer
 {

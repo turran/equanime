@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT(equanime, 0.0.1, enlightenment-devel@lists.sourceforge.net)
+AC_INIT(equanime, 0.0.2, enlightenment-devel@lists.sourceforge.net)
 AC_PREREQ(2.52)
 AC_CONFIG_SRCDIR(configure.ac)
 AC_CANONICAL_BUILD
@@ -54,10 +54,14 @@ Makefile
 equanime.pc
 src/Makefile
 src/modules/Makefile
-src/modules/mp25xxf/Makefile
-src/modules/dm320/Makefile
+src/modules/neuros_osd2/Makefile
 src/modules/dummy/Makefile
 src/lib/Makefile
+src/lib/drivers/Makefile
+src/lib/drivers/mp25xxf/Makefile
+src/lib/drivers/mp2520f/Makefile
+src/lib/drivers/mp2530f/Makefile
+src/lib/drivers/dm320/Makefile
 src/lib/hal/Makefile
 src/bin/Makefile
 src/include/Makefile
@@ -77,6 +81,9 @@ echo "------------------------------------------------------------------------"
 echo
 echo
 echo "Configuration Options Summary:"
+echo
+echo "Drivers:"
+echo
 echo
 echo "Installation Path.........: $prefix"
 echo

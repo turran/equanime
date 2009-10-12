@@ -1,6 +1,6 @@
 MAINTAINERCLEANFILES = Makefile.in
 
-SUBDIRS = hal
+SUBDIRS = drivers hal
 
 AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \

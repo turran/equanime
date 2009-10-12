@@ -81,6 +81,7 @@ typedef enum
 	EQUANIME_LAYER_LEVEL		= (1 << 3),
 	EQUANIME_LAYER_COLORKEY		= (1 << 4),
 	EQUANIME_LAYER_BLEND		= (1 << 5),
+	EQUANIME_LAYER_3D		= (1 << 6),
 } Equanime_Layer_Flags;
 /**
  *
