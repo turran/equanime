@@ -9,6 +9,7 @@ Eina_Bool module_init(void)
 	Equanime_Hal_Device *hd;
 	Equanime_Hal_Device *hdc;
 
+	printf("Initializing Neuros OSD2 Board\n");
 	/* get the host and setup the memory pool */
 	hd = equanime_hal_uio_open("equanime-host");
 	if (!hd)

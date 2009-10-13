@@ -5,7 +5,6 @@
 #include <stdio.h>
 
 #include "Eina.h"
-#include "Enesim.h"
 
 /**
  * @mainpage Equanime

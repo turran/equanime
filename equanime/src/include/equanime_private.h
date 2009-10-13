@@ -102,7 +102,6 @@ struct _Equ_Layer
 	int h;
 	int level;
 	unsigned char hidden;
-	//Enesim_Surface_Format format;
 	void *data;
 	void *ptr; /* TODO remove this? */
 	//Equ_Surface *surface;
@@ -157,7 +156,6 @@ struct _Equ_Input
  */
 struct _Equ_Surface
 {
-	Enesim_Surface *es;
 	Equ_Surface_Type type;
 };
 

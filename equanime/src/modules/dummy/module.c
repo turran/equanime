@@ -1,5 +1,3 @@
-#include "Eina.h"
-#include "Enesim.h"
 #include "Equanime.h"
 
 #if 0

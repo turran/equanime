@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#include "Eina.h"
-#include "Enesim.h"
 #include "Equanime.h"
 
 const char *layer_flags[] = {
