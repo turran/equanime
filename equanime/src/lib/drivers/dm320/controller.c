@@ -1,9 +1,7 @@
 #include <stdlib.h>
 
-#include "Eina.h"
-#include "Enesim.h"
 #include "Equanime.h"
-#include "Equanime_Module.h"
+#include "equanime_private.h"
 
 #include "dm320_regs.h"
 
@@ -16,6 +14,7 @@
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
+#if 0
 #define CONTROLLER_NAME "Texas Instruments DM320"
 
 #define DRIVER_NAME "dm320_osd"
@@ -47,13 +46,12 @@ struct _Layer
  */
 struct _Controller
 {
-	Equanime_Hal_Device *device;
+	Equ_Hal_Device *device;
 	Layer *layers[DM320_LAYERS];
 	void *regs;
 };
 
 /* old code */
-#if 0
 static void
 dm320_fb_plane_enable(int plane, int enable)
 {
@@ -403,45 +401,44 @@ dm320_fb_plane_size_set(int plane, int width, int height)
 	}
 	return 1;
 }
-#endif
 
 /*============================================================================*
  *                               Controller                                   * 
  *============================================================================*/
-static int controller_probe(Equanime_Controller *ec)
+static int controller_probe(Equ_Controller *ec)
 {
 	Controller *c;
 		
 	c = malloc(sizeof(Controller));
 	/* check if the driver exists */
-	c->device = equanime_hal_uio_open(DRIVER_NAME);
+	c->device = equ_hal_uio_open(DRIVER_NAME);
 	if (!c->device)
 	{
 		free(c);
 		return 0;
 	}
-	equanime_controller_data_set(ec, c);
+	equ_controller_data_set(ec, c);
 	
 	return 1;
 }
 
-static void controller_remove(Equanime_Controller *ec)
+static void controller_remove(Equ_Controller *ec)
 {
 	Controller *c;
 			
 	/* unregister the controller */
-	c = equanime_controller_data_get(ec);
+	c = equ_controller_data_get(ec);
 	/* close the device */
-	equanime_hal_uio_close(c->device);
+	equ_hal_uio_close(c->device);
 	free(c);
 }
 
-static Equanime_Controller_Description dm320_description = 
+static Equ_Controller_Description dm320_description = 
 {
 	.name = CONTROLLER_NAME,
 };
 
-static Equanime_Controller_Functions dm320_functions =
+static Equ_Controller_Functions dm320_functions =
 {
 	.probe = &controller_probe,
 	.remove = &controller_remove,		
@@ -449,17 +446,17 @@ static Equanime_Controller_Functions dm320_functions =
 /*============================================================================*
  *                                  Layer                                     * 
  *============================================================================*/
-static int layer_probe(Equanime_Layer *el)
+static int layer_probe(Equ_Layer *el)
 {
 	Layer *l;
 	Controller *c;
-	Equanime_Layer_Description *eld;
+	Equ_Layer_Description *eld;
 	
-	c = equanime_controller_data_get(equanime_layer_controller_get(el));
+	c = equ_controller_data_get(equ_layer_controller_get(el));
 	
 	l = malloc(sizeof(Layer));
 	/* check the name and match it to the id */
-	eld = equanime_layer_description_get(el);
+	eld = equ_layer_description_get(el);
 	if (!strcmp(eld->name, "VIDEO0"))
 		l->id = DM320_VIDEO0;
 	else if (!strcmp(eld->name, "VIDEO1"))
@@ -474,16 +471,16 @@ static int layer_probe(Equanime_Layer *el)
 		free(l);
 		return 0;
 	}
-	equanime_layer_data_set(el, l);
+	equ_layer_data_set(el, l);
 
 	return 1;
 }
 
-static void layer_remove(Equanime_Layer *el)
+static void layer_remove(Equ_Layer *el)
 {
 	Layer *l;
 	
-	l = equanime_layer_data_get(el);
+	l = equ_layer_data_get(el);
 	l->c->layers[l->id] = NULL;
 	free(l);
 }
@@ -492,11 +489,11 @@ static void layer_remove(Equanime_Layer *el)
  * width pixels (max 4096 = 2^12)
  * height lines (max 2048 = 2^11)
  */
-static void layer_size_set(Equanime_Layer *el)
+static void layer_size_set(Equ_Layer *el)
 {
 	Layer *l;
 		
-	l = equanime_layer_data_get(el);
+	l = equ_layer_data_get(el);
 	switch (l->id)
 	{
 		case DM320_VIDEO0:
@@ -521,11 +518,11 @@ static void layer_size_set(Equanime_Layer *el)
 	}
 }
 
-static void layer_position_set(Equanime_Layer *el)
+static void layer_position_set(Equ_Layer *el)
 {
 	Layer *l;
 	
-	l = equanime_layer_data_get(el);
+	l = equ_layer_data_get(el);
 	switch (l->id)
 	{
 		case DM320_VIDEO0:
@@ -550,52 +547,52 @@ static void layer_position_set(Equanime_Layer *el)
 	}
 }
 
-static void layer_format_set(Equanime_Layer *l, int f)
+static void layer_format_set(Equ_Layer *l, int f)
 {
 	
 }
 
-static Equanime_Layer_Description dm320_video0_description = 
+static Equ_Layer_Description dm320_video0_description = 
 {
 	.cname = CONTROLLER_NAME,
 	.name = "VIDEO0",
-	.flags = EQUANIME_LAYER_VISIBILITY |
-		EQUANIME_LAYER_POSITION | 
-		EQUANIME_LAYER_SIZE |
-		EQUANIME_LAYER_LEVEL,
+	.flags = EQU_LAYER_VISIBILITY |
+		EQU_LAYER_POSITION | 
+		EQU_LAYER_SIZE |
+		EQU_LAYER_LEVEL,
 };
 
-static Equanime_Layer_Description dm320_video1_description = 
+static Equ_Layer_Description dm320_video1_description = 
 {
 	.cname = CONTROLLER_NAME,
 	.name = "VIDEO1",
-	.flags = EQUANIME_LAYER_VISIBILITY |
-		EQUANIME_LAYER_POSITION | 
-		EQUANIME_LAYER_SIZE |
-		EQUANIME_LAYER_LEVEL,
+	.flags = EQU_LAYER_VISIBILITY |
+		EQU_LAYER_POSITION | 
+		EQU_LAYER_SIZE |
+		EQU_LAYER_LEVEL,
 };
 
-static Equanime_Layer_Description dm320_rgb0_description = 
+static Equ_Layer_Description dm320_rgb0_description = 
 {
 	.cname = CONTROLLER_NAME,
 	.name = "RGB0",
-	.flags = EQUANIME_LAYER_VISIBILITY |
-		EQUANIME_LAYER_POSITION | 
-		EQUANIME_LAYER_SIZE |
-		EQUANIME_LAYER_LEVEL,
+	.flags = EQU_LAYER_VISIBILITY |
+		EQU_LAYER_POSITION | 
+		EQU_LAYER_SIZE |
+		EQU_LAYER_LEVEL,
 };
 
-static Equanime_Layer_Description dm320_rgb1_description = 
+static Equ_Layer_Description dm320_rgb1_description = 
 {
 	.cname = CONTROLLER_NAME,
 	.name = "RGB1",
-	.flags = EQUANIME_LAYER_VISIBILITY |
-		EQUANIME_LAYER_POSITION | 
-		EQUANIME_LAYER_SIZE |
-		EQUANIME_LAYER_LEVEL,
+	.flags = EQU_LAYER_VISIBILITY |
+		EQU_LAYER_POSITION | 
+		EQU_LAYER_SIZE |
+		EQU_LAYER_LEVEL,
 };
 
-static Equanime_Layer_Functions dm320_layer_functions =
+static Equ_Layer_Functions dm320_layer_functions =
 {
 	.probe = &layer_probe,
 	.remove = &layer_remove,		
@@ -607,36 +604,38 @@ static Equanime_Layer_Functions dm320_layer_functions =
 int module_init(void)
 {
 	/* register the controller */
-	if (!equanime_controller_register(&dm320_description, &dm320_functions))
+	if (!equ_controller_register(&dm320_description, &dm320_functions))
 		goto err_controller;
 	/* register the layers */
-	if (!equanime_layer_register(&dm320_video0_description, &dm320_layer_functions))
+	if (!equ_layer_register(&dm320_video0_description, &dm320_layer_functions))
 		goto err_layer0;
-	if (!equanime_layer_register(&dm320_video1_description, &dm320_layer_functions))
+	if (!equ_layer_register(&dm320_video1_description, &dm320_layer_functions))
 		goto err_layer1;
-	if (!equanime_layer_register(&dm320_rgb0_description, &dm320_layer_functions))
+	if (!equ_layer_register(&dm320_rgb0_description, &dm320_layer_functions))
 		goto err_layer2;
-	if (!equanime_layer_register(&dm320_rgb1_description, &dm320_layer_functions))
+	if (!equ_layer_register(&dm320_rgb1_description, &dm320_layer_functions))
 		goto err_layer3;
 	return 1;
 	
 err_layer3:
-	equanime_layer_unregister(&dm320_rgb0_description);
+	equ_layer_unregister(&dm320_rgb0_description);
 err_layer2:
-	equanime_layer_unregister(&dm320_video1_description);
+	equ_layer_unregister(&dm320_video1_description);
 err_layer1:
-	equanime_layer_unregister(&dm320_video0_description);
+	equ_layer_unregister(&dm320_video0_description);
 err_layer0:
-	equanime_controller_unregister(&dm320_description);
+	equ_controller_unregister(&dm320_description);
 err_controller:
 	return 0;
 }
 
 void module_exit(void)
 {
-	equanime_layer_unregister(&dm320_video0_description);
-	equanime_layer_unregister(&dm320_video1_description);
-	equanime_layer_unregister(&dm320_rgb0_description);
-	equanime_layer_unregister(&dm320_rgb1_description);
-	equanime_controller_unregister(&dm320_description);
+	equ_layer_unregister(&dm320_video0_description);
+	equ_layer_unregister(&dm320_video1_description);
+	equ_layer_unregister(&dm320_rgb0_description);
+	equ_layer_unregister(&dm320_rgb1_description);
+	equ_controller_unregister(&dm320_description);
 }
+#endif
+

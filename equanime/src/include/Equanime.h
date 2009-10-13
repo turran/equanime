@@ -1,6 +1,12 @@
 #ifndef EQUANIME_H_
 #define EQUANIME_H_
 
+#include <stdlib.h>
+#include <stdio.h>
+
+#include "Eina.h"
+#include "Enesim.h"
+
 /**
  * @mainpage Equanime
  * @section intro Introduction
@@ -36,21 +42,19 @@
  * - Support for differnt hw blocks: Colorspace converter, Resizer, Rotator, etc
  */
 
-typedef struct _Equanime_Region Equanime_Region; /**< Opaque handler */
-typedef struct _Equanime_Region_Description Equanime_Region_Description; /**< Opaque handler */
-typedef struct _Equanime_Output Equanime_Output; /**< Opaque handler */
-typedef struct _Equanime_Input Equanime_Input; /**< Opaque handler */
+#include "equ_core.h"
+#include "equ_surface.h"
+#include "equ_controller.h"
+#include "equ_layer.h"
+#include "equ_region.h"
+
+typedef struct _Equ_Output Equ_Output; /**< Opaque handler */
+typedef struct _Equ_Input Equ_Input; /**< Opaque handler */
 
 typedef struct _Equ_Component Equ_Component;
 typedef struct _Equ_Rotator Equ_Rotator;
 typedef struct _Equ_Scaler Equ_Scaler;
 typedef struct _Equ_Csc Equ_Csc;
-
-
-typedef enum _Equ_Format
-{
-	EQU_FORMATS,
-} Equ_Format;
 
 typedef enum _Equ_Angle
 {
@@ -71,132 +75,16 @@ typedef enum _Equ_Component_Type
 
 
 /**
- * TODO define possible layer options, like:
- */
-typedef enum
-{
-	EQUANIME_LAYER_VISIBILITY 	= (1 << 0),
-	EQUANIME_LAYER_POSITION 	= (1 << 1),
-	EQUANIME_LAYER_SIZE	 	= (1 << 2),
-	EQUANIME_LAYER_LEVEL		= (1 << 3),
-	EQUANIME_LAYER_COLORKEY		= (1 << 4),
-	EQUANIME_LAYER_BLEND		= (1 << 5),
-	EQUANIME_LAYER_3D		= (1 << 6),
-} Equanime_Layer_Flags;
-/**
  *
  */
 typedef enum
 {
-	EQUANIME_REGION_VISIBILITY 	= (1 << 0),
-	EQUANIME_REGION_POSITION 	= (1 << 1),
-	EQUANIME_REGION_SIZE	 	= (1 << 2),
-	EQUANIME_REGION_LEVEL		= (1 << 3),
-	EQUANIME_REGION_COLORKEY	= (1 << 4),
-	EQUANIME_REGION_BLEND		= (1 << 5),
-} Equanime_Region_Flags;
-/**
- *
- */
-typedef enum
-{
-	EQUANIME_OUTPUT_LCD,
-	EQUANIME_OUTPUT_TV,
-	EQUANIME_OUTPUT_TYPES,
-} Equanime_Output_Type;
+	EQU_OUTPUT_LCD,
+	EQU_OUTPUT_TV,
+	EQU_OUTPUT_TYPES,
+} Equ_Output_Type;
 
 
-/**
- *
- */
-struct _Equanime_Region_Description
-{
-	const char *cname; /** Controller name */
-	const char *name; /** Layer name */
-	int flags; /** Layer flags */
-};
-/**
- *
- */
-struct _Equanime_Layer_Description
-{
-	const char *cname; /** Controller name */
-	const char *name; /** Layer name */
-	int flags; /** Layer flags */
-	const int *formats; /** Supported pixel formats */
-};
-/**
- *
- */
-struct _Equanime_Controller_Description
-{
-	const char *name; /** Controller name */
-};
-
-typedef int (*Equanime_Cb)(void *data, void *user_data); /**< */
-/**
- * @defgroup Equanime_Core_Group Core
- * @{
- */
-EAPI void equanime_init(void);
-EAPI void equanime_shutdown(void);
-/**
- * @}
- * @defgroup Equanime_Controllers_Group Controllers
- * @{
- */
-
-typedef struct _Equanime_Controller Equanime_Controller; /**< Opaque handler */
-typedef struct _Equanime_Controller_Description Equanime_Controller_Description; /**< Opaque handler */
-
-EAPI void equanime_controllers_get(Equanime_Cb cb, void *cb_data);
-EAPI void equanime_controller_layers_get(Equanime_Controller *c, Equanime_Cb cb, void *cb_data);
-EAPI const Equanime_Controller_Description * equanime_controller_description_get(Equanime_Controller *c);
-
-/**
- * @}
- * @defgroup Equanime_Surface_Group Surfaces
- * @{
- */
-
-/**
- *
- */
-typedef enum
-{
-	EQUANIME_SURFACE_ONSCREEN, /**< Visible graphics memory */
-	EQUANIME_SURFACE_OFFSCREEN, /**< Non visible graphics memory */
-	EQUANIME_SURFACE_VIRTUAL, /**< Virtual space */
-} Equanime_Surface_Type;
-
-typedef struct _Equanime_Surface Equanime_Surface; /**< Opaque handler */
-EAPI const Enesim_Surface * equanime_surface_surface_get(const Equanime_Surface *);
-EAPI Equanime_Surface_Type equanime_surface_type_get(const Equanime_Surface *);
-
-/**
- * @}
- * @defgroup Equanime_Layer_Group Layers
- * @{
- */
-
-typedef struct _Equanime_Layer Equanime_Layer; /**< Opaque handler */
-typedef struct _Equanime_Layer_Description Equanime_Layer_Description; /**< Opaque handler */
-
-EAPI const Equanime_Layer_Description * equanime_layer_description_get(Equanime_Layer *l);
-EAPI void equanime_layer_regions_get(Equanime_Layer *l, void *cb, void *cb_data);
-EAPI void equanime_layer_size_set(Equanime_Layer *l, int w, int h);
-EAPI void equanime_layer_position_set(Equanime_Layer *l, int x, int y);
-EAPI void equanime_layer_geometry_get(Equanime_Layer *l, int *x, int *y, int *w, int *h);
-//EAPI void equanime_layer_format_set(Equanime_Layer *l, Enesim_Surface_Format sfmt);
-EAPI void equanime_layer_level_get(Equanime_Layer *l, unsigned int *level);
-EAPI void equanime_layer_level_set(Equanime_Layer *l, unsigned int level);
-EAPI void equanime_layer_level_up(Equanime_Layer *l);
-EAPI void equanime_layer_level_down(Equanime_Layer *l);
-EAPI void equanime_layer_hide(Equanime_Layer *l);
-EAPI void equanime_layer_show(Equanime_Layer *l);
-EAPI void equanime_layer_visibility_get(Equanime_Layer *l, unsigned char *hidden);
-EAPI Equanime_Controller * equanime_layer_controller_get(Equanime_Layer *l);
-EAPI const Equanime_Surface * equanime_layer_surface_get(Equanime_Layer *l);
 /**
  * @}
  * @}

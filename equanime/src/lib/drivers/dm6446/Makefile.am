@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 
 noinst_LTLIBRARIES = libequanime_dm6446.la
 
-libequanime_dm6446_la_SOURCES =
+libequanime_dm6446_la_SOURCES = \
+dm6446_controller.c
 
 libequanime_dm6446_la_LIBADD =

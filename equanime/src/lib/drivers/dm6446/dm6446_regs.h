@@ -6,6 +6,7 @@
 #define	OSD_REG_BASE				IO_ADDRESS(0x01c72600)
 #define OSD_REG_SIZE				0x00000180
 
+/* offset 0x2400 */
 struct dm6446_venc_regs
 {
 	uint32_t vmod;
@@ -95,8 +96,9 @@ struct dm6446_venc_regs
 	uint32_t hvldcl0;
 	uint32_t hvldcl1;
 	uint32_t osdhad;
-}
+};
 
+/* offset 0x2600 */
 struct dm6446_osd_regs
 {
 	uint32_t mode;
@@ -165,6 +167,7 @@ struct dm6446_osd_regs
 	uint32_t ppvwin0ad;
 };
 
+/* offset 0x2780 */
 struct dm6446_vpbe_regs
 {
 	uint32_t pid;
@@ -174,6 +177,16 @@ struct dm6446_vpbe_regs
 struct dm6446_vpss_regs
 {
 	uint32_t clkctl;
-}
+};
+
+struct dm6446
+{
+	struct dm6446_venc_regs *venc;
+	struct dm6446_osd_regs *osd;
+	struct dm6446_vpbe_regs *vpbe;
+	struct dm6446_vpss_regs *vpss;
+};
+
+Eina_Bool dm6446_controller_init(struct dm6446 *dm6446);
 
 #endif

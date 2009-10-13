@@ -1,11 +1,9 @@
+#include "Equanime.h"
+#include "equanime_private.h"
+
 #include <dirent.h>
 #include <string.h>
 #include <dlfcn.h>
-
-#include "equanime_common.h"
-#include "Equanime.h"
-#include "Equanime_Module.h"
-#include "equanime_private.h"
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
@@ -18,9 +16,9 @@ typedef struct _Module
 
 enum
 {
-	EQUANIME_MODULE_CONTROLLER,
-	EQUANIME_MODULE_LAYER,
-	EQUANIME_MODULES
+	EQU_MODULE_CONTROLLER,
+	EQU_MODULE_LAYER,
+	EQU_MODULES
 };
 
 static Module *_modules = NULL;
@@ -76,24 +74,24 @@ static void _module_unload(int type)
 /*============================================================================*
  *                                 Global                                     * 
  *============================================================================*/
-void equanime_module_load_all(void)
+void equ_module_load_all(void)
 {
 	char *mpath;
 	char *path;
 	int type;
 	
 	
-	path = getenv("EQUANIME_DIR");
+	path = getenv("EQU_DIR");
 	if (!path)
 	{
-		path = strdup("/usr/local/lib/equanime");
+		path = strdup("/usr/local/lib/equ");
 	}
-	/* find the directory where equanime is libequanime.so/../equanime/ */
+	/* find the directory where equ is libequ.so/../equ/ */
 #if 0
-	Dl_info equanime_dl;
-	if (dladdr(equanime_module_load_all, &equanime_dl))
+	Dl_info equ_dl;
+	if (dladdr(equ_module_load_all, &equ_dl))
 	{
-		printf("path = %s\n", equanime_dl.dli_fname);
+		printf("path = %s\n", equ_dl.dli_fname);
 	}
 #endif
 	mpath = malloc(strlen(path) + strlen("controller") + 1);
@@ -101,17 +99,17 @@ void equanime_module_load_all(void)
 	
 	/* try to load every controller */
 	printf("%s\n", mpath);
-	type = EQUANIME_MODULE_CONTROLLER;
-	eina_module_load_all(mpath, &_module_load_all_cb, &type);
+	type = EQU_MODULE_CONTROLLER;
+	//eina_module_load_all(mpath, &_module_load_all_cb, &type);
 	/* try to load every layer */
-	//_module_load("/usr/local/lib/equanime/layer", EQUANIME_MODULE_LAYER);	
+	//_module_load("/usr/local/lib/equ/layer", EQU_MODULE_LAYER);	
 }
 
-void equanime_module_unload_all(void)
+void equ_module_unload_all(void)
 {
 	/* unload every loaded module */
 	/* first the layers */
-	_module_unload(EQUANIME_MODULE_LAYER);
+	_module_unload(EQU_MODULE_LAYER);
 	/* then the controllers */
-	_module_unload(EQUANIME_MODULE_CONTROLLER);
+	_module_unload(EQU_MODULE_CONTROLLER);
 }

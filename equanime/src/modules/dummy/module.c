@@ -1,18 +1,17 @@
 #include "Eina.h"
 #include "Enesim.h"
 #include "Equanime.h"
-#include "Equanime_Module.h"
 
+#if 0
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 #define CONTROLLER_NAME "Dummy UIO"
 #define DRIVER_NAME "uio_dummy" // useful for testing the uio interface
-
 /*============================================================================*
  *                               Controller                                   *
  *============================================================================*/
-static int controller_probe(Equanime_Controller *ec)
+static int controller_probe(Equ_Controller *ec)
 {
 	Equanime_Hal_Device *device;
 	/* check if the driver exists */
@@ -24,7 +23,7 @@ static int controller_probe(Equanime_Controller *ec)
 	return 1;
 }
 
-static void controller_remove(Equanime_Controller *ec)
+static void controller_remove(Equ_Controller *ec)
 {
 	Equanime_Hal_Device *device;
 
@@ -34,12 +33,12 @@ static void controller_remove(Equanime_Controller *ec)
 	equanime_hal_uio_close(device);
 }
 
-static Equanime_Controller_Description dummy_description =
+static Equ_Controller_Description dummy_description =
 {
 	.name = CONTROLLER_NAME,
 };
 
-static Equanime_Controller_Functions dummy_functions =
+static Equ_Controller_Functions dummy_functions =
 {
 	.probe = &controller_probe,
 	.remove = &controller_remove,
@@ -51,13 +50,14 @@ static Equanime_Controller_Functions dummy_functions =
 int module_init(void)
 {
 	/* register the controller */
-	if (!equanime_controller_register(&dummy_description, &dummy_functions))
+	if (!equ_controller_register(&dummy_description, &dummy_functions))
 		return 0;
 	return 1;
 }
 
 void module_exit(void)
 {
-	equanime_controller_unregister(&dummy_description);
+	equ_controller_unregister(&dummy_description);
 }
+#endif
 

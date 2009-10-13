@@ -6,10 +6,8 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 
-#include "equanime_common.h"
 #include "Equanime.h"
-#include "Equanime_Module.h"
-
+#include "equanime_private.h"
 /*============================================================================*
  *                                  Local                                     * 
  *============================================================================*/
