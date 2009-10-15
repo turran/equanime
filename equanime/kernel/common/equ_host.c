@@ -105,9 +105,7 @@ static int __init equ_init_module(void)
 		return ret;
 	ret = platform_driver_register(&equ_driver);
 	if (ret)
-	{
 		platform_device_unregister(&equ_device);
-	}
 	return ret;
 }
 

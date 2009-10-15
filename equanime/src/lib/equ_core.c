@@ -35,6 +35,8 @@ EAPI void equ_init(void)
 	if (_init) return;
 
 	_init++;
+	eina_init();
+	equ_hal_i2c_init();
 	_module_init();
 }
 /**
@@ -46,6 +48,8 @@ EAPI void equ_shutdown(void)
 	if (_init == 1)
 	{
 		_module_shutdown();
+		equ_hal_i2c_shutdown();
+		eina_shutdown();
 	}
 	_init--;
 }

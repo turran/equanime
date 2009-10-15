@@ -2,7 +2,8 @@
 #include "equanime_private.h"
 /**
  * A controller is in charge of controlling the global output, disabling and
- * enabling specific layers and change their priority.
+ * enabling specific layers and change their priority. Also setting the
+ * standard output, the timmings, etc
  *
  */
 /*============================================================================*

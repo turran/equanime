@@ -179,6 +179,12 @@ struct dm6446_vpss_regs
 	uint32_t clkctl;
 };
 
+
+/*
+ * TODO
+ * we should have an array of components (outputs, inputs)
+ * a flag to determine if the timmings are handled internally and how (VENC)
+ */
 struct dm6446
 {
 	volatile struct dm6446_venc_regs *venc;

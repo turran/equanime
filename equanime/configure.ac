@@ -61,6 +61,8 @@ src/lib/drivers/mp2520f/Makefile
 src/lib/drivers/mp2530f/Makefile
 src/lib/drivers/dm320/Makefile
 src/lib/drivers/dm6446/Makefile
+src/lib/drivers/ths8200/Makefile
+src/lib/drivers/ths7313/Makefile
 src/lib/hal/Makefile
 src/bin/Makefile
 src/include/Makefile

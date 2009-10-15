@@ -2,41 +2,55 @@
 #include "equanime_private.h"
 #include "dm6446_regs.h"
 
+/**
+ * This module adds support for the neuros osd2 device
+ * Outputs:
+ * composite (internal)
+ * component (ths8200)
+ * hdmi (sil9034)
+ * Inputs:
+ * composite
+ * component
+ *
+ * Here we should create a controller, set the functions
+ * and call the generic dm6446 when needed and the different
+ * attached components when needed
+ * Create the host ourselves too
+ */
+
 struct dm6446 dm6446;
 
 Eina_Bool module_init(void)
 {
 	Equanime_Hal_Device *hd;
-	Equanime_Hal_Device *hdc;
+	Equ_Hal_I2C *ths8200;
 	void *mem;
 
 	printf("Initializing Neuros OSD2 Board\n");
+	/* get the companion devices */
+	/* TODO ths7313 (0x2c) */
+	/* TODO ths8200 (0x20) */
+	ths8200 = equ_hal_i2c_get(0x20);
+	/* something = ths8200_init(ths8200); */
+	/* set this as one output of dm6446 */
+
 	/* get the UIO devices */
-	hd = equanime_hal_uio_open("equanime-host");
+	hd = equanime_hal_uio_open("dm6446_media");
 	if (!hd)
 		goto end;
-	mem = equanime_hal_uio_map(hd, 0);
-
-	hdc = equanime_hal_uio_open("dm6446-media");
-	if (!hdc)
-		goto host_clean;
-
 	/* TODO setup the memory */
-
+	mem = equanime_hal_uio_map(hd, 0);
 	/* initialize the dm6446 controller, layers, input, output, etc */
-	dm6446.osd = equanime_hal_uio_map(hdc, 0);
-	dm6446.venc = equanime_hal_uio_map(hdc, 1);
+	dm6446.osd = equanime_hal_uio_map(hd, 1);
+	dm6446.venc = equanime_hal_uio_map(hd, 2);
 	if (!dm6446_controller_init(&dm6446))
-		goto media_clean
+		goto media_clean;
+
 
 	return EINA_TRUE;
 
 media_clean:
-	equanime_hal_uio_unmap(hdc, 0);
-	equanime_hal_uio_unmap(hdc, 1);
-	equanime_hal_uio_close(hdc);
-host_clean:
-	equanime_hal_uio_unmap(hd, 0);
+	/* equ_hal_i2c_delete(ths8200); */
 	equanime_hal_uio_close(hd);
 end:
 	return EINA_FALSE;

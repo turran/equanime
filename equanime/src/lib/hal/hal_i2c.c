@@ -1,13 +1,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
+#include <i2c-dev.h>
 
 #include "Equanime.h"
 #include "equanime_private.h"
 /*============================================================================*
- *                                  Local                                     * 
+ *                                  Local                                     *
  *============================================================================*/
-typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 typedef struct _Equ_Hal_I2C_Adapter Equ_Hal_I2C_Adapter;
 
 struct _Equ_Hal_I2C_Adapter
@@ -31,7 +32,7 @@ void equ_hal_i2c_init(void)
 {
 	int i;
 	char filename[20];
-  
+
 	for (i = 0; i < 255; i++)
 	{
 		Equ_Hal_I2C_Adapter *a;
@@ -54,9 +55,12 @@ void equ_hal_i2c_init(void)
 /* unregister every adapter */
 void equ_hal_i2c_shutdown(void)
 {
-	/* TODO for every adapter, clean it up, close the fd, etc */
+	Equ_Hal_I2C_Adapter *a;
+	Eina_List *l;
+
+	/* for every adapter, clean it up, close the fd, etc */
+	EINA_LIST_FOREACH(_adapters, l, a)
 	{
-		Equ_Hal_I2C_Adapter *a;
 
 		close(a->fd);
 		free(a);
@@ -66,11 +70,11 @@ void equ_hal_i2c_shutdown(void)
 
 Equ_Hal_I2C * equ_hal_i2c_get(int addr)
 {
+	Equ_Hal_I2C_Adapter *a;
 	Eina_List *l;
 
-
+	EINA_LIST_FOREACH(_adapters, l, a)
 	{
-		Equ_Hal_I2C_Adapter *a;
 
 		if (!ioctl(a->fd, I2C_SLAVE, addr))
 		{
@@ -81,6 +85,7 @@ Equ_Hal_I2C * equ_hal_i2c_get(int addr)
 			d->adapter = a;
 			d->address = addr;
 
+			printf("I2C found!!!! %p\n", d);
 			return d;
 		}
 	}

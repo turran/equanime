@@ -5,6 +5,7 @@ typedef struct _Equ_Controller_Functions Equ_Controller_Functions;
 typedef struct _Equ_Layer_Functions  Equ_Layer_Functions;
 typedef struct _Equ_Region_Functions  Equ_Region_Functions;
 typedef struct _Equ_Host_Backend Equ_Host_Backend;
+typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 
 struct _Equ_Host_Backend
 {
@@ -239,5 +240,9 @@ static inline void writel(volatile void *addr, unsigned int i)
 {
 	*(volatile unsigned int *) addr = i;
 }
+
+void equ_hal_i2c_init(void);
+void equ_hal_i2c_shutdown(void);
+Equ_Hal_I2C * equ_hal_i2c_get(int addr);
 
 #endif /*EQUANIME_PRIVATE_H_*/

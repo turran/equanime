@@ -18,7 +18,7 @@ void equ_host_register(Equ_Host_Backend *hb)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Equ_Surface * equ_host_surface_get(Equ_Host *h, uint32_t w, uint32_t h,
+EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 		Equ_Format fmt)
 {
 
