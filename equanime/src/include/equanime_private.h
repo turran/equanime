@@ -4,6 +4,12 @@
 typedef struct _Equ_Controller_Functions Equ_Controller_Functions;
 typedef struct _Equ_Layer_Functions  Equ_Layer_Functions;
 typedef struct _Equ_Region_Functions  Equ_Region_Functions;
+typedef struct _Equ_Host_Backend Equ_Host_Backend;
+
+struct _Equ_Host_Backend
+{
+
+}; 
 
 /**
  * Functions every controller module should implement based on the description

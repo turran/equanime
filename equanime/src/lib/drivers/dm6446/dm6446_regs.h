@@ -181,10 +181,10 @@ struct dm6446_vpss_regs
 
 struct dm6446
 {
-	struct dm6446_venc_regs *venc;
-	struct dm6446_osd_regs *osd;
-	struct dm6446_vpbe_regs *vpbe;
-	struct dm6446_vpss_regs *vpss;
+	volatile struct dm6446_venc_regs *venc;
+	volatile struct dm6446_osd_regs *osd;
+	volatile struct dm6446_vpbe_regs *vpbe;
+	volatile struct dm6446_vpss_regs *vpss;
 };
 
 Eina_Bool dm6446_controller_init(struct dm6446 *dm6446);

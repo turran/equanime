@@ -8,34 +8,44 @@ Eina_Bool module_init(void)
 {
 	Equanime_Hal_Device *hd;
 	Equanime_Hal_Device *hdc;
+	void *mem;
 
 	printf("Initializing Neuros OSD2 Board\n");
-	/* get the host and setup the memory pool */
+	/* get the UIO devices */
 	hd = equanime_hal_uio_open("equanime-host");
 	if (!hd)
-		return EINA_FALSE;
-	/* get the controller device */
+		goto end;
+	mem = equanime_hal_uio_map(hd, 0);
+
 	hdc = equanime_hal_uio_open("dm6446-media");
 	if (!hdc)
-	{
-		equanime_hal_uio_close(hd);
-		return EINA_FALSE;
-	}
-#if 0
-	dm6446.venc = map[0];
-	dm6446.osd = map[1];
-	etc
-#endif
+		goto host_clean;
+
+	/* TODO setup the memory */
+
 	/* initialize the dm6446 controller, layers, input, output, etc */
+	dm6446.osd = equanime_hal_uio_map(hdc, 0);
+	dm6446.venc = equanime_hal_uio_map(hdc, 1);
 	if (!dm6446_controller_init(&dm6446))
-	{
-		equanime_hal_uio_close(hdc);
-		equanime_hal_uio_close(hd);
-		return EINA_FALSE;
-	}
+		goto media_clean
+
+	return EINA_TRUE;
+
+media_clean:
+	equanime_hal_uio_unmap(hdc, 0);
+	equanime_hal_uio_unmap(hdc, 1);
+	equanime_hal_uio_close(hdc);
+host_clean:
+	equanime_hal_uio_unmap(hd, 0);
+	equanime_hal_uio_close(hd);
+end:
+	return EINA_FALSE;
 }
 
 void module_shutdown(void)
 {
 
 }
+
+EINA_MODULE_INIT(module_init);
+EINA_MODULE_SHUTDOWN(module_shutdown);

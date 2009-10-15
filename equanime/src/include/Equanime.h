@@ -43,14 +43,15 @@
 
 #include "equ_core.h"
 #include "equ_surface.h"
+#include "equ_host.h" 
 #include "equ_controller.h"
 #include "equ_layer.h"
 #include "equ_region.h"
+#include "equ_component.h"
 
 typedef struct _Equ_Output Equ_Output; /**< Opaque handler */
 typedef struct _Equ_Input Equ_Input; /**< Opaque handler */
 
-typedef struct _Equ_Component Equ_Component;
 typedef struct _Equ_Rotator Equ_Rotator;
 typedef struct _Equ_Scaler Equ_Scaler;
 typedef struct _Equ_Csc Equ_Csc;
@@ -63,15 +64,6 @@ typedef enum _Equ_Angle
 	EQU_ANGLE_270,
 	EQU_ANGLES,
 } Equ_Angle;
-
-typedef enum _Equ_Component_Type
-{
-	EQU_COMPONENT_SCALER,
-	EQU_COMPONENT_ROTATOR,
-	EQU_COMPONENT_CSC,
-	EQU_COMPONENT_TYPES,
-} Equ_Component_Type;
-
 
 /**
  *

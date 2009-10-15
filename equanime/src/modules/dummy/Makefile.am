@@ -6,8 +6,7 @@ AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \
 @EQUANIME_CFLAGS@
 
-
-dummydir = $(libdir)/equanime/controller
+dummydir = $(libdir)/equanime/
 dummy_LTLIBRARIES = dummy.la
 
 dummy_la_SOURCES = \
