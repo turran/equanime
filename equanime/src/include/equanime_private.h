@@ -10,7 +10,32 @@ typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 struct _Equ_Host_Backend
 {
 
-}; 
+};
+
+struct _Equ_Input_Backend
+{
+	Eina_Bool (*timing_set)(Equ_Input *i, Equ_Timing *t);
+	Eina_Bool (*surface_set)(Equ_Input *i, Equ_Surface *s);
+};
+
+struct _Equ_Output_Backend
+{
+	Eina_Bool (*timing_set)(Equ_Output *o, Equ_Timing *t);
+};
+
+struct _Equ_Layer_Backend
+{
+	Eina_Bool (*size_set)(Equ_Layer *l, int w, int h);
+	Eina_Bool (*position_set)(Equ_Layer *l, int x, int y);
+	Eina_Bool (*visibility_set)(Equ_Layer *l, int show);
+	Eina_Bool (*surface_set)(Equ_Layer *l, Equ_Surface *s);
+	//Eina_Bool (*input_set)(Equ_Layer *l, Equ_Input *i);
+};
+
+struct _Equ_Controller_Backend
+{
+	Eina_Bool (*output_set)(Equ_Controller *c, Equ_Output *o);
+};
 
 /**
  * Functions every controller module should implement based on the description
@@ -115,7 +140,7 @@ struct _Equ_Layer
 	unsigned int surface_ref; /* number of times the surface has been get */
 };
 /**
- * 
+ *
  */
 struct _Equ_Region
 {
@@ -132,7 +157,7 @@ struct _Equ_Region
 	void *data;
 };
 /**
- * 
+ *
  */
 struct _Equ_Controller
 {
@@ -144,22 +169,22 @@ struct _Equ_Controller
 	void *data;
 };
 /**
- * 
+ *
  */
 struct _Equ_Output
 {
-	
+
 };
 /**
- * 
+ *
  */
 struct _Equ_Input
 {
-	
+
 };
 
 /**
- * 
+ *
  */
 struct _Equ_Surface
 {
