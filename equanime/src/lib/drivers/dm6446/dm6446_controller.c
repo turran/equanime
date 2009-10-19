@@ -113,12 +113,15 @@ static Eina_Bool _osd0_position_set(Equ_Layer *l, int x, int y)
 
 }
 
-static Eina_Bool _osd0_visibility_set(Equ_Layer *l, Eina_Bool show)
+static Eina_Bool _osd0_visibility_set(Equ_Layer *el, Eina_Bool show)
 {
+	Layer *l = equ_layer_data_get(el);
+	struct dm6446 *dm6446 = l->dm6446;
+
 	if (show)
-		l->osd->osdwin0md |= show;
+		dm6446->osd->osdwin0md |= show;
 	else
-		l->osd->osdwin0md &= ~show;
+		dm6446->osd->osdwin0md &= ~show;
 }
 
 static Eina_Bool _osd0_surface_set(Equ_Layer *l, Equ_Surface *s)

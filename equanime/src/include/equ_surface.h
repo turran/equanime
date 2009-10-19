@@ -12,6 +12,7 @@ typedef enum _Equ_Format
 	EQU_FORMAT_RGB888,
 	EQU_FORMAT_RGB565,
 	EQU_FORMAT_Ab31,
+	EQU_FORMAT_YUV422,
 	EQU_FORMATS,
 } Equ_Format;
 

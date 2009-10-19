@@ -24,6 +24,11 @@ Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *b, void *data)
 
 	return l;
 }
+
+void * equ_layer_data_get(Equ_Layer *l)
+{
+	return l->data;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

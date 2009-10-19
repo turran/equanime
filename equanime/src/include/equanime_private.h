@@ -172,6 +172,7 @@ void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib, vo
 
 void equ_layer_unregister(Equ_Layer *l);
 Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *lb, void *data);
+void * equ_layer_data_get(Equ_Layer *l);
 
 /* for now place hal info here */
 /* maybe place the uio stuff in another header ? */
