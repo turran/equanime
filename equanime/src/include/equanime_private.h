@@ -1,9 +1,11 @@
 #ifndef EQUANIME_PRIVATE_H_
 #define EQUANIME_PRIVATE_H_
 
-typedef struct _Equ_Controller_Functions Equ_Controller_Functions;
-typedef struct _Equ_Layer_Functions  Equ_Layer_Functions;
-typedef struct _Equ_Region_Functions  Equ_Region_Functions;
+typedef struct _Equ_Controller_Backend Equ_Controller_Backend;
+typedef struct _Equ_Layer_Backend  Equ_Layer_Backend;
+typedef struct _Equ_Output_Backend  Equ_Output_Backend;
+typedef struct _Equ_Input_Backend  Equ_Input_Backend;
+typedef struct _Equ_Region_Backend  Equ_Region_Backend;
 typedef struct _Equ_Host_Backend Equ_Host_Backend;
 typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 
@@ -23,65 +25,35 @@ struct _Equ_Output_Backend
 	Eina_Bool (*timing_set)(Equ_Output *o, Equ_Timing *t);
 };
 
-struct _Equ_Layer_Backend
-{
-	Eina_Bool (*size_set)(Equ_Layer *l, int w, int h);
-	Eina_Bool (*position_set)(Equ_Layer *l, int x, int y);
-	Eina_Bool (*visibility_set)(Equ_Layer *l, int show);
-	Eina_Bool (*surface_set)(Equ_Layer *l, Equ_Surface *s);
-	//Eina_Bool (*input_set)(Equ_Layer *l, Equ_Input *i);
-};
-
+/**
+ * Backend every controller should implement based on the description
+ * flags
+ */
 struct _Equ_Controller_Backend
 {
 	Eina_Bool (*output_set)(Equ_Controller *c, Equ_Output *o);
 };
 
 /**
- * Functions every controller module should implement based on the description
+ * Backend every layer should implement based on the description
  * flags
  */
-struct _Equ_Controller_Functions
+struct _Equ_Layer_Backend
 {
-	int (*probe)(Equ_Controller *c);
-	void (*remove)(Equ_Controller *c);
-	/* possible functions:
-	 * enable a layer
-	 * change a layer priority
-	 * if the above cases are correct then the controller should know
-	 * every layer name or something.
-	 */
+	Eina_Bool (*size_set)(Equ_Layer *l, unsigned int w, unsigned int h);
+	Eina_Bool (*position_set)(Equ_Layer *l, int x, int y);
+	Eina_Bool (*visibility_set)(Equ_Layer *l, Eina_Bool show);
+	Eina_Bool (*surface_set)(Equ_Layer *l, Equ_Surface *s);
+	//Equ_Format * (*format_get)(Equ_Layer *l, int num_formats);
+	//Eina_Bool (*input_set)(Equ_Layer *l, Equ_Input *i);
 };
+
 /**
- * Functions every layer module should implement based on the description
+ * Backend every region should implement based on the description
  * flags
  */
-struct _Equ_Layer_Functions
+struct _Equ_Region_Backend
 {
-	int (*probe)(Equ_Layer *l);
-	void (*remove)(Equ_Layer *l);
-	int (*size_set)(Equ_Layer *l, int w, int h);
-	int (*position_set)(Equ_Layer *l, int x, int y);
-	int (*visibility_set)(Equ_Layer *l, int show);
-	void *(*ptr_get)(Equ_Layer *l);
-	/* possible functions:
-	 * format_set
-	 */
-};
-/**
- * Functions every region module should implement based on the description
- * flags
- */
-struct _Equ_Region_Functions
-{
-	int (*probe)(Equ_Layer *l);
-	void (*remove)(Equ_Layer *l);
-	/* possible functions:
-	 * enable a layer
-	 * change a layer priority
-	 * if the above cases are correct then the controller should know
-	 * every layer name or something.
-	 */
 };
 
 /**
@@ -124,30 +96,26 @@ typedef struct _Equ_Component_Backend
  */
 struct _Equ_Layer
 {
-	Eina_Inlist list;
 	Equ_Controller *controller;
-	const Equ_Layer_Description *desc;
-	const Equ_Layer_Functions *fncs;
+	const Equ_Layer_Backend *backend;
+	int flags; /** Layer flags */
+	const int *formats; /** Supported pixel formats */
 	int x;
 	int y;
 	int w;
 	int h;
 	int level;
 	unsigned char hidden;
+	Equ_Surface *surface;
 	void *data;
-	void *ptr; /* TODO remove this? */
-	//Equ_Surface *surface;
-	unsigned int surface_ref; /* number of times the surface has been get */
 };
 /**
  *
  */
 struct _Equ_Region
 {
-	Eina_Inlist list;
 	Equ_Layer *layer;
-	const Equ_Region_Description *desc;
-	const Equ_Region_Functions *fncs;
+	const Equ_Region_Backend *backend;
 	int x;
 	int y;
 	int w;
@@ -161,11 +129,10 @@ struct _Equ_Region
  */
 struct _Equ_Controller
 {
-	Eina_Inlist list;
-	Equ_Layer **layers;
-	int num_layers;
-	const Equ_Controller_Description *desc;
-	const Equ_Controller_Functions *fncs;
+	const Equ_Controller_Backend *backend;
+	Eina_List *layers;
+	Eina_List *outputs;
+	Eina_List *inputs;
 	void *data;
 };
 /**
@@ -173,14 +140,16 @@ struct _Equ_Controller
  */
 struct _Equ_Output
 {
-
+	Equ_Output_Backend *backend;
+	void *data;
 };
 /**
  *
  */
 struct _Equ_Input
 {
-
+	Equ_Input_Backend *backend;
+	void *data;
 };
 
 /**
@@ -189,23 +158,20 @@ struct _Equ_Input
 struct _Equ_Surface
 {
 	Equ_Surface_Type type;
+	Equ_Format fmt;
 };
 
-void equ_controller_layer_register(Equ_Controller *ec, Equ_Layer *el);
 void equ_controller_layer_unregister(Equ_Layer *el);
-Equ_Controller * equ_controller_name_get_by(const char *name);
 
+Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend, void *data);
+void equ_controller_unregister(Equ_Controller *c);
 
-EAPI int equ_controller_register(Equ_Controller_Description *cd, Equ_Controller_Functions *cf);
-EAPI void equ_controller_unregister(Equ_Controller_Description *cd);
-EAPI void equ_controller_data_set(Equ_Controller *ec, void *data);
-EAPI void * equ_controller_data_get(Equ_Controller *ec);
+Equ_Layer * equ_controller_layer_register(Equ_Controller *ec, Equ_Layer_Backend *lb, void *data);
+void equ_controller_output_register(Equ_Controller *ec, Equ_Output_Backend *ob, void *data);
+void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib, void *data);
 
-EAPI int equ_layer_register(Equ_Layer_Description *ld, Equ_Layer_Functions *lf);
-EAPI void equ_layer_unregister(Equ_Layer_Description *ld);
-EAPI void equ_layer_data_set(Equ_Layer *el, void *data);
-EAPI void * equ_layer_data_get(Equ_Layer *el);
-
+void equ_layer_unregister(Equ_Layer *l);
+Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *lb, void *data);
 
 /* for now place hal info here */
 /* maybe place the uio stuff in another header ? */
@@ -234,37 +200,6 @@ EAPI void * equanime_hal_uio_map(Equanime_Hal_Device *d, int map);
 EAPI void equanime_hal_uio_unmap(Equanime_Hal_Device *d, int map);
 EAPI void equanime_hal_uio_close(Equanime_Hal_Device *d);
 EAPI void equanime_hal_uio_dump(Equanime_Hal_Device *d);
-
-/* write, read */
-static inline unsigned char readb(const volatile void *addr)
-{
-	return *(volatile unsigned char *) addr;
-}
-
-static inline unsigned short readw(const volatile void *addr)
-{
-	return *(volatile unsigned short *) addr;
-}
-
-static inline unsigned int readl(const volatile void *addr)
-{
-	return *(volatile unsigned int *) addr;
-}
-
-static inline void writeb(volatile void *addr, unsigned char b)
-{
-	*(volatile unsigned char *) addr = b;
-}
-
-static inline void writew(volatile void *addr, unsigned short s)
-{
-	*(volatile unsigned short *) addr = s;
-}
-
-static inline void writel(volatile void *addr, unsigned int i)
-{
-	*(volatile unsigned int *) addr = i;
-}
 
 void equ_hal_i2c_init(void);
 void equ_hal_i2c_shutdown(void);

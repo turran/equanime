@@ -9,7 +9,7 @@ static Eina_Bool _rotator_setup(Equ_Component *c)
 {
 	Equ_Rotator *r;
 
-	r = equ_component_interface_get(c, EQU_COMPONENT_ROTATOR);
+	r = (Equ_Rotator *)equ_component_interface_get(c, EQU_COMPONENT_ROTATOR);
 	/* TODO check the parameters */
 	return EINA_TRUE;
 }
@@ -18,7 +18,7 @@ static void _rotator_run(Equ_Component *c)
 {
 	Equ_Rotator *r;
 
-	r = equ_component_interface_get(c, EQU_COMPONENT_ROTATOR);
+	r = (Equ_Rotator *)equ_component_interface_get(c, EQU_COMPONENT_ROTATOR);
 	/* TODO trigger the run register */
 }
 

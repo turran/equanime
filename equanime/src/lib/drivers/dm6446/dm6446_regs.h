@@ -193,6 +193,6 @@ struct dm6446
 	volatile struct dm6446_vpss_regs *vpss;
 };
 
-Eina_Bool dm6446_controller_init(struct dm6446 *dm6446);
+Eina_Bool dm6446_controller_init(Equ_Controller *c, struct dm6446 *dm6446);
 
 #endif

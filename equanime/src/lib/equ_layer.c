@@ -1,56 +1,28 @@
 #include "Equanime.h"
 #include "equanime_private.h"
 /**
- * A layer ...
+ * A layer is often known as a plane on a video controller. The contorller then
+ * blends all layers and sends the result through the video encoder signal
  *
  */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define CHECK_FLAG(l, f) if (!(l->desc->flags & f)) return;
+#define CHECK_FLAG(l, f) if (!(l->flags & f)) return;
 Equ_Region *_regions = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/**
- *
- */
-int equ_layer_register(Equ_Layer_Description *ld, Equ_Layer_Functions *lf)
+Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *b, void *data)
 {
 	Equ_Layer *l;
-	Equ_Controller *c;
-
-	c = equ_controller_name_get_by(ld->cname);
-	if (!c)
-	{
-		return 0;
-	}
 
 	l = malloc(sizeof(Equ_Layer));
-	l->desc = ld;
-	l->fncs = lf;
+	l->backend = b;
 	l->controller = c;
-	/* call the probe function */
-	printf("mmm\n");
-	if (!(l->fncs->probe(l)))
-	{
-		free(l);
-		return 0;
-	}
-	equ_controller_layer_register(c, l);
+	l->data = data;
 
-	return 1;
-}
-/**
- *
- */
-void equ_layer_unregister(Equ_Layer_Description *ld)
-{
-	Equ_Layer *l;
-
-	/* TODO remove the layer from the controller */
-	//l = equ_controller_layer_unregister(ld->cname);
-	//free(l);
+	return l;
 }
 /*============================================================================*
  *                                   API                                      *
@@ -112,23 +84,6 @@ EAPI const Equ_Surface * equ_layer_surface_get(Equ_Layer *l)
 /**
  *
  */
-EAPI void equ_layer_surface_release(Equ_Layer *l)
-{
-	if (l->surface_ref)
-		l->surface_ref--;
-}
-
-
-/**
- *
- */
-EAPI const Equ_Layer_Description * equ_layer_description_get(Equ_Layer *l)
-{
-	return l->desc;
-}
-/**
- *
- */
 EAPI void equ_layer_regions_get(Equ_Layer *l, void *cb, void *cb_data)
 {
 
@@ -142,7 +97,7 @@ EAPI void equ_layer_size_set(Equ_Layer *l, int w, int h)
 	CHECK_FLAG(l, EQU_LAYER_SIZE)
 	if ((w == l->w) && (h == l->h))
 		return;
-	if (l->fncs->size_set(l, w, h))
+	if (l->backend->size_set(l, w, h))
 	{
 		l->w = w;
 		l->h = h;
@@ -158,7 +113,7 @@ EAPI void equ_layer_position_set(Equ_Layer *l, int x, int y)
 	CHECK_FLAG(l, EQU_LAYER_POSITION)
 	if ((x == l->x) && (y == l->y))
 		return;
-	if (l->fncs->position_set(l, x, y))
+	if (l->backend->position_set(l, x, y))
 	{
 		l->x = x;
 		l->y = y;
@@ -229,8 +184,8 @@ EAPI void equ_layer_hide(Equ_Layer *l)
 {
 	CHECK_FLAG(l, EQU_LAYER_VISIBILITY)
 	if (l->hidden) return;
-	if (l->fncs->visibility_set(l, 0))
-			l->hidden = 1;
+	if (l->backend->visibility_set(l, 0))
+		l->hidden = 1;
 }
 /**
  *
@@ -239,15 +194,15 @@ EAPI void equ_layer_show(Equ_Layer *l)
 {
 	CHECK_FLAG(l, EQU_LAYER_VISIBILITY)
 	if (!l->hidden) return;
-	if (l->fncs->visibility_set(l, 1))
+	if (l->backend->visibility_set(l, 1))
 		l->hidden = 0;
 }
 /**
  *
  */
-EAPI void equ_layer_visibility_get(Equ_Layer *l, unsigned char *hidden)
+EAPI Eina_Bool equ_layer_is_visible(Equ_Layer *l)
 {
-	if (hidden) *hidden = l->hidden;
+	return l->hidden;
 }
 
 /**

@@ -6,6 +6,12 @@ typedef struct _Equ_Timing Equ_Timing;
 typedef enum _Equ_Standard
 {
 	EQU_STANDARD_CUSTOM,
+	EQU_STANDARD_PAL,
+	EQU_STANDARD_NTSC,
+	EQU_STANDARD_480P,
+	EQU_STANDARD_720P,
+	EQU_STANDARD_1080I,
+	EQU_STANDARD_1080P,
 } Equ_Standard;
 
 struct _Equ_Timing

@@ -3,53 +3,70 @@
 /**
  * A controller is in charge of controlling the global output, disabling and
  * enabling specific layers and change their priority. Also setting the
- * standard output, the timmings, etc
+ * standard output, the timings, etc
  *
  */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static Equ_Controller *_controllers = NULL;
-static Equ_Layer *_layers = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 /**
  *
  */
-void equ_controller_layer_register(Equ_Controller *ec, Equ_Layer *el)
+Equ_Layer * equ_controller_layer_register(Equ_Controller *ec, Equ_Layer_Backend *lb, void *data)
 {
-	ec->num_layers++;
-	_layers = eina_inlist_append(_layers, el);
+	Equ_Layer *l;
+
+	l = equ_layer_new(ec, lb, data);
+	ec->layers = eina_list_append(ec->layers, l);
+	return l;
+}
+
+void equ_controller_output_register(Equ_Controller *ec, Equ_Output_Backend *ob, void *data)
+{
+	Equ_Output *o;
+
+	//o = equ_output_new(ec, ob, data);
+	ec->outputs = eina_list_append(ec->outputs, o);
+}
+
+void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib, void *data)
+{
+	Equ_Input *i;
+
+	//i = equ_input_new(ec, ib, data);
+	ec->outputs = eina_list_append(ec->outputs, i);
 }
 /**
  *
  */
 void equ_controller_layer_unregister(Equ_Layer *el)
 {
-	// itearate over the list of layers and get it
-	//el->controller->num_layers--;
-	//_layers = eina_inlist_remove(_layers, el);
 }
+
 /**
  *
  */
-Equ_Controller * equ_controller_name_get_by(const char *name)
+EAPI Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend, void *data)
 {
 	Equ_Controller *c;
 
-	Eina_Inlist *l;
+	c = malloc(sizeof(Equ_Controller));
+	c->backend = backend;
+	c->data = data;
 
-	for (l = (Eina_Inlist *)_controllers; l; l = l->next)
-	{
-		Equ_Controller *c = (Equ_Controller *)l;
-		if (!strcmp(c->desc->name, name))
-		{
-			/* increment the number of layers */
-			return c;
-		}
-	}
-	return NULL;
+	return c;
+}
+
+/**
+ *
+ */
+void equ_controller_unregister(Equ_Controller *c)
+{
+	/* TODO Do nothing for now, we should remove the controller from the list
+	 * of controllers and then free the controller itself */
 }
 /*============================================================================*
  *                                   API                                      *
@@ -59,78 +76,12 @@ Equ_Controller * equ_controller_name_get_by(const char *name)
  */
 EAPI void equ_controllers_get(Equ_Cb cb, void *cb_data)
 {
-	Eina_Inlist *l;
 
-	for (l = (Eina_Inlist *)_controllers; l; l = l->next)
-	{
-		Equ_Controller *c = (Equ_Controller *)l;
-		if (!cb(c, cb_data))
-			return;
-	}
 }
 /**
  *
  */
 EAPI void equ_controller_layers_get(Equ_Controller *c, Equ_Cb cb, void *cb_data)
 {
-	Eina_Inlist *l;
-
-	for (l = (Eina_Inlist *)_layers; l; l = l->next)
-	{
-		Equ_Layer *y = (Equ_Layer *)l;
-		if (y->controller == c)
-			if (!cb(y, cb_data))
-				return;
-	}
-}
-/**
- *
- */
-EAPI int equ_controller_register(Equ_Controller_Description *cd, Equ_Controller_Functions *cf)
-{
-	Equ_Controller *c;
-
-	c = calloc(1, sizeof(Equ_Controller));
-	c->desc = cd;
-	c->fncs = cf;
-	/* call the probe function */
-	if (!(c->fncs->probe(c)))
-	{
-		free(c);
-		return 0;
-	}
-	/* add the controller to the list of controllers */
-	_controllers = eina_inlist_append(_controllers, c);
-	return 1;
-}
-/**
- *
- */
-EAPI void equ_controller_unregister(Equ_Controller_Description *cd)
-{
-	/* TODO Do nothing for now, we should remove the controller from the list
-	 * of controllers and then free the controller itself */
-}
-/**
- *
- */
-EAPI void equ_controller_data_set(Equ_Controller *ec, void *data)
-{
-	ec->data = data;
-}
-/**
- *
- */
-EAPI void * equ_controller_data_get(Equ_Controller *ec)
-{
-	return ec->data;
-}
-/**
- *
- */
-EAPI const Equ_Controller_Description * equ_controller_description_get(Equ_Controller *ec)
-{
-	return ec->desc;
-
 }
 
