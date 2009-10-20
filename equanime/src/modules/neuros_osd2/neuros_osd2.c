@@ -27,16 +27,27 @@ static struct nt_osd2 osd2;
 
 static Eina_Bool _output_set(Equ_Controller *c, Equ_Output *o)
 {
-	/* TODO in case of composite output, setup the internal DAC too */
+	struct nt_osd2 *osd2 = equ_controller_data_get(c);
+	Equ_Mode *m = equ_output_mode_get(o);
+
+	/* TODO disable output mode */
+	/* in case of composite output, setup the internal DAC too */
 	if (!strcmp(equ_output_name_get(o), "composite"))
 	{
-
+		/* enable all DACS */
+		dm6446_venc_dac_enable(&osd2->dm6446, EINA_TRUE,
+				EINA_TRUE, EINA_TRUE, EINA_TRUE);
+		/* set the timing */
+		dm6446_venc_mode_set(&osd2->dm6446, m, EINA_TRUE);
 	}
 	else
 	{
-
+		/* set the timing */
+		dm6446_venc_mode_set(&osd2->dm6446, m, EINA_FALSE);
+		/* set the timing on ths8200 */
 	}
-		
+	/* TODO enable output mode */
+
 	return EINA_TRUE;
 }
 
@@ -45,11 +56,11 @@ static Equ_Controller_Backend _controller =
 	.output_set = _output_set,
 };
 
-static Eina_Bool _composite_timing_set(Equ_Output *o, Equ_Timing *t)
+static Eina_Bool _composite_mode_set(Equ_Output *o, Equ_Mode *m)
 {
 	/* only sdtv (NTSC, PAL) */
-	if ((t->std != EQU_STANDARD_PAL) ||
-			(t->std != EQU_STANDARD_NTSC))
+	if ((m->std != EQU_STANDARD_PAL) ||
+			(m->std != EQU_STANDARD_NTSC))
 		return EINA_FALSE;
 
 	/* set register values for the ths7313 */
@@ -58,15 +69,15 @@ static Eina_Bool _composite_timing_set(Equ_Output *o, Equ_Timing *t)
 
 static Equ_Output_Backend _composite_output =
 {
-	.timing_set = _composite_timing_set,
+	.mode_set = _composite_mode_set,
 };
 
-static Eina_Bool _component_timing_set(Equ_Output *o, Equ_Timing *t)
+static Eina_Bool _component_mode_set(Equ_Output *o, Equ_Mode *m)
 {
 	/* only hdtv (480p, 720p, 1080i) */
-	if ((t->std != EQU_STANDARD_480P) ||
-			(t->std != EQU_STANDARD_720P) ||
-			(t->std != EQU_STANDARD_1080I))
+	if ((m->std != EQU_STANDARD_480P) ||
+			(m->std != EQU_STANDARD_720P) ||
+			(m->std != EQU_STANDARD_1080I))
 		return EINA_FALSE;
 
 	/* set the register values for the ths8200 */
@@ -76,7 +87,7 @@ static Eina_Bool _component_timing_set(Equ_Output *o, Equ_Timing *t)
 
 static Equ_Output_Backend _component_output =
 {
-	.timing_set = _component_timing_set,
+	.mode_set = _component_mode_set,
 };
 
 /* initialize the dm6446 controller, layers, regions, etc */

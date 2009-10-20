@@ -17,6 +17,7 @@ equ_csc.c \
 equ_host.c \
 equ_input.c \
 equ_layer.c \
+equ_mode.c \
 equ_output.c \
 equ_region.c \
 equ_scaler.c \

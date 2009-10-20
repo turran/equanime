@@ -44,15 +44,14 @@
 
 #include "equ_core.h"
 #include "equ_surface.h"
-#include "equ_host.h" 
+#include "equ_host.h"
+#include "equ_mode.h"
+#include "equ_output.h"
+#include "equ_input.h"
 #include "equ_controller.h"
 #include "equ_layer.h"
 #include "equ_region.h"
 #include "equ_component.h"
-#include "equ_timing.h"
-
-typedef struct _Equ_Output Equ_Output; /**< Opaque handler */
-typedef struct _Equ_Input Equ_Input; /**< Opaque handler */
 
 typedef struct _Equ_Rotator Equ_Rotator;
 typedef struct _Equ_Scaler Equ_Scaler;

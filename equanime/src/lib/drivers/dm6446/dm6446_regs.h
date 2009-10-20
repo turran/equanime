@@ -180,6 +180,16 @@ struct dm6446_vpss_regs
 };
 
 
+typedef enum _dm6446_dout
+{
+	DM6446_DOUT_CVBS,
+	DM6446_DOUT_SV_Y,
+	DM6446_DOUT_SV_C,
+	DM6446_DOUT_Y_G,
+	DM6446_DOUT_Pb_B,
+	DM6446_DOUT_Pr_R,
+} dm6446_dout;
+
 /*
  * TODO
  * we should have an array of components (outputs, inputs)
@@ -194,8 +204,11 @@ struct dm6446
 };
 
 Eina_Bool dm6446_controller_init(Equ_Controller *c, struct dm6446 *dm6446);
-void dm6446_venc_timings_set(struct dm6446 *dm6446, Equ_Timing *t);
-void dm6446_venc_dac_set(struct dm6446 *dm6446);
-void dm6446_venc_mode_set(struct dm6446 *dm6446);
+void dm6446_venc_more_set(struct dm6446 *dm6446, Equ_Mode *m,
+		Eina_Bool internal);
+void dm6446_venc_dac_set(struct dm6446 *dm6446, dm6446_dout dac0,
+		dm6446_dout dac1, dm6446_dout dac2, dm6446_dout dac3);
+void dm6446_venc_dac_enable(struct dm6446 *dm6446, Eina_Bool dac0,
+		Eina_Bool dac1, Eina_Bool dac2, Eina_Bool dac3);
 
 #endif

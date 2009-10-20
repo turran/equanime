@@ -73,6 +73,13 @@ void equ_controller_unregister(Equ_Controller *c)
 	/* TODO Do nothing for now, we should remove the controller from the list
 	 * of controllers and then free the controller itself */
 }
+/*
+ *
+ */
+void * equ_controller_data_get(Equ_Controller *c)
+{
+	return c->data;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

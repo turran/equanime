@@ -26,3 +26,14 @@ EAPI const char * equ_output_name_get(Equ_Output *o)
 {
 	return o->name;
 }
+
+EAPI Equ_Mode * equ_output_mode_get(Equ_Output *o)
+{
+	return o->mode;
+}
+
+EAPI Eina_Bool equ_output_mode_set(Equ_Output *o, Equ_Mode *m)
+{
+
+}
+

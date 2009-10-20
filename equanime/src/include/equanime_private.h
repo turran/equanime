@@ -16,13 +16,15 @@ struct _Equ_Host_Backend
 
 struct _Equ_Input_Backend
 {
-	Eina_Bool (*timing_set)(Equ_Input *i, Equ_Timing *t);
+	Eina_Bool (*mode_set)(Equ_Input *i, Equ_Mode *m);
 	Eina_Bool (*surface_set)(Equ_Input *i, Equ_Surface *s);
+	/* TODO add a way to get the possible modes */
 };
 
 struct _Equ_Output_Backend
 {
-	Eina_Bool (*timing_set)(Equ_Output *o, Equ_Timing *t);
+	Eina_Bool (*mode_set)(Equ_Output *o, Equ_Mode *m);
+	/* TODO add a way to get the possible modes */
 };
 
 /**
@@ -145,6 +147,8 @@ struct _Equ_Output
 	Equ_Output_Backend *backend;
 	const char *name;
 	void *data;
+
+	Equ_Mode *mode;
 };
 /**
  *
@@ -154,6 +158,8 @@ struct _Equ_Input
 	Equ_Input_Backend *backend;
 	const char *name;
 	void *data;
+
+	Equ_Mode *mode;
 };
 
 /**
@@ -173,6 +179,7 @@ void equ_controller_layer_unregister(Equ_Layer *el);
 
 Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend, const char *name, void *data);
 void equ_controller_unregister(Equ_Controller *c);
+void * equ_controller_data_get(Equ_Controller *c);
 
 Equ_Layer * equ_controller_layer_register(Equ_Controller *ec, Equ_Layer_Backend *lb, const char *name, void *data);
 void equ_controller_output_register(Equ_Controller *ec, Equ_Output_Backend *ob, const char *name, void *data);

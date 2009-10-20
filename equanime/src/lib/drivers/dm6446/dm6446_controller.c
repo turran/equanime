@@ -3,7 +3,7 @@
 
 #include "dm6446_regs.h"
 
-/* 
+/*
  * Constraints:
  * If the vertical resize filter is enabled for either of the video windows, the maximum horizontal window
  * dimension cannot be greater than 720 currently. This is due to the limitation in the size of the line
@@ -201,7 +201,7 @@ static Eina_Bool _osd0_visibility_set(Equ_Layer *el, Eina_Bool show)
 
 	if (!_visibility_check(l, el, show))
 		return EINA_FALSE;
-	/* enable/disable it */	
+	/* enable/disable it */
 	if (show)
 		dm6446->osd->osdwin0md |= show;
 	else
@@ -246,7 +246,7 @@ static Eina_Bool _osd1_visibility_set(Equ_Layer *el, Eina_Bool show)
 
 	if (!_visibility_check(l, el, show))
 		return EINA_FALSE;
-	/* enable/disable it */	
+	/* enable/disable it */
 	if (show)
 		dm6446->osd->osdwin1md |= show;
 	else
@@ -344,44 +344,44 @@ void dm6446_controller_shutdown(Equ_Controller *c)
 	/* TODO get the first layer and free the array of data */
 }
 
-void dm6446_venc_timings_set(struct dm6446 *dm6446, Equ_Timing *t)
+void dm6446_venc_mode_set(struct dm6446 *dm6446, Equ_Mode *m,
+		Eina_Bool internal)
 {
 #if 0
-	(VENC_HSPLS, mode->hsync_len);
-	(VENC_VSPLS, mode->vsync_len);
-	(VENC_HINT, mode->xres + mode->left_margin +
-	mode->right_margin);
-	(VENC_HSTART, mode->left_margin);
-	(VENC_HVALID, mode->xres);
-	(VENC_VINT, mode->yres + mode->upper_margin +
-	mode->lower_margin);
-	(VENC_VSTART, mode->upper_margin);
-	(VENC_VVALID, mode->vmode == FB_VMODE_INTERLACED ? mode->yres / 2 : mode->yres);
+	dm6446->venc->hspls = t->hsync_len;
+	dm6446->venc->vspls = t->vsync_len;
+	dm6446->venc->hint = mode->xres + t->left_margin + t->right_margin;
+	dm6446->venc->hstart = t->left_margin;
+	dm6446->venc->hvalid = mode->xres;
+	dm6446->venc->vint = t->yres + t->upper_margin + t->lower_margin;
+	dm6446->venc->vstart = t->upper_margin;
+	dm6446->venc->vvalid = t->vmode == EQU_VIDEO_MODE_INTERLACED ? mode->yres / 2 : mode->yres;
 	/* TODO check vmode (interlaced / progressive)*/
 	/* set the window field / frame mode */
 	(VENC_YCCCTL, 0x0);
+
 	(VENC_VSTARTA, extmode->vstarta);
 	(OSD_BASEPX, extmode->basex);
 	(OSD_BASEPY, extmode->basey);
-#endif
-}
-
-void dm6446_venc_dac_set(struct dm6446 *dm6446)
-{
-#if 0
-	(VENC_DACSEL, 0x0);
-#endif
-}
-
-void dm6446_venc_mode_set(struct dm6446 *dm6446)
-{
-#if 0
-	 /* Enable all DACs */
-	(VENC_DACTST, 0);
+	if (internal)
+	{
 	/* Set REC656 Mode */
 	(VENC_YCCCTL, 0x1);
 	/* Enable output mode and NTSC */
 	(VENC_VMOD, 0x1003);
+	}
 #endif
+}
+
+void dm6446_venc_dac_set(struct dm6446 *dm6446, dm6446_dout dac0,
+		dm6446_dout dac1, dm6446_dout dac2, dm6446_dout dac3)
+{
+	dm6446->venc->dacsel = dac0 | dac1 << 4 | dac2 << 8 | dac3 << 12;
+}
+
+void dm6446_venc_dac_enable(struct dm6446 *dm6446, Eina_Bool dac0,
+		Eina_Bool dac1, Eina_Bool dac2, Eina_Bool dac3)
+{
+	dm6446->venc->dactst = dac0 << 12 | dac1 << 13 | dac2 << 14 | dac3 << 15;
 }
 
