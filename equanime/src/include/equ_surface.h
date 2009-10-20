@@ -27,6 +27,6 @@ typedef enum
 } Equ_Surface_Type;
 
 typedef struct _Equ_Surface Equ_Surface; /**< Opaque handler */
-EAPI Equ_Surface_Type equ_surface_type_get(const Equ_Surface *);
+EAPI Equ_Surface_Type equ_surface_type_get(const Equ_Surface *s);
 
 #endif

@@ -40,7 +40,6 @@ struct _Equ_Controller_Backend
  */
 struct _Equ_Layer_Backend
 {
-	Eina_Bool (*size_set)(Equ_Layer *l, unsigned int w, unsigned int h);
 	Eina_Bool (*position_set)(Equ_Layer *l, int x, int y);
 	Eina_Bool (*visibility_set)(Equ_Layer *l, Eina_Bool show);
 	Eina_Bool (*surface_set)(Equ_Layer *l, Equ_Surface *s);
@@ -97,17 +96,17 @@ typedef struct _Equ_Component_Backend
 struct _Equ_Layer
 {
 	Equ_Controller *controller;
+	const char *name;
 	const Equ_Layer_Backend *backend;
+	void *data;
+
 	int flags; /** Layer flags */
 	const int *formats; /** Supported pixel formats */
 	int x;
 	int y;
-	int w;
-	int h;
 	int level;
 	unsigned char hidden;
 	Equ_Surface *surface;
-	void *data;
 };
 /**
  *
@@ -116,13 +115,14 @@ struct _Equ_Region
 {
 	Equ_Layer *layer;
 	const Equ_Region_Backend *backend;
+	void *data;
+
 	int x;
 	int y;
 	int w;
 	int h;
 	int level;
 	unsigned char hidden;
-	void *data;
 };
 /**
  *
@@ -130,10 +130,12 @@ struct _Equ_Region
 struct _Equ_Controller
 {
 	const Equ_Controller_Backend *backend;
+	const char *name;
+	void *data;
+
 	Eina_List *layers;
 	Eina_List *outputs;
 	Eina_List *inputs;
-	void *data;
 };
 /**
  *
@@ -141,6 +143,7 @@ struct _Equ_Controller
 struct _Equ_Output
 {
 	Equ_Output_Backend *backend;
+	const char *name;
 	void *data;
 };
 /**
@@ -149,6 +152,7 @@ struct _Equ_Output
 struct _Equ_Input
 {
 	Equ_Input_Backend *backend;
+	const char *name;
 	void *data;
 };
 
@@ -159,20 +163,28 @@ struct _Equ_Surface
 {
 	Equ_Surface_Type type;
 	Equ_Format fmt;
+	unsigned int w;
+	unsigned int h;
+	unsigned int pitch;
+	void *data;
 };
 
 void equ_controller_layer_unregister(Equ_Layer *el);
 
-Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend, void *data);
+Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend, const char *name, void *data);
 void equ_controller_unregister(Equ_Controller *c);
 
-Equ_Layer * equ_controller_layer_register(Equ_Controller *ec, Equ_Layer_Backend *lb, void *data);
-void equ_controller_output_register(Equ_Controller *ec, Equ_Output_Backend *ob, void *data);
-void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib, void *data);
+Equ_Layer * equ_controller_layer_register(Equ_Controller *ec, Equ_Layer_Backend *lb, const char *name, void *data);
+void equ_controller_output_register(Equ_Controller *ec, Equ_Output_Backend *ob, const char *name, void *data);
+void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib, const char *nane, void *data);
 
 void equ_layer_unregister(Equ_Layer *l);
-Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *lb, void *data);
+Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *lb, const char *name, void *data);
 void * equ_layer_data_get(Equ_Layer *l);
+
+Equ_Output * equ_output_new(Equ_Controller *c, Equ_Output_Backend *ob, const char *name, void *data);
+
+Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib, const char *name, void *data);
 
 /* for now place hal info here */
 /* maybe place the uio stuff in another header ? */

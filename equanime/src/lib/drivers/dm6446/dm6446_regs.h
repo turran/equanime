@@ -194,5 +194,8 @@ struct dm6446
 };
 
 Eina_Bool dm6446_controller_init(Equ_Controller *c, struct dm6446 *dm6446);
+void dm6446_venc_timings_set(struct dm6446 *dm6446, Equ_Timing *t);
+void dm6446_venc_dac_set(struct dm6446 *dm6446);
+void dm6446_venc_mode_set(struct dm6446 *dm6446);
 
 #endif

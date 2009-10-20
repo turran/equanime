@@ -28,6 +28,16 @@ static struct nt_osd2 osd2;
 static Eina_Bool _output_set(Equ_Controller *c, Equ_Output *o)
 {
 	/* TODO in case of composite output, setup the internal DAC too */
+	if (!strcmp(equ_output_name_get(o), "composite"))
+	{
+
+	}
+	else
+	{
+
+	}
+		
+	return EINA_TRUE;
 }
 
 static Equ_Controller_Backend _controller =
@@ -41,6 +51,7 @@ static Eina_Bool _composite_timing_set(Equ_Output *o, Equ_Timing *t)
 	if ((t->std != EQU_STANDARD_PAL) ||
 			(t->std != EQU_STANDARD_NTSC))
 		return EINA_FALSE;
+
 	/* set register values for the ths7313 */
 	return EINA_TRUE;
 }
@@ -57,6 +68,7 @@ static Eina_Bool _component_timing_set(Equ_Output *o, Equ_Timing *t)
 			(t->std != EQU_STANDARD_720P) ||
 			(t->std != EQU_STANDARD_1080I))
 		return EINA_FALSE;
+
 	/* set the register values for the ths8200 */
 	return EINA_TRUE;
 }
@@ -102,8 +114,8 @@ static Eina_Bool _io_setup(Equ_Controller *c)
 	/* ths7313 (0x2c) */
 	ths7313 = equ_hal_i2c_get(0x2c);
 
-	equ_controller_output_register(c, &_component_output, ths8200);
-	equ_controller_output_register(c, &_composite_output, ths7313);
+	equ_controller_output_register(c, &_component_output, "component", ths8200);
+	equ_controller_output_register(c, &_composite_output, "composite", ths7313);
 }
 
 static Eina_Bool module_init(void)
@@ -120,7 +132,7 @@ static Eina_Bool module_init(void)
 	/* TODO setup the memory */
 	mem = equanime_hal_uio_map(hd, 0);
 
-	osd2.c = equ_controller_register(&_controller, &osd2);
+	osd2.c = equ_controller_register(&_controller, "neuros_osd2", &osd2);
 	/* TODO check !osd2.c */
 	if (!_dm6446_setup(osd2.c, hd, &osd2.dm6446))
 	{

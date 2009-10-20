@@ -13,7 +13,8 @@ Equ_Region *_regions = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *b, void *data)
+Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *b,
+		const char *name, void *data)
 {
 	Equ_Layer *l;
 
@@ -21,6 +22,7 @@ Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *b, void *data)
 	l->backend = b;
 	l->controller = c;
 	l->data = data;
+	l->name = name;
 
 	return l;
 }
@@ -45,7 +47,7 @@ EAPI void equ_layer_surface_set(Equ_Layer *l, Equ_Surface *s)
  * TODO What happens if a layer changes resolution, size, format ?
  * we should check that the surface is released?
  */
-EAPI const Equ_Surface * equ_layer_surface_get(Equ_Layer *l)
+EAPI Equ_Surface * equ_layer_surface_get(Equ_Layer *l)
 {
 	Equ_Surface *s;
 #if 0
@@ -93,22 +95,30 @@ EAPI void equ_layer_regions_get(Equ_Layer *l, void *cb, void *cb_data)
 {
 
 }
+
 /**
  *
- *
  */
-EAPI void equ_layer_size_set(Equ_Layer *l, int w, int h)
+EAPI void equ_layer_size_get(Equ_Layer *l, int *w, int *h)
 {
-	CHECK_FLAG(l, EQU_LAYER_SIZE)
-	if ((w == l->w) && (h == l->h))
-		return;
-	if (l->backend->size_set(l, w, h))
+	if (!l->surface)
 	{
-		l->w = w;
-		l->h = h;
+		if (w) *w = 0;
+		if (h) *h = 0;
+
+		return;
 	}
+	equ_surface_size_get(l->surface, w, h);
 }
 
+/**
+ *
+ */
+EAPI void equ_layer_position_get(Equ_Layer *l, int *x, int *y)
+{
+	if (x) *x = l->x;
+	if (y) *x = l->y;
+}
 /**
  *
  *
@@ -126,27 +136,6 @@ EAPI void equ_layer_position_set(Equ_Layer *l, int x, int y)
 	l->x = x;
 	l->y = y;
 }
-/**
- *
- *
- */
-EAPI void equ_layer_geometry_get(Equ_Layer *l, int *x, int *y, int *w, int *h)
-{
-	if (x) *x = l->x;
-	if (y) *y = l->y;
-	if (w) *w = l->w;
-	if (h) *h = l->h;
-}
-/**
- *
- */
-#if 0
-EAPI void equ_layer_format_set(Equ_Layer *l, Enesim_Surface_Format fmt)
-{
-
-
-}
-#endif
 /**
  *
  */
@@ -217,21 +206,3 @@ EAPI Equ_Controller * equ_layer_controller_get(Equ_Layer *l)
 {
 	return l->controller;
 }
-
-/**
- *
- */
-EAPI void equ_layer_data_set(Equ_Layer *l, void *data)
-{
-	l->data = data;
-}
-
-/**
- *
- */
-EAPI void * equ_layer_data_get(Equ_Layer *l)
-{
-	return l->data;
-}
-
-
