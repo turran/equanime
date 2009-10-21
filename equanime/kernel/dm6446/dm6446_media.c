@@ -66,6 +66,9 @@ static int dm6446_media_probe(struct platform_device *pdev)
 	}
 	platform_set_drvdata(pdev, info);
 
+	{
+		outl(0x18, IO_ADDRESS(0x01c40044));
+	}
 	printk(KERN_INFO "[DM6446] Media UIO Driver\n");
 
 	return 0;

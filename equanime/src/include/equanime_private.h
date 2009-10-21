@@ -148,7 +148,8 @@ struct _Equ_Output
 	const char *name;
 	void *data;
 
-	Equ_Mode *mode;
+	Equ_Controller *controller;
+	Equ_Mode mode;
 };
 /**
  *

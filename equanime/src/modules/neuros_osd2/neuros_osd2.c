@@ -31,7 +31,7 @@ static Eina_Bool _output_set(Equ_Controller *c, Equ_Output *o)
 	Equ_Mode *m = equ_output_mode_get(o);
 
 	/* disable output mode */
-	dm6446_venc_enable(&osd->dm6446, EINA_FALSE);
+	dm6446_venc_enable(&osd2->dm6446, EINA_FALSE);
 	/* in case of composite output, setup the internal DAC too */
 	if (!strcmp(equ_output_name_get(o), "composite"))
 	{
@@ -53,7 +53,7 @@ static Eina_Bool _output_set(Equ_Controller *c, Equ_Output *o)
 		dm6446_venc_mode_set(&osd2->dm6446, m, EINA_FALSE);
 	}
 	/* enable output mode */
-	dm6446_venc_enable(&osd->dm6446, EINA_TRUE);
+	dm6446_venc_enable(&osd2->dm6446, EINA_TRUE);
 
 	return EINA_TRUE;
 }
@@ -66,7 +66,7 @@ static Equ_Controller_Backend _controller =
 static Eina_Bool _composite_mode_set(Equ_Output *o, Equ_Mode *m)
 {
 	/* only sdtv (NTSC, PAL) */
-	if ((m->std != EQU_STANDARD_PAL) ||
+	if ((m->std != EQU_STANDARD_PAL) &&
 			(m->std != EQU_STANDARD_NTSC))
 		return EINA_FALSE;
 
@@ -82,15 +82,15 @@ static Equ_Output_Backend _composite_output =
 static Eina_Bool _component_mode_set(Equ_Output *o, Equ_Mode *m)
 {
 	Equ_Hal_I2C *ths8200 = equ_output_data_get(o);
-	
+
 	/* only hdtv (480p, 720p, 1080i) */
-	if ((m->std != EQU_STANDARD_480P) ||
-			(m->std != EQU_STANDARD_720P) ||
+	if ((m->std != EQU_STANDARD_480P) &&
+			(m->std != EQU_STANDARD_720P) &&
 			(m->std != EQU_STANDARD_1080I))
 		return EINA_FALSE;
 
 	/* set the register values for the ths8200 */
-	th8200_mode_set(ths8200, m);
+	//th8200_mode_set(ths8200, m);
 
 	return EINA_TRUE;
 }

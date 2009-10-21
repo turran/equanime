@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "Equanime.h"
 #include "equanime_private.h"
 
@@ -337,6 +339,23 @@ Eina_Bool dm6446_controller_init(Equ_Controller *c, struct dm6446 *dm6446)
 	l->dm6446 = dm6446;
 	l->all = all;
 	l->layer = equ_controller_layer_register(c, &_layer_vid1, "vid1", l);
+	/* set color bars mode */
+	printf("%08x %08x\n", dm6446->venc->dacsel, dm6446->venc->dactst);
+
+	/* disable VCLK output pin enable */
+#if 0
+	dm6446->osd->mode = 0x200;
+	dm6446->venc->osdclk0 = 1;
+	dm6446->venc->osdclk1 = 2;
+	dm6446->venc->vidctl = 0x1101;
+	dm6446->venc->syncctl = 0;
+	dm6446->venc->dclkctl = 0;
+	dm6446->venc->drgbx1 = 0x57c;
+	dm6446->venc->lcdout = 0;
+	dm6446->venc->cmpnt = 0x100;
+#endif
+
+	dm6446->venc->vdpro = (1 << 8);
 }
 
 void dm6446_controller_shutdown(Equ_Controller *c)
@@ -358,8 +377,14 @@ void dm6446_venc_mode_set(struct dm6446 *dm6446, Equ_Mode *m,
 	/* Set the internal DAC (only NTSC, PAL, 525P, 625) */
 	if (internal)
 	{
+		printf("YCCTL = %d\n", offsetof(struct dm6446_venc_regs, ycctl));
+		printf("VMOD = %d\n", offsetof(struct dm6446_venc_regs, vmod));
+		dm6446->venc->vmod |= 1 << 12;
+		dm6446->venc->ycctl |= 1;
+		printf("internal0 = %08x\n", dm6446->venc->vmod);
 		if (m->std == EQU_STANDARD_NTSC)
 		{
+			dm6446->venc->vmod |= 1 << 1;
 			/* NTSC/PAL Timing */
 			dm6446->venc->vmod &= ~(1 << 4);
 			/* master mode */
@@ -373,6 +398,7 @@ void dm6446_venc_mode_set(struct dm6446 *dm6446, Equ_Mode *m,
 		}
 		else if (m->std == EQU_STANDARD_PAL)
 		{
+			dm6446->venc->vmod |= 1 << 1;
 			/* NTSC/PAL Timing */
 			dm6446->venc->vmod &= ~(1 << 4);
 			/* master mode */
@@ -384,6 +410,7 @@ void dm6446_venc_mode_set(struct dm6446 *dm6446, Equ_Mode *m,
 			/* standard interlace */
 			dm6446->venc->vmod &= ~(1 << 10);
 		}
+		printf("internal1 = %08x\n", dm6446->venc->vmod);
 #if 0
 		/* Set REC656 Mode */
 		(VENC_YCCCTL, 0x1);
@@ -407,6 +434,7 @@ void dm6446_venc_mode_set(struct dm6446 *dm6446, Equ_Mode *m,
 void dm6446_venc_dac_set(struct dm6446 *dm6446, dm6446_dout dac0,
 		dm6446_dout dac1, dm6446_dout dac2, dm6446_dout dac3)
 {
+	printf("Setting dacs to %d %d %d %d\n", dac0, dac1, dac2, dac3);
 	dm6446->venc->dacsel = dac0 | dac1 << 4 | dac2 << 8 | dac3 << 12;
 }
 
@@ -422,6 +450,7 @@ void dm6446_venc_enable(struct dm6446 *dm6446, Eina_Bool enable)
 		dm6446->venc->vmod |= 1;
 	else
 		dm6446->venc->vmod &= ~1;
+
 }
 
 void dm6446_venc_vout_set(struct dm6446 *dm6446, dm6446_vout vout)
@@ -437,7 +466,7 @@ void dm6446_venc_vout_set(struct dm6446 *dm6446, dm6446_vout vout)
 		case DM6446_VOUT_16BIT_YCRCB:
 		ycctl |= vout << 2;
 		break;
-	
+
 		case DM6446_VOUT_8BIT_CBYCRY:
 		case DM6446_VOUT_8BIT_YCRYCB:
 		case DM6446_VOUT_8BIT_CRYCBY:

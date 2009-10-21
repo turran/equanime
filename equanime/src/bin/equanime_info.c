@@ -37,6 +37,7 @@ static void _layer_desc_dump(const Equ_Layer *l)
 	int flags;
 
 	printf("\t- name = %s\n", equ_layer_name_get(l));
+#if 0
 	printf("\t- flags = ");
 	while (flags)
 	{
@@ -48,6 +49,7 @@ static void _layer_desc_dump(const Equ_Layer *l)
 		i++;
 	}
 	printf("\n");
+#endif
 }
 
 static int _layer_cb(Equ_Layer *l, void *data)
