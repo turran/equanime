@@ -1,7 +1,2 @@
-+ Move the modules code into a common place outside equanime
-+ Make more functions for the modules (beside init and shutdown) to get
-  the description of the layers or the controllers or whatever so a gui
-  can be built on top of this to select devices / ouputs / inputs, etc. Or
-  maybe define a xml file for each controller/layer/whatever.
 + Add the API to retreive memory surfaces from the controller, something like
   a surface allocator.

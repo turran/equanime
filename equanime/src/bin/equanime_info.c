@@ -1,7 +1,11 @@
 #include <stdio.h>
-
 #include "Equanime.h"
 
+/*
+ * This application just shows the host hierarchy, showing all controllers,
+ * layers, outputs, inputs, etc.
+ *
+ */
 const char *layer_flags[] = {
 	"VISIBILITY",
 	"POSITION",
@@ -9,12 +13,30 @@ const char *layer_flags[] = {
 	"LEVEL",
 };
 
+static void _output_desc_dump(Equ_Output *o)
+{
+	printf("\t- name = %s\n", equ_output_name_get(o));
+}
+
+static int _output_cb(Equ_Output *o, void *data)
+{
+	int *num = data;
+	char *ptr;
+	int i;
+
+	printf("Output %d\n", *num);
+	*num = *num + 1;
+	_output_desc_dump(o);
+
+	return 1;
+}
+
 static void _layer_desc_dump(const Equ_Layer *l)
 {
 	int i = 0;
 	int flags;
 
-	//printf("\t- name = %s\n");
+	printf("\t- name = %s\n", equ_layer_name_get(l));
 	printf("\t- flags = ");
 	while (flags)
 	{
@@ -28,7 +50,7 @@ static void _layer_desc_dump(const Equ_Layer *l)
 	printf("\n");
 }
 
-int _layer_cb(Equ_Layer *l, void *data)
+static int _layer_cb(Equ_Layer *l, void *data)
 {
 	int *num = data;
 	char *ptr;
@@ -42,19 +64,21 @@ int _layer_cb(Equ_Layer *l, void *data)
 }
 
 
-static void _controller_desc_dump(const Equ_Controller *c)
+static void _controller_desc_dump(Equ_Controller *c)
 {
-	//printf("\t- name = %s\n");
+	printf("\t- name = %s\n", equ_controller_name_get(c));
 }
 
 int _controller_cb(Equ_Controller *c, void *data)
 {
 	int *num = data;
 	int num_layer = 0;
+	int num_output = 0;
 
 	printf("Controller %d\n", *num++);
 	_controller_desc_dump(c);
 	equ_controller_layers_get(c, (Equ_Cb)_layer_cb, &num_layer);
+	equ_controller_outputs_get(c, (Equ_Cb)_output_cb, &num_output);
 
 	return 1;
 }
@@ -68,7 +92,10 @@ int main(void)
 	int num_controller = 0;
 
 	equ_init();
+
 	equ_controllers_get((Equ_Cb)_controller_cb, &num_controller);
+	/* TODO support input commands? */
+
 	equ_shutdown();
 	return 0;
 }

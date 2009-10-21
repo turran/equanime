@@ -30,23 +30,30 @@ static Eina_Bool _output_set(Equ_Controller *c, Equ_Output *o)
 	struct nt_osd2 *osd2 = equ_controller_data_get(c);
 	Equ_Mode *m = equ_output_mode_get(o);
 
-	/* TODO disable output mode */
+	/* disable output mode */
+	dm6446_venc_enable(&osd->dm6446, EINA_FALSE);
 	/* in case of composite output, setup the internal DAC too */
 	if (!strcmp(equ_output_name_get(o), "composite"))
 	{
 		/* enable all DACS */
+		dm6446_venc_dac_set(&osd2->dm6446, DM6446_DOUT_CVBS,
+				DM6446_DOUT_CVBS, DM6446_DOUT_CVBS,
+				DM6446_DOUT_CVBS);
 		dm6446_venc_dac_enable(&osd2->dm6446, EINA_TRUE,
 				EINA_TRUE, EINA_TRUE, EINA_TRUE);
-		/* set the timing */
+		/* set the mode */
 		dm6446_venc_mode_set(&osd2->dm6446, m, EINA_TRUE);
 	}
 	else
 	{
-		/* set the timing */
+		/* disable all DACS */
+		dm6446_venc_dac_enable(&osd2->dm6446, EINA_FALSE,
+				EINA_FALSE, EINA_FALSE, EINA_FALSE);
+		/* set the mode */
 		dm6446_venc_mode_set(&osd2->dm6446, m, EINA_FALSE);
-		/* set the timing on ths8200 */
 	}
-	/* TODO enable output mode */
+	/* enable output mode */
+	dm6446_venc_enable(&osd->dm6446, EINA_TRUE);
 
 	return EINA_TRUE;
 }
@@ -63,7 +70,7 @@ static Eina_Bool _composite_mode_set(Equ_Output *o, Equ_Mode *m)
 			(m->std != EQU_STANDARD_NTSC))
 		return EINA_FALSE;
 
-	/* set register values for the ths7313 */
+	/* TODO set register values for the ths7313? */
 	return EINA_TRUE;
 }
 
@@ -74,6 +81,8 @@ static Equ_Output_Backend _composite_output =
 
 static Eina_Bool _component_mode_set(Equ_Output *o, Equ_Mode *m)
 {
+	Equ_Hal_I2C *ths8200 = equ_output_data_get(o);
+	
 	/* only hdtv (480p, 720p, 1080i) */
 	if ((m->std != EQU_STANDARD_480P) ||
 			(m->std != EQU_STANDARD_720P) ||
@@ -81,9 +90,10 @@ static Eina_Bool _component_mode_set(Equ_Output *o, Equ_Mode *m)
 		return EINA_FALSE;
 
 	/* set the register values for the ths8200 */
+	th8200_mode_set(ths8200, m);
+
 	return EINA_TRUE;
 }
-
 
 static Equ_Output_Backend _component_output =
 {

@@ -9,6 +9,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Eina_List *_controllers;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -57,10 +58,12 @@ EAPI Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend,
 {
 	Equ_Controller *c;
 
-	c = malloc(sizeof(Equ_Controller));
+	c = calloc(1, sizeof(Equ_Controller));
 	c->backend = backend;
 	c->data = data;
 	c->name = name;
+
+	_controllers = eina_list_append(_controllers, c);
 
 	return c;
 }
@@ -86,14 +89,64 @@ void * equ_controller_data_get(Equ_Controller *c)
 /**
  *
  */
+EAPI const char * equ_controller_name_get(Equ_Controller *c)
+{
+	return c->name;
+}
+/**
+ *
+ */
 EAPI void equ_controllers_get(Equ_Cb cb, void *cb_data)
 {
+	Equ_Controller *c;
+	Eina_List *l;
 
+	EINA_LIST_FOREACH(_controllers, l, c)
+	{
+		cb(c, cb_data);
+	}
 }
 /**
  *
  */
 EAPI void equ_controller_layers_get(Equ_Controller *c, Equ_Cb cb, void *cb_data)
 {
+	Equ_Layer *la;
+	Eina_List *l;
+
+	EINA_LIST_FOREACH(c->layers, l, la)
+	{
+		cb(la, cb_data);
+	}
+}
+
+/**
+ *
+ */
+EAPI void equ_controller_outputs_get(Equ_Controller *c, Equ_Cb cb, void *cb_data)
+{
+	Equ_Output *o;
+	Eina_List *l;
+
+	EINA_LIST_FOREACH(c->layers, l, o)
+	{
+		cb(o, cb_data);
+	}
+
+}
+
+/**
+ *
+ */
+EAPI void equ_controller_inputs_get(Equ_Controller *c, Equ_Cb cb, void *cb_data)
+{
+	Equ_Input *i;
+	Eina_List *l;
+
+	EINA_LIST_FOREACH(c->layers, l, i)
+	{
+		cb(i, cb_data);
+	}
+
 }
 

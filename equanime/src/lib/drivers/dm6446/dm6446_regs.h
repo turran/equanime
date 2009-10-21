@@ -23,7 +23,7 @@ struct dm6446_venc_regs
 	uint32_t vvalid;
 	uint32_t hsdly;
 	uint32_t vsdly;
-	uint32_t yccctl;
+	uint32_t ycctl;
 	uint32_t rgbctl;
 	uint32_t rgbclp;
 	uint32_t linectl;
@@ -179,6 +179,16 @@ struct dm6446_vpss_regs
 	uint32_t clkctl;
 };
 
+typedef enum _dm6446_vout
+{
+	DM6446_VOUT_16BIT_YCBCR,
+	DM6446_VOUT_16BIT_YCRCB,
+	DM6446_VOUT_8BIT_CBYCRY,
+	DM6446_VOUT_8BIT_YCRYCB,
+	DM6446_VOUT_8BIT_CRYCBY,
+	DM6446_VOUT_8BIT_YCBYCR,
+	DM6446_VOUT_PARALLEL,
+} dm6446_vout;
 
 typedef enum _dm6446_dout
 {
@@ -204,7 +214,8 @@ struct dm6446
 };
 
 Eina_Bool dm6446_controller_init(Equ_Controller *c, struct dm6446 *dm6446);
-void dm6446_venc_more_set(struct dm6446 *dm6446, Equ_Mode *m,
+void dm6446_venc_vout_set(struct dm6446 *dm6446, dm6446_vout vout);
+void dm6446_venc_mode_set(struct dm6446 *dm6446, Equ_Mode *m,
 		Eina_Bool internal);
 void dm6446_venc_dac_set(struct dm6446 *dm6446, dm6446_dout dac0,
 		dm6446_dout dac1, dm6446_dout dac2, dm6446_dout dac3);

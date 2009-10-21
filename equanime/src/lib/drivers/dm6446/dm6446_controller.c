@@ -348,29 +348,60 @@ void dm6446_venc_mode_set(struct dm6446 *dm6446, Equ_Mode *m,
 		Eina_Bool internal)
 {
 #if 0
-	dm6446->venc->hspls = t->hsync_len;
-	dm6446->venc->vspls = t->vsync_len;
-	dm6446->venc->hint = mode->xres + t->left_margin + t->right_margin;
-	dm6446->venc->hstart = t->left_margin;
-	dm6446->venc->hvalid = mode->xres;
-	dm6446->venc->vint = t->yres + t->upper_margin + t->lower_margin;
-	dm6446->venc->vstart = t->upper_margin;
-	dm6446->venc->vvalid = t->vmode == EQU_VIDEO_MODE_INTERLACED ? mode->yres / 2 : mode->yres;
-	/* TODO check vmode (interlaced / progressive)*/
 	/* set the window field / frame mode */
 	(VENC_YCCCTL, 0x0);
 
 	(VENC_VSTARTA, extmode->vstarta);
 	(OSD_BASEPX, extmode->basex);
 	(OSD_BASEPY, extmode->basey);
+#endif
+	/* Set the internal DAC (only NTSC, PAL, 525P, 625) */
 	if (internal)
 	{
-	/* Set REC656 Mode */
-	(VENC_YCCCTL, 0x1);
-	/* Enable output mode and NTSC */
-	(VENC_VMOD, 0x1003);
-	}
+		if (m->std == EQU_STANDARD_NTSC)
+		{
+			/* NTSC/PAL Timing */
+			dm6446->venc->vmod &= ~(1 << 4);
+			/* master mode */
+			dm6446->venc->vmod &= ~(1 << 5);
+			/* NTSC */
+			dm6446->venc->vmod &= ~(1 << 6);
+			/* SDTV */
+			dm6446->venc->vmod &= ~(1 << 8);
+			/* standard interlace */
+			dm6446->venc->vmod &= ~(1 << 10);
+		}
+		else if (m->std == EQU_STANDARD_PAL)
+		{
+			/* NTSC/PAL Timing */
+			dm6446->venc->vmod &= ~(1 << 4);
+			/* master mode */
+			dm6446->venc->vmod &= ~(1 << 5);
+			/* NTSC */
+			dm6446->venc->vmod |= (1 << 6);
+			/* SDTV */
+			dm6446->venc->vmod &= ~(1 << 8);
+			/* standard interlace */
+			dm6446->venc->vmod &= ~(1 << 10);
+		}
+#if 0
+		/* Set REC656 Mode */
+		(VENC_YCCCTL, 0x1);
+		/* Enable output mode and NTSC */
+		(VENC_VMOD, 0x1003);
 #endif
+	}
+	else
+	{
+		dm6446->venc->hspls = m->t.hsync_len;
+		dm6446->venc->vspls = m->t.vsync_len;
+		dm6446->venc->hint = m->xres + m->t.left_margin + m->t.right_margin;
+		dm6446->venc->hstart = m->t.left_margin;
+		dm6446->venc->hvalid = m->xres;
+		dm6446->venc->vint = m->yres + m->t.upper_margin + m->t.lower_margin;
+		dm6446->venc->vstart = m->t.upper_margin;
+		dm6446->venc->vvalid = m->vmode == EQU_VIDEO_MODE_INTERLACED ? m->yres / 2 : m->yres;
+	}
 }
 
 void dm6446_venc_dac_set(struct dm6446 *dm6446, dm6446_dout dac0,
@@ -382,6 +413,46 @@ void dm6446_venc_dac_set(struct dm6446 *dm6446, dm6446_dout dac0,
 void dm6446_venc_dac_enable(struct dm6446 *dm6446, Eina_Bool dac0,
 		Eina_Bool dac1, Eina_Bool dac2, Eina_Bool dac3)
 {
-	dm6446->venc->dactst = dac0 << 12 | dac1 << 13 | dac2 << 14 | dac3 << 15;
+	dm6446->venc->dactst = !dac0 << 12 | !dac1 << 13 | !dac2 << 14 | !dac3 << 15;
 }
 
+void dm6446_venc_enable(struct dm6446 *dm6446, Eina_Bool enable)
+{
+	if (enable)
+		dm6446->venc->vmod |= 1;
+	else
+		dm6446->venc->vmod &= ~1;
+}
+
+void dm6446_venc_vout_set(struct dm6446 *dm6446, dm6446_vout vout)
+{
+	uint32_t vmod;
+	uint32_t ycctl;
+
+	vmod = dm6446->venc->vmod & ~(0xf << 12);
+	ycctl = dm6446->venc->ycctl & ~(0x3 << 2);
+	switch (vout)
+	{
+		case DM6446_VOUT_16BIT_YCBCR:
+		case DM6446_VOUT_16BIT_YCRCB:
+		ycctl |= vout << 2;
+		break;
+	
+		case DM6446_VOUT_8BIT_CBYCRY:
+		case DM6446_VOUT_8BIT_YCRYCB:
+		case DM6446_VOUT_8BIT_CRYCBY:
+		case DM6446_VOUT_8BIT_YCBYCR:
+		vmod |= 1 << 12;
+		ycctl |= (vout - DM6446_VOUT_8BIT_CBYCRY) << 2;
+		break;
+
+		case DM6446_VOUT_PARALLEL:
+		vmod |= 2 << 12;
+		break;
+
+		default:
+		break;
+	}
+	dm6446->venc->vmod = vmod;
+	dm6446->venc->ycctl = ycctl;
+}

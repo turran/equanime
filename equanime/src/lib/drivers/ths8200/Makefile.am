@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 
 noinst_LTLIBRARIES = libequanime_ths8200.la
 
-libequanime_ths8200_la_SOURCES =
+libequanime_ths8200_la_SOURCES = \
+ths8200.c
 
 libequanime_ths8200_la_LIBADD =

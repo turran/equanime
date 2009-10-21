@@ -37,6 +37,8 @@ typedef struct _Equ_Mode
 	Equ_Standard std;
 	Equ_Timing t;
 	Equ_Video_Mode vmode;
+	unsigned int xres;
+	unsigned int yres;
 } Equ_Mode;
 
 EAPI void equ_mode_standard_from(Equ_Mode *m, Equ_Standard std);

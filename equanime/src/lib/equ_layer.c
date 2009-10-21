@@ -37,6 +37,13 @@ void * equ_layer_data_get(Equ_Layer *l)
 /**
  *
  */
+EAPI const char * equ_layer_name_get(Equ_Layer *l)
+{
+	return l->name;
+}
+/**
+ *
+ */
 EAPI void equ_layer_surface_set(Equ_Layer *l, Equ_Surface *s)
 {
 

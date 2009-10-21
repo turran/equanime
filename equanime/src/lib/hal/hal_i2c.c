@@ -2,8 +2,8 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <i2c-dev.h>
-//#include <linux/i2c-dev.h>
+//#include <i2c-dev.h>
+#include <linux/i2c-dev.h>
 
 #include "Equanime.h"
 #include "equanime_private.h"
@@ -67,7 +67,6 @@ void equ_hal_i2c_shutdown(void)
 		free(a);
 	}
 }
-
 
 Equ_Hal_I2C * equ_hal_i2c_get(int addr)
 {
