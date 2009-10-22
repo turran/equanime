@@ -110,7 +110,7 @@ static Eina_Bool _dm6446_setup(Equ_Controller *c, Equanime_Hal_Device *dev, stru
 	dm6446->venc = equanime_hal_uio_map(dev, 2);
 	if (!dm6446->venc)
 		goto venc_err;
-	
+
 	dm6446->vpss = equanime_hal_uio_map(dev, 3);
 	if (!dm6446->vpss)
 		goto vpss_err;

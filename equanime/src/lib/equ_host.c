@@ -12,6 +12,7 @@ struct _Equ_Host
 	const char *name;
 	void *data;
 
+	/* TODO add the memory areas */
 	Eina_List *controllers;
 	Eina_List *components;
 };
@@ -26,6 +27,8 @@ Equ_Host * equ_host_register(const char *name, void *data)
 
 	h = calloc(1, sizeof(Equ_Host));
 	h->name = name;
+
+	_hosts = eina_list_append(_hosts, h);
 
 	return h;
 }
@@ -43,10 +46,17 @@ Equ_Controller * equ_host_controller_register(Equ_Host *h,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/* TODO add a way to know the alignment */
 EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 		Equ_Format fmt)
 {
+	Equ_Surface *s;
+	void *ptr;
 
+	/* TODO allocate the data */
+	//s = equ_surface_new(h, w, h, fmt);
+
+	return s;
 }
 
 EAPI void equ_host_controllers_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
