@@ -9,7 +9,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static Eina_List *_controllers;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -53,17 +52,16 @@ void equ_controller_layer_unregister(Equ_Layer *el)
 /**
  *
  */
-EAPI Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend,
+EAPI Equ_Controller * equ_controller_new(Equ_Host *h, Equ_Controller_Backend *backend,
 		const char *name, void *data)
 {
 	Equ_Controller *c;
 
 	c = calloc(1, sizeof(Equ_Controller));
+	c->host = h;
 	c->backend = backend;
 	c->data = data;
 	c->name = name;
-
-	_controllers = eina_list_append(_controllers, c);
 
 	return c;
 }
@@ -92,19 +90,6 @@ void * equ_controller_data_get(Equ_Controller *c)
 EAPI const char * equ_controller_name_get(Equ_Controller *c)
 {
 	return c->name;
-}
-/**
- *
- */
-EAPI void equ_controllers_get(Equ_Cb cb, void *cb_data)
-{
-	Equ_Controller *c;
-	Eina_List *l;
-
-	EINA_LIST_FOREACH(_controllers, l, c)
-	{
-		cb(c, cb_data);
-	}
 }
 /**
  *

@@ -18,6 +18,9 @@
 #define DM6446_VENC_START 0x01c72400
 #define DM6446_VENC_END 0x01c725F4
 
+#define DM6446_VPSSCLK_START 0x01c40044
+#define DM6446_VPSSCLK_END 0x01c40044
+
 #define DRIVER_NAME "dm6446_media"
 #define DRIVER_VERSION "0.1"
 
@@ -55,6 +58,10 @@ static int dm6446_media_probe(struct platform_device *pdev)
 	info->mem[2].addr = DM6446_VENC_START;
 	info->mem[2].size = DM6446_VENC_END - DM6446_VENC_START + 1;
 	info->mem[2].memtype = UIO_MEM_PHYS;
+	/* vpss reg */
+	info->mem[3].addr = DM6446_VPSSCLK_START;
+	info->mem[3].size = DM6446_VPSSCLK_END - DM6446_VPSSCLK_START + 1;
+	info->mem[3].memtype = UIO_MEM_PHYS;
 
 	info->version = DRIVER_VERSION;
 	info->name = DRIVER_NAME;
@@ -66,9 +73,6 @@ static int dm6446_media_probe(struct platform_device *pdev)
 	}
 	platform_set_drvdata(pdev, info);
 
-	{
-		outl(0x18, IO_ADDRESS(0x01c40044));
-	}
 	printk(KERN_INFO "[DM6446] Media UIO Driver\n");
 
 	return 0;

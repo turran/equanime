@@ -110,6 +110,10 @@ static Eina_Bool _dm6446_setup(Equ_Controller *c, Equanime_Hal_Device *dev, stru
 	dm6446->venc = equanime_hal_uio_map(dev, 2);
 	if (!dm6446->venc)
 		goto venc_err;
+	
+	dm6446->vpss = equanime_hal_uio_map(dev, 3);
+	if (!dm6446->vpss)
+		goto vpss_err;
 
 	if (!dm6446_controller_init(c, dm6446))
 		goto dm6446_err;
@@ -117,6 +121,8 @@ static Eina_Bool _dm6446_setup(Equ_Controller *c, Equanime_Hal_Device *dev, stru
 	return EINA_TRUE;
 
 dm6446_err:
+	equanime_hal_uio_unmap(dev, 3);
+vpss_err:
 	equanime_hal_uio_unmap(dev, 2);
 venc_err:
 	equanime_hal_uio_unmap(dev, 1);
@@ -142,6 +148,7 @@ static Eina_Bool _io_setup(Equ_Controller *c)
 static Eina_Bool module_init(void)
 {
 	Equanime_Hal_Device *hd;
+	Equ_Host *h;
 	void *mem;
 
 	printf("Initializing Neuros OSD2 Board\n");
@@ -150,10 +157,11 @@ static Eina_Bool module_init(void)
 	if (!hd)
 		goto end;
 
-	/* TODO setup the memory */
+	/* setup the memory */
 	mem = equanime_hal_uio_map(hd, 0);
 
-	osd2.c = equ_controller_register(&_controller, "neuros_osd2", &osd2);
+	h = equ_host_register("neuros_osd", NULL);
+	osd2.c = equ_host_controller_register(h, &_controller, "vpbe", &osd2);
 	/* TODO check !osd2.c */
 	if (!_dm6446_setup(osd2.c, hd, &osd2.dm6446))
 	{

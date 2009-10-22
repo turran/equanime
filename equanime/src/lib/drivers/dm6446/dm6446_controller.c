@@ -339,7 +339,7 @@ Eina_Bool dm6446_controller_init(Equ_Controller *c, struct dm6446 *dm6446)
 	l->dm6446 = dm6446;
 	l->all = all;
 	l->layer = equ_controller_layer_register(c, &_layer_vid1, "vid1", l);
-	/* set color bars mode */
+
 	printf("%08x %08x\n", dm6446->venc->dacsel, dm6446->venc->dactst);
 
 	/* disable VCLK output pin enable */
@@ -354,8 +354,10 @@ Eina_Bool dm6446_controller_init(Equ_Controller *c, struct dm6446 *dm6446)
 	dm6446->venc->lcdout = 0;
 	dm6446->venc->cmpnt = 0x100;
 #endif
-
+	/* set color bars mode */
 	dm6446->venc->vdpro = (1 << 8);
+	/* enable the clocks */
+	dm6446->vpss->clkctl = 0x18;
 }
 
 void dm6446_controller_shutdown(Equ_Controller *c)

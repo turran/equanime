@@ -85,18 +85,32 @@ int _controller_cb(Equ_Controller *c, void *data)
 	return 1;
 }
 
+static void _host_desc_dump(Equ_Host *h)
+{
+	printf("\t- name = %s\n", equ_host_name_get(h));
+}
+
+int _host_cb(Equ_Host *h, void *data)
+{
+	int num_controller = 0;
+	int *num = data;
+
+	printf("Host %d\n", *num++);
+	_host_desc_dump(h);
+	equ_host_controllers_get(h, (Equ_Cb)_controller_cb, &num_controller);
+
+	return 1;
+}
 
 /**
  * List all controllers, layers, inputs and ouputs.
  */
 int main(void)
 {
-	int num_controller = 0;
-
+	int num_host;
 	equ_init();
 
-	equ_controllers_get((Equ_Cb)_controller_cb, &num_controller);
-	/* TODO support input commands? */
+	equ_hosts_get(_host_cb, &num_host);
 
 	equ_shutdown();
 	return 0;

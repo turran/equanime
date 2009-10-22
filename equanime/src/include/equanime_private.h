@@ -135,6 +135,7 @@ struct _Equ_Controller
 	const char *name;
 	void *data;
 
+	Equ_Host *host;
 	Eina_List *layers;
 	Eina_List *outputs;
 	Eina_List *inputs;
@@ -178,7 +179,9 @@ struct _Equ_Surface
 
 void equ_controller_layer_unregister(Equ_Layer *el);
 
-Equ_Controller * equ_controller_register(Equ_Controller_Backend *backend, const char *name, void *data);
+Equ_Controller * equ_host_controller_register(Equ_Host *h,
+		Equ_Controller_Backend *backend, const char *name, void *data);
+
 void equ_controller_unregister(Equ_Controller *c);
 void * equ_controller_data_get(Equ_Controller *c);
 
