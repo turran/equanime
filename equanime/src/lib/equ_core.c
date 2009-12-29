@@ -17,12 +17,12 @@ static void _module_init(void)
 		path = strdup("/usr/local/lib/equanime");
 	}
 	_modules = eina_module_list_get(_modules, path, 1, NULL, NULL);
-	eina_module_list_load(_modules); 
+	eina_module_list_load(_modules);
 }
 
 static void _module_shutdown(void)
 {
-	eina_module_list_flush(_modules); 
+	eina_module_list_flush(_modules);
 }/*============================================================================*
  *                                   API                                      *
  *============================================================================*/
