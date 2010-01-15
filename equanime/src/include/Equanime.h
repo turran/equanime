@@ -1,5 +1,5 @@
-#ifndef EQUANIME_H_
-#define EQUANIME_H_
+#ifndef _EQUANIME_H
+#define _EQUANIME_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,6 +43,7 @@
  */
 
 #include "equ_core.h"
+#include "equ_enums.h"
 #include "equ_surface.h"
 #include "equ_host.h"
 #include "equ_mode.h"
@@ -57,28 +58,9 @@ typedef struct _Equ_Rotator Equ_Rotator;
 typedef struct _Equ_Scaler Equ_Scaler;
 typedef struct _Equ_Csc Equ_Csc;
 
-typedef enum _Equ_Angle
-{
-	EQU_ANGLE_0,
-	EQU_ANGLE_90,
-	EQU_ANGLE_180,
-	EQU_ANGLE_270,
-	EQU_ANGLES,
-} Equ_Angle;
-
-/**
- *
- */
-typedef enum
-{
-	EQU_OUTPUT_LCD,
-	EQU_OUTPUT_TV,
-	EQU_OUTPUT_TYPES,
-} Equ_Output_Type;
-
 
 /**
  * @}
  * @}
  */
-#endif /*EQUANIME_H_*/
+#endif /*_EQUANIME_H*/

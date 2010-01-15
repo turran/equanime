@@ -1,5 +1,5 @@
 #include "Equanime.h"
-#include "equ_private.h"
+#include "equanime_private.h"
 /**
  * A host is just the main element that owns a controller, different
  * components, surface, allocators, etc
@@ -21,6 +21,28 @@ Eina_List *_hosts = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Equ_Host * equ_host_register(const char *name, void *data)
+{
+	Equ_Host *h;
+
+	h = calloc(1, sizeof(Equ_Host));
+	h->name = name;
+
+	_hosts = eina_list_append(_hosts, h);
+
+	return h;
+}
+
+Equ_Controller * equ_host_controller_register(Equ_Host *h,
+		Equ_Controller_Backend *backend, const char *name, void *data)
+{
+	Equ_Controller *c;
+
+	c = equ_controller_new(h, backend, name, data);
+	h->controllers = eina_list_append(h->controllers, c);
+
+	return c;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

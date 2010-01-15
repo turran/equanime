@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT(equanime, 0.0.2, enlightenment-devel@lists.sourceforge.net)
+AC_INIT(equanime, 0.0.3, enlightenment-devel@lists.sourceforge.net)
 AC_PREREQ(2.52)
 AC_CONFIG_SRCDIR(configure.ac)
 AC_CANONICAL_BUILD
@@ -37,13 +37,34 @@ case "$host_os" in
 esac
 AC_SUBST(create_shared_lib)
 
+# Common
 PKG_CHECK_MODULES(EINA, [eina-0 >= 0.0.1])
+PKG_CHECK_MODULES(EET, [eet >= 1.2.2])
 
-EQUANIME_CFLAGS="$EINA_CFLAGS"
-EQUANIME_LIBS="$EINA_LIBS"
-AC_SUBST(EQUANIME_CFLAGS)
-AC_SUBST(EQUANIME_LIBS)
+# Server modules
+PKG_CHECK_MODULES(SDL, [sdl], [have_sdl=yes], [have_sdl=no])
+if test "x$have_sdl" = "xyes"; then
+	build_module_sdl=yes
+	AC_DEFINE(BUILD_MODULE_SDL, [1], [Build support for SDL engine])
+else
+	build_module_sdl=no
+fi
+AM_CONDITIONAL(BUILD_MODULE_SDL, test "x$build_module_sdl" = "xyes")
 
+EQUANIME_COMMON_CFLAGS="$EINA_CFLAGS $EET_CFLAGS"
+EQUANIME_COMMON_LIBS="$EINA_LIBS $EET_LIBS"
+AC_SUBST(EQUANIME_COMMON_CFLAGS)
+AC_SUBST(EQUANIME_COMMON_LIBS)
+
+EQUANIME_LIB_CFLAGS="$EQUANIME_COMMON_CFLAGS"
+EQUANIME_LIB_LIBS="$EQUANIME_COMMON_LIBS"
+AC_SUBST(EQUANIME_LIB_CFLAGS)
+AC_SUBST(EQUANIME_LIB_LIBS)
+
+EQUANIME_SERVER_CFLAGS="$EQUANIME_COMMON_CFLAGS"
+EQUANIME_SERVER_LIBS="$EQUANIME_COMMON_LIBS"
+AC_SUBST(EQUANIME_SERVER_CFLAGS)
+AC_SUBST(EQUANIME_SERVER_LIBS)
 
 ## Make the debug preprocessor configurable
 
@@ -51,20 +72,25 @@ AC_OUTPUT([
 Makefile
 equanime.pc
 src/Makefile
-src/modules/Makefile
-src/modules/neuros_osd2/Makefile
-src/modules/dummy/Makefile
+src/common/Makefile
 src/lib/Makefile
-src/lib/drivers/Makefile
-src/lib/drivers/mp25xxf/Makefile
-src/lib/drivers/mp2520f/Makefile
-src/lib/drivers/mp2530f/Makefile
-src/lib/drivers/dm320/Makefile
-src/lib/drivers/dm6446/Makefile
-src/lib/drivers/ths8200/Makefile
-src/lib/drivers/ths7313/Makefile
-src/lib/hal/Makefile
+src/server/Makefile
+src/server/modules/Makefile
+src/server/modules/neuros_osd2/Makefile
+src/server/modules/dummy/Makefile
+src/server/modules/sdl/Makefile
+src/server/drivers/Makefile
+src/server/drivers/mp25xxf/Makefile
+src/server/drivers/mp2520f/Makefile
+src/server/drivers/mp2530f/Makefile
+src/server/drivers/dm320/Makefile
+src/server/drivers/dm6446/Makefile
+src/server/drivers/ths8200/Makefile
+src/server/drivers/ths7313/Makefile
+src/server/hal/Makefile
 src/bin/Makefile
+src/bin/mode/Makefile
+src/bin/info/Makefile
 src/include/Makefile
 ],[
 ])

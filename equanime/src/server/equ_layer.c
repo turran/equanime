@@ -1,5 +1,5 @@
 #include "Equanime.h"
-#include "equ_private.h"
+#include "equanime_private.h"
 /**
  * A layer is often known as a plane on a video controller. The contorller then
  * blends all layers and sends the result through the video encoder signal

@@ -1,34 +1,19 @@
 #include "Equanime.h"
-#include "equ_private.h"
+#include "equanime_private.h"
+/* TODO
+ * add the supported formats
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static int _init = 0;
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void equ_init(void)
+EAPI equ_csc_format_set(Equ_Csc *c, Equ_Format sf, Equ_Format df)
 {
-	if (_init) return;
 
-	_init++;
-	eina_init();
-	eet_init();
 }
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void equ_shutdown(void)
-{
-	if (_init == 1)
-	{
-		eina_shutdown();
-		eet_shutdown();
-	}
-	_init--;
-}
+

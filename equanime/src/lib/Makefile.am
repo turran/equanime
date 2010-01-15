@@ -1,11 +1,9 @@
 MAINTAINERCLEANFILES = Makefile.in
 
-SUBDIRS = drivers hal
-
 AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \
 -I. \
-@EQUANIME_CFLAGS@
+@EQUANIME_LIB_CFLAGS@
 
 lib_LTLIBRARIES = libequanime.la
 
@@ -24,12 +22,9 @@ equ_scaler.c \
 equ_surface.c
 
 libequanime_la_LIBADD = \
-$(top_builddir)/src/lib/hal/libequanime_hal.la \
-$(top_builddir)/src/lib/drivers/libequanime_drivers.la \
-@EQUANIME_LIBS@
+@EQUANIME_LIB_LIBS@
 
 libequanime_la_DEPENDENCIES = \
-$(top_builddir)/src/lib/hal/libequanime_hal.la \
-$(top_builddir)/src/lib/drivers/libequanime_drivers.la
+$(top_builddir)/src/common/libequ_common.la
 
 libequanime_la_LDFLAGS = @create_shared_lib@ -version-info @version_info@
