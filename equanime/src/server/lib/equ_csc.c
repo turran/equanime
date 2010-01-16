@@ -1,5 +1,7 @@
-#include "Equanime.h"
-#include "equanime_private.h"
+#include "Equ_Server.h"
+/* TODO
+ * add the supported formats
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -9,7 +11,8 @@
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI void equ_scaler_geometry_set(Equ_Scaler *s, uint32_t sw, uint32_t sh, uint32_t dw, uint32_t dh)
+EAPI equ_csc_format_set(Equ_Csc *c, Equ_Format sf, Equ_Format df)
 {
 
 }
+

@@ -1,38 +1,52 @@
-#include "Equanime.h"
-#include "equanime_private.h"
-
+#include "Equ_Server.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib,
+Equ_Output * equ_output_new(Equ_Controller *c, Equ_Output_Backend *ob,
 		const char *name, void *data)
 {
-	Equ_Input *i;
+	Equ_Output *o;
 
-	i = malloc(sizeof(Equ_Input));
-	i->backend = ib;
-	i->name = name;
-	i->data = data;
+	o = malloc(sizeof(Equ_Output));
+	o->controller = c;
+	o->backend = ob;
+	o->name = name;
+	o->data = data;
 
-	return i;
+	return o;
+}
+
+void * equ_output_data_get(Equ_Output *o)
+{
+	return o->data;
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI const char * equ_input_name_get(Equ_Input *i)
+EAPI const char * equ_output_name_get(Equ_Output *o)
 {
-	return i->name;
+	return o->name;
 }
 
-EAPI Equ_Mode * equ_input_mode_get(Equ_Input *i)
+EAPI Equ_Mode * equ_output_mode_get(Equ_Output *o)
 {
-	return i->mode;
+	return &o->mode;
 }
 
-EAPI Eina_Bool equ_input_mode_set(Equ_Input *i, Equ_Mode *m)
+EAPI Eina_Bool equ_output_mode_set(Equ_Output *o, Equ_Mode *m)
 {
+	if (o->backend->mode_set)
+	{
+		if (o->backend->mode_set(o, m))
+		{
+			o->mode = *m;
+			printf("ok!!\n");
 
+			return EINA_TRUE;
+		}
+	}
+	return EINA_FALSE;
 }

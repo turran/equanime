@@ -4,7 +4,6 @@
 /*
  * This application just shows the host hierarchy, showing all controllers,
  * layers, outputs, inputs, etc.
- *
  */
 const char *layer_flags[] = {
 	"VISIBILITY",
@@ -65,7 +64,6 @@ static int _layer_cb(Equ_Layer *l, void *data)
 	return 1;
 }
 
-
 static void _controller_desc_dump(Equ_Controller *c)
 {
 	printf("\t- name = %s\n", equ_controller_name_get(c));
@@ -108,10 +106,10 @@ int _host_cb(Equ_Host *h, void *data)
 int main(void)
 {
 	int num_host;
+
 	equ_init();
-
 	equ_hosts_get(_host_cb, &num_host);
-
 	equ_shutdown();
+
 	return 0;
 }

@@ -6,20 +6,6 @@
  * @{
  */
 
-/**
- * TODO define possible layer options, like:
- */
-typedef enum
-{
-	EQU_LAYER_VISIBILITY 	= (1 << 0),
-	EQU_LAYER_POSITION 	= (1 << 1),
-	EQU_LAYER_SIZE	 	= (1 << 2),
-	EQU_LAYER_LEVEL		= (1 << 3),
-	EQU_LAYER_COLORKEY	= (1 << 4),
-	EQU_LAYER_BLEND		= (1 << 5),
-	EQU_LAYER_3D		= (1 << 6),
-} Equ_Layer_Flags;
-
 typedef struct _Equ_Layer Equ_Layer; /**< Opaque handler */
 
 EAPI void equ_layer_regions_get(Equ_Layer *l, void *cb, void *cb_data);

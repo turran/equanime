@@ -1,54 +1,37 @@
-#include "Equanime.h"
-#include "equanime_private.h"
-
+#include "Equ_Server.h"
+/**
+ * A surface ...
+ * 
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Output * equ_output_new(Equ_Controller *c, Equ_Output_Backend *ob,
-		const char *name, void *data)
+Equ_Surface * equanime_surface_new(void)
 {
-	Equ_Output *o;
+	Equ_Surface *s;
 
-	o = malloc(sizeof(Equ_Output));
-	o->controller = c;
-	o->backend = ob;
-	o->name = name;
-	o->data = data;
-
-	return o;
-}
-
-void * equ_output_data_get(Equ_Output *o)
-{
-	return o->data;
+	s = calloc(1, sizeof(Equ_Surface));
+	/* TODO handle the magic */
+	return s;
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI const char * equ_output_name_get(Equ_Output *o)
+EAPI Equ_Format equ_surface_format_get(Equ_Surface *s)
 {
-	return o->name;
+	return s->fmt;
 }
 
-EAPI Equ_Mode * equ_output_mode_get(Equ_Output *o)
+EAPI void equ_surface_size_get(Equ_Surface *s, unsigned int *w, unsigned int *h)
 {
-	return &o->mode;
+	if (w) *w = s->w;
+	if (h) *h = s->h;
 }
 
-EAPI Eina_Bool equ_output_mode_set(Equ_Output *o, Equ_Mode *m)
+EAPI Equ_Surface_Type equanime_surface_type_get(const Equ_Surface *s)
 {
-	if (o->backend->mode_set)
-	{
-		if (o->backend->mode_set(o, m))
-		{
-			o->mode = *m;
-			printf("ok!!\n");
-
-			return EINA_TRUE;
-		}
-	}
-	return EINA_FALSE;
+	return s->type;
 }

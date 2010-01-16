@@ -1,5 +1,4 @@
-#include "Equanime.h"
-#include "equanime_private.h"
+#include "Equ_Server.h"
 /**
  * A host is just the main element that owns a controller, different
  * components, surface, allocators, etc

@@ -15,6 +15,8 @@ neuros_osd2_LTLIBRARIES = neuros_osd2.la
 neuros_osd2_la_SOURCES = \
 neuros_osd2.c
 
-neuros_osd2_la_LIBADD       = $(top_builddir)/src/lib/libequanime.la
+neuros_osd2_la_LIBADD       = $(top_builddir)/src/server/lib/libequ_server.la
 neuros_osd2_la_LDFLAGS      = @create_shared_lib@ -module -avoid-version
-neuros_osd2_la_DEPENDENCIES = $(top_builddir)/config.h
+neuros_osd2_la_DEPENDENCIES = \
+$(top_builddir)/config.h \
+$(top_builddir)/src/server/lib/libequ_server.la

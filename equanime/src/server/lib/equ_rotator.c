@@ -1,6 +1,4 @@
-#include "Equanime.h"
-#include "equanime_private.h"
-
+#include "Equ_Server.h"
 /* TODO add the supported formats */
 
 void equ_rotator_init(Equ_Rotator *r)

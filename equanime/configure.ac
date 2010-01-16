@@ -42,6 +42,8 @@ PKG_CHECK_MODULES(EINA, [eina-0 >= 0.0.1])
 PKG_CHECK_MODULES(EET, [eet >= 1.2.2])
 
 # Server modules
+PKG_CHECK_MODULES(ECORE, [ecore])
+PKG_CHECK_MODULES(ECORE_CON, [ecore-con])
 PKG_CHECK_MODULES(SDL, [sdl], [have_sdl=yes], [have_sdl=no])
 if test "x$have_sdl" = "xyes"; then
 	build_module_sdl=yes
@@ -61,8 +63,8 @@ EQUANIME_LIB_LIBS="$EQUANIME_COMMON_LIBS"
 AC_SUBST(EQUANIME_LIB_CFLAGS)
 AC_SUBST(EQUANIME_LIB_LIBS)
 
-EQUANIME_SERVER_CFLAGS="$EQUANIME_COMMON_CFLAGS"
-EQUANIME_SERVER_LIBS="$EQUANIME_COMMON_LIBS"
+EQUANIME_SERVER_CFLAGS="$EQUANIME_COMMON_CFLAGS $ECORE_CFLAGS $ECORE_CON_CFLAGS"
+EQUANIME_SERVER_LIBS="$EQUANIME_COMMON_LIBS $ECORE_LIBS $ECORE_CON_LIBS"
 AC_SUBST(EQUANIME_SERVER_CFLAGS)
 AC_SUBST(EQUANIME_SERVER_LIBS)
 
@@ -88,6 +90,7 @@ src/server/drivers/dm6446/Makefile
 src/server/drivers/ths8200/Makefile
 src/server/drivers/ths7313/Makefile
 src/server/hal/Makefile
+src/server/lib/Makefile
 src/bin/Makefile
 src/bin/mode/Makefile
 src/bin/info/Makefile

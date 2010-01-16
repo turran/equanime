@@ -1,5 +1,4 @@
-#include "Equanime.h"
-#include "equanime_private.h"
+#include "Equ_Server.h"
 /**
  * A controller is in charge of controlling the global output, disabling and
  * enabling specific layers and change their priority. Also setting the
