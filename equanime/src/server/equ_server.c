@@ -34,16 +34,19 @@ static void _module_shutdown(void)
 int _client_add(void *data, int type, void *event)
 {
 	Ecore_Con_Event_Client_Add *e = event;
+	printf("client added\n");
 }
 
 int _client_del(void *data, int type, void *event)
 {
 	Ecore_Con_Event_Client_Add *e = event;
+	printf("client del\n");
 }
 
 int _client_data(void *data, int type, void *event)
 {
 	Ecore_Con_Event_Client_Data *cdata = event;
+	printf("client data\n");
 }
 
 static void _server_init(void)

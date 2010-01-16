@@ -13,24 +13,6 @@ Equ_Region *_regions = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *b,
-		const char *name, void *data)
-{
-	Equ_Layer *l;
-
-	l = malloc(sizeof(Equ_Layer));
-	l->backend = b;
-	l->controller = c;
-	l->data = data;
-	l->name = name;
-
-	return l;
-}
-
-void * equ_layer_data_get(Equ_Layer *l)
-{
-	return l->data;
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -135,11 +117,6 @@ EAPI void equ_layer_position_set(Equ_Layer *l, int x, int y)
 	CHECK_FLAG(l, EQU_LAYER_POSITION)
 	if ((x == l->x) && (y == l->y))
 		return;
-	if (l->backend->position_set(l, x, y))
-	{
-		l->x = x;
-		l->y = y;
-	}
 	l->x = x;
 	l->y = y;
 }
@@ -185,8 +162,7 @@ EAPI void equ_layer_hide(Equ_Layer *l)
 {
 	CHECK_FLAG(l, EQU_LAYER_VISIBILITY)
 	if (l->hidden) return;
-	if (l->backend->visibility_set(l, 0))
-		l->hidden = 1;
+	l->hidden = 1;
 }
 /**
  *
@@ -195,8 +171,7 @@ EAPI void equ_layer_show(Equ_Layer *l)
 {
 	CHECK_FLAG(l, EQU_LAYER_VISIBILITY)
 	if (!l->hidden) return;
-	if (l->backend->visibility_set(l, 1))
-		l->hidden = 0;
+	l->hidden = 0;
 }
 /**
  *
