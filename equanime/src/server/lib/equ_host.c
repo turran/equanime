@@ -28,6 +28,7 @@ Equ_Host * equ_host_register(const char *name, void *data)
 	h->name = name;
 
 	_hosts = eina_list_append(_hosts, h);
+	printf("host %s registered\n", name);
 
 	return h;
 }

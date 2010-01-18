@@ -33,6 +33,7 @@ static Eina_Bool module_init(void)
 {
 	Equ_Host *h;
 
+	printf("module init\n");
 	h = equ_host_register("sdl", NULL);
 
 	return EINA_TRUE;

@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: Equanime
 Description: Equanime
-Requires:
+Requires: eina-0 eet ecore ecore-con
 Version: @VERSION@
 Libs: -L${libdir} -lequanime
 Cflags: -I${includedir}
