@@ -29,6 +29,8 @@ typedef struct _Equ_Region_Backend  Equ_Region_Backend;
 typedef struct _Equ_Host_Backend Equ_Host_Backend;
 typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 
+#include "equ_server_private.h"
+
 typedef enum _Equ_Standard
 {
 	EQU_STANDARD_CUSTOM,
@@ -71,7 +73,8 @@ typedef struct _Equ_Mode
 
 struct _Equ_Host_Backend
 {
-
+	Eina_Bool (*init)(Equ_Host *);
+	void (*shutdown)(Equ_Host *);
 };
 
 struct _Equ_Input_Backend
@@ -105,6 +108,7 @@ struct _Equ_Layer_Backend
 	Eina_Bool (*position_set)(Equ_Layer *l, int x, int y);
 	Eina_Bool (*visibility_set)(Equ_Layer *l, Eina_Bool show);
 	Eina_Bool (*surface_set)(Equ_Layer *l, Equ_Surface *s);
+	Eina_Bool (*surface_put)(Equ_Layer *l, Equ_Surface *s, int x, int y);
 	//Equ_Format * (*format_get)(Equ_Layer *l, int num_formats);
 	//Eina_Bool (*input_set)(Equ_Layer *l, Equ_Input *i);
 };
@@ -237,23 +241,26 @@ struct _Equ_Surface
 	void *data;
 };
 
-void equ_controller_layer_unregister(Equ_Layer *el);
 
+Equ_Output * equ_output_new(Equ_Controller *c,
+		const char *name, Equ_Output_Backend *ob);
+Equ_Output *equ_controller_output_register(Equ_Controller *c,
+		const char *name, Equ_Output_Backend *backend);
+Equ_Layer * equ_layer_new(Equ_Controller *c,
+		const char *name, Equ_Layer_Backend *lb);
+Equ_Layer * equ_controller_layer_register(Equ_Controller *c,
+		const char *name, Equ_Layer_Backend *lb);
 Equ_Controller * equ_host_controller_register(Equ_Host *h,
-		Equ_Controller_Backend *backend, const char *name, void *data);
+		const char *name, Equ_Controller_Backend *backend);
 
 void equ_controller_unregister(Equ_Controller *c);
 void * equ_controller_data_get(Equ_Controller *c);
 
-Equ_Layer * equ_controller_layer_register(Equ_Controller *ec, Equ_Layer_Backend *lb, const char *name, void *data);
-void equ_controller_output_register(Equ_Controller *ec, Equ_Output_Backend *ob, const char *name, void *data);
 void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib, const char *nane, void *data);
 
 void equ_layer_unregister(Equ_Layer *l);
-Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *lb, const char *name, void *data);
 void * equ_layer_data_get(Equ_Layer *l);
 
-Equ_Output * equ_output_new(Equ_Controller *c, Equ_Output_Backend *ob, const char *name, void *data);
 
 Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib, const char *name, void *data);
 
@@ -289,4 +296,4 @@ void equ_hal_i2c_init(void);
 void equ_hal_i2c_shutdown(void);
 Equ_Hal_I2C * equ_hal_i2c_get(int addr);
 
-#endif /*EQUANIME_PRIVATE_H_*/
+#endif /*EQU_SERVER_H_*/

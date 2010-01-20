@@ -15,22 +15,23 @@
  *
  */
 Equ_Layer * equ_controller_layer_register(Equ_Controller *ec,
-		Equ_Layer_Backend *lb, const char *name, void *data)
+		const char *name, Equ_Layer_Backend *lb)
 {
 	Equ_Layer *l;
 
-	l = equ_layer_new(ec, lb, name, data);
+	l = equ_layer_new(ec, name, lb);
 	ec->layers = eina_list_append(ec->layers, l);
 	return l;
 }
 
-void equ_controller_output_register(Equ_Controller *ec, Equ_Output_Backend *ob,
-		const char *name, void *data)
+Equ_Output * equ_controller_output_register(Equ_Controller *ec,
+		const char *name, Equ_Output_Backend *ob)
 {
 	Equ_Output *o;
 
-	o = equ_output_new(ec, ob, name, data);
+	o = equ_output_new(ec, name, ob);
 	ec->outputs = eina_list_append(ec->outputs, o);
+	return o;
 }
 
 void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib,
@@ -44,22 +45,27 @@ void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib,
 /**
  *
  */
-void equ_controller_layer_unregister(Equ_Layer *el)
+void equ_controller_layer_unregister(Equ_Layer *l)
 {
+	eina_list_remove(l->controller->layers, l);
+}
+
+void equ_controller_output_unregister(Equ_Output *o)
+{
+	eina_list_remove(o->controller->outputs, o);
 }
 
 /**
  *
  */
-EAPI Equ_Controller * equ_controller_new(Equ_Host *h, Equ_Controller_Backend *backend,
-		const char *name, void *data)
+EAPI Equ_Controller * equ_controller_new(Equ_Host *h,
+		const char *name, Equ_Controller_Backend *cb)
 {
 	Equ_Controller *c;
 
 	c = calloc(1, sizeof(Equ_Controller));
 	c->host = h;
-	c->backend = backend;
-	c->data = data;
+	c->backend = cb;
 	c->name = name;
 
 	return c;

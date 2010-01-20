@@ -12,6 +12,14 @@ typedef struct _Equanime
 
 static Eina_Array *_modules = NULL;
 
+static void _help(void)
+{
+	printf("equanime\n");
+	printf("-m <module>             : The system module to load\n");
+	printf("                          Use 'list' to list the available modules\n");
+	printf("-n                      : Dont detach from the console\n");
+}
+
 static void _module_init(void)
 {
 	char *mpath;
@@ -65,23 +73,33 @@ static void _server_shutdown(void)
 	//ecore_con_server_del(srv);
 }
 
+static void _server_setup(void)
+{
+	/* parse the cmd line options */
+	if (!equ_host_init("sdl"))
+		return;
+}
+
 int main(int argc, char **argv)
 {
 	Equanime equ;
 
+	/* initialize every system */
 	eina_init();
 	ecore_init();
 	ecore_con_init();
-	// equ_message_init();
-	/* initialize the modules */
+	equ_message_init();
+	_help();
 	_module_init();
 	_server_init();
 	/* setup the system */
+	_server_setup();
 	/* listen to the messages */
 	ecore_main_loop_begin();
+	/* shutdown every system */
 	_server_shutdown();
 	_module_shutdown();
-	// equ_message_shutdown();
+	equ_message_shutdown();
 	ecore_con_shutdown();
 	ecore_shutdown();
 	eina_shutdown();

@@ -8,37 +8,53 @@
  *============================================================================*/
 struct _Equ_Host
 {
-	const char *name;
+	Eina_Bool initialized;
+	Equ_Host_Backend *backend;;
 	void *data;
+	const char *name;
 
 	/* TODO add the memory areas */
 	Eina_List *controllers;
 	Eina_List *components;
 };
 
-Eina_List *_hosts = NULL;
+Eina_Hash *_hosts = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Host * equ_host_register(const char *name, void *data)
+Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 {
 	Equ_Host *h;
 
-	h = calloc(1, sizeof(Equ_Host));
-	h->name = name;
+	if (!_hosts)
+		_hosts = eina_hash_string_superfast_new(NULL);
 
-	_hosts = eina_list_append(_hosts, h);
+	if (eina_hash_find(_hosts, name))
+		return EINA_FALSE;
+
+	h = calloc(1, sizeof(Equ_Host));
+	h->name = strdup(name);
+	h->backend = hb;
+	eina_hash_add(_hosts, name, h);
 	printf("host %s registered\n", name);
 
-	return h;
+	return EINA_TRUE;
+}
+
+void equ_host_unregister(Equ_Host *h)
+{
+	if (!h->backend->shutdown);
+		return;
+	h->backend->shutdown(h);
+	eina_hash_remove(_hosts, h->name);
 }
 
 Equ_Controller * equ_host_controller_register(Equ_Host *h,
-		Equ_Controller_Backend *backend, const char *name, void *data)
+		const char *name, Equ_Controller_Backend *cb)
 {
 	Equ_Controller *c;
 
-	c = equ_controller_new(h, backend, name, data);
+	c = equ_controller_new(h, cb, name);
 	h->controllers = eina_list_append(h->controllers, c);
 
 	return c;
@@ -95,4 +111,25 @@ EAPI void equ_hosts_get(Equ_Cb cb, void *cb_data)
 EAPI const char * equ_host_name_get(Equ_Host *h)
 {
 	return h->name;
+}
+
+void equ_host_data_set(Equ_Host *h, void *data)
+{
+	h->data = data;
+}
+
+void * equ_host_data_get(Equ_Host *h)
+{
+	return h->data;
+}
+
+EAPI Eina_Bool equ_host_init(const char *name)
+{
+	Equ_Host *h;
+
+	h = eina_hash_find(_hosts, name);
+	if (!h ||  h->initialized) return EINA_FALSE;
+	if (!h->backend->init) return EINA_FALSE;
+
+	return h->backend->init(h);
 }

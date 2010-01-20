@@ -12,15 +12,14 @@ Equ_Region *_regions = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Layer_Backend *b,
-		const char *name, void *data)
+Equ_Layer * equ_layer_new(Equ_Controller *c,
+		const char *name, Equ_Layer_Backend *b)
 {
 	Equ_Layer *l;
 
 	l = malloc(sizeof(Equ_Layer));
 	l->backend = b;
 	l->controller = c;
-	l->data = data;
 	l->name = name;
 
 	return l;

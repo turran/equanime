@@ -5,8 +5,8 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Output * equ_output_new(Equ_Controller *c, Equ_Output_Backend *ob,
-		const char *name, void *data)
+Equ_Output * equ_output_new(Equ_Controller *c,
+		const char *name, Equ_Output_Backend *ob)
 {
 	Equ_Output *o;
 
@@ -14,7 +14,6 @@ Equ_Output * equ_output_new(Equ_Controller *c, Equ_Output_Backend *ob,
 	o->controller = c;
 	o->backend = ob;
 	o->name = name;
-	o->data = data;
 
 	return o;
 }
