@@ -2,6 +2,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+struct _Equ_Output
+{
+	Equ_Output_Backend *backend;
+	const char *name;
+	void *data;
+
+	Equ_Controller *controller;
+	Equ_Mode mode;
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -25,6 +34,16 @@ void * equ_output_data_get(Equ_Output *o)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI void equ_output_unregister(Equ_Output *o)
+{
+	equ_controller_output_unregister(o->controller, o);
+}
+
+EAPI Equ_Controller * equ_output_controller_get(Equ_Output *o)
+{
+	return o->controller;
+}
+
 EAPI const char * equ_output_name_get(Equ_Output *o)
 {
 	return o->name;

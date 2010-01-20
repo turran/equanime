@@ -21,6 +21,7 @@ equ_rotator.c \
 equ_csc.c \
 equ_input.c \
 equ_mode.c \
+equ_pool.c \
 equ_region.c \
 equ_scaler.c \
 equ_surface.c

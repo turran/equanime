@@ -20,6 +20,7 @@ typedef struct _Equ_Host Equ_Host;
 typedef struct _Equ_Scaler Equ_Scaler;
 typedef struct _Equ_Csc Equ_Csc;
 typedef struct _Equ_Region Equ_Region;
+typedef struct _Equ_Pool Equ_Pool;
 
 typedef struct _Equ_Controller_Backend Equ_Controller_Backend;
 typedef struct _Equ_Layer_Backend  Equ_Layer_Backend;
@@ -27,6 +28,8 @@ typedef struct _Equ_Output_Backend  Equ_Output_Backend;
 typedef struct _Equ_Input_Backend  Equ_Input_Backend;
 typedef struct _Equ_Region_Backend  Equ_Region_Backend;
 typedef struct _Equ_Host_Backend Equ_Host_Backend;
+typedef struct _Equ_Pool_Backend Equ_Pool_Backend;
+
 typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 
 #include "equ_server_private.h"
@@ -88,6 +91,12 @@ struct _Equ_Output_Backend
 {
 	Eina_Bool (*mode_set)(Equ_Output *o, Equ_Mode *m);
 	/* TODO add a way to get the possible modes */
+};
+
+struct _Equ_Pool_Backend
+{
+	void * (*alloc)(Equ_Pool *p, size_t bytes);
+	void (*free)(Equ_Pool *p, void *data);
 };
 
 /**
@@ -207,18 +216,6 @@ struct _Equ_Controller
 /**
  *
  */
-struct _Equ_Output
-{
-	Equ_Output_Backend *backend;
-	const char *name;
-	void *data;
-
-	Equ_Controller *controller;
-	Equ_Mode mode;
-};
-/**
- *
- */
 struct _Equ_Input
 {
 	Equ_Input_Backend *backend;
@@ -227,20 +224,6 @@ struct _Equ_Input
 
 	Equ_Mode *mode;
 };
-
-/**
- *
- */
-struct _Equ_Surface
-{
-	Equ_Surface_Type type;
-	Equ_Format fmt;
-	unsigned int w;
-	unsigned int h;
-	unsigned int pitch;
-	void *data;
-};
-
 
 Equ_Output * equ_output_new(Equ_Controller *c,
 		const char *name, Equ_Output_Backend *ob);

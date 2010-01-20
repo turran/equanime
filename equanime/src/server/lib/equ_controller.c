@@ -45,14 +45,14 @@ void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib,
 /**
  *
  */
-void equ_controller_layer_unregister(Equ_Layer *l)
+void equ_controller_layer_unregister(Equ_Controller *c, Equ_Layer *l)
 {
-	eina_list_remove(l->controller->layers, l);
+	eina_list_remove(c->layers, l);
 }
 
-void equ_controller_output_unregister(Equ_Output *o)
+void equ_controller_output_unregister(Equ_Controller *c, Equ_Output *o)
 {
-	eina_list_remove(o->controller->outputs, o);
+	eina_list_remove(c->outputs, o);
 }
 
 /**
@@ -144,7 +144,7 @@ EAPI void equ_controller_inputs_get(Equ_Controller *c, Equ_Cb cb, void *cb_data)
  */
 EAPI Eina_Bool equ_controller_output_set(Equ_Controller *c, Equ_Output *o)
 {
-	if (o->controller != c)
+	if (equ_output_controller_get(o) != c)
 		return EINA_FALSE;
 	if (c->backend->output_set)
 		return c->backend->output_set(c, o);

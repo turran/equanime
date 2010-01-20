@@ -13,16 +13,19 @@ struct _Equ_Host
 	void *data;
 	const char *name;
 
-	/* TODO add the memory areas */
 	Eina_List *controllers;
 	Eina_List *components;
+	Eina_List *pools;
 };
 
 Eina_Hash *_hosts = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+EAPI Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 {
 	Equ_Host *h;
 
@@ -41,7 +44,7 @@ Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 	return EINA_TRUE;
 }
 
-void equ_host_unregister(Equ_Host *h)
+EAPI void equ_host_unregister(Equ_Host *h)
 {
 	if (!h->backend->shutdown);
 		return;
@@ -49,7 +52,7 @@ void equ_host_unregister(Equ_Host *h)
 	eina_hash_remove(_hosts, h->name);
 }
 
-Equ_Controller * equ_host_controller_register(Equ_Host *h,
+EAPI Equ_Controller * equ_host_controller_register(Equ_Host *h,
 		const char *name, Equ_Controller_Backend *cb)
 {
 	Equ_Controller *c;
@@ -59,19 +62,34 @@ Equ_Controller * equ_host_controller_register(Equ_Host *h,
 
 	return c;
 }
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
+
+EAPI Equ_Pool * equ_host_pool_register(Equ_Host *h,
+		const char *name, uint32_t tmask, Equ_Pool_Backend *pb)
+{
+	Equ_Pool *p;
+
+	p = equ_pool_new(h, pb, name, tmask);
+	h->pools = eina_list_append(h->pools, p);
+}
+
 /* TODO add a way to know the alignment */
 EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
-		Equ_Format fmt)
+		Equ_Format fmt, Equ_Surface_Type type)
 {
+	Equ_Pool *p;
+	Eina_List *l;
 	Equ_Surface *s;
-	void *ptr;
+	void *data = NULL;
 
-	/* TODO allocate the data */
-	//s = equ_surface_new(h, w, h, fmt);
+	EINA_LIST_FOREACH(host->pools, l, p)
+	{
+		if (data = equ_pool_alloc(p, w * h * fmt, type))
+			break;
+	}
+	if (!data)
+		return NULL;
 
+	s = equ_surface_new(p, w, h, fmt, type, data);
 	return s;
 }
 
@@ -113,12 +131,12 @@ EAPI const char * equ_host_name_get(Equ_Host *h)
 	return h->name;
 }
 
-void equ_host_data_set(Equ_Host *h, void *data)
+EAPI void equ_host_data_set(Equ_Host *h, void *data)
 {
 	h->data = data;
 }
 
-void * equ_host_data_get(Equ_Host *h)
+EAPI void * equ_host_data_get(Equ_Host *h)
 {
 	return h->data;
 }

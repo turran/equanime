@@ -32,6 +32,11 @@ void * equ_layer_data_get(Equ_Layer *l)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI void equ_layer_unregister(Equ_Layer *l)
+{
+	equ_controller_layer_unregister(l->controller, l);
+}
+
 /**
  *
  */
