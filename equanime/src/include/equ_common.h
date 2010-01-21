@@ -37,25 +37,15 @@ typedef enum
  */
 typedef enum
 {
-	EQU_MSG_NAME_SEGMENT_NEW,
-	EQU_MSG_NAME_SEGMENT_NEWR,
-	EQU_MSG_NAME_SEGMENT_GET,
-	EQU_MSG_NAME_SEGMENT_GETR,
-	EQU_MSG_NAME_SEGMENT_LOCK,
-	EQU_MSG_NAME_SEGMENT_UNLOCK,
-	EQU_MSG_NAME_SEGMENT_DELETE,
+	EQU_MSG_NAME_HOSTS_GET,
+	EQU_MSG_NAME_HOSTS_GETR,
 	EQU_MSG_NAMES
 } Equ_Message_Name;
 
 typedef enum
 {
-	EQU_MSG_TYPE_SEGMENT_NEW    = ((EQU_MSG_NAME_SEGMENT_NEW << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_SEGMENT_NEWR   = ((EQU_MSG_NAME_SEGMENT_NEWR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_SEGMENT_GET    = ((EQU_MSG_NAME_SEGMENT_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_SEGMENT_GETR   = ((EQU_MSG_NAME_SEGMENT_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_SEGMENT_LOCK   = ((EQU_MSG_NAME_SEGMENT_LOCK << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_SEGMENT_UNLOCK = ((EQU_MSG_NAME_SEGMENT_UNLOCK << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_SEGMENT_DELETE = ((EQU_MSG_NAME_SEGMENT_DELETE << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_HOSTS_GET    = ((EQU_MSG_NAME_HOSTS_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_HOSTS_GETR   = ((EQU_MSG_NAME_HOSTS_GETR << 1) | EQU_MSG_NO_REPLY),
 } Equ_Message_Type;
 
 
@@ -74,32 +64,9 @@ typedef struct _Equ_Message
 	unsigned int size; /* size of the body */
 } Equ_Message;
 
-typedef struct _Equ_Message_Segment_New
+typedef struct _Equ_Message_Hosts_Get
 {
-	const char *id;
-	unsigned int size;
-} Equ_Message_Segment_New;
-
-typedef struct _Equ_Message_Segment_Get
-{
-	const char *id;
-} Equ_Message_Segment_Get;
-
-typedef struct _Equ_Message_Segment_Delete
-{
-	const char *id;
-} Equ_Message_Segment_Delete;
-
-typedef struct _Equ_Message_Segment_Lock
-{
-	const char *id;
-	unsigned char write;
-} Equ_Message_Segment_Lock;
-
-typedef struct _Equ_Message_Segment_Unlock
-{
-	const char *id;
-} Equ_Message_Segment_Unlock;
+} Equ_Message_Hosts_Get;
 
 /*
  * A reply is composed of:
@@ -116,15 +83,11 @@ typedef struct _Equ_Reply
 	unsigned int size; /* size of the body */
 } Equ_Reply;
 
-typedef struct _Equ_Reply_Segment_New
+typedef struct _Equ_Reply_Hosts_Get
 {
-	int shmid;
-} Equ_Reply_Segment_New;
-
-typedef struct _Equ_Reply_Segment_Get
-{
-	int shmid;
-} Equ_Reply_Segment_Get;
+	int hosts_num;
+	Equ_Host *hosts;
+} Equ_Reply_Hosts_Get;
 
 Equ_Error equ_server_send(Equ_Message *m, void *data, double timeout, void **rdata);
 

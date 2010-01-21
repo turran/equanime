@@ -117,6 +117,8 @@ EAPI void equ_host_components_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
 
 EAPI void equ_hosts_get(Equ_Cb cb, void *cb_data)
 {
+	
+#if 0
 	Equ_Host *h;
 	Eina_List *l;
 
@@ -124,6 +126,7 @@ EAPI void equ_hosts_get(Equ_Cb cb, void *cb_data)
 	{
 		cb(h, cb_data);
 	}
+#endif
 }
 
 EAPI const char * equ_host_name_get(Equ_Host *h)

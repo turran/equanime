@@ -17,6 +17,7 @@ static void _help(void)
 	printf("equanime\n");
 	printf("-m <module>             : The system module to load\n");
 	printf("                          Use 'list' to list the available modules\n");
+	printf("-p <port>               : The server port to listen connections on\n");
 	printf("-n                      : Dont detach from the console\n");
 }
 

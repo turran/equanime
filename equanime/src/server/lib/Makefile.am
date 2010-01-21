@@ -11,6 +11,7 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libequ_server.la
 
 libequ_server_la_SOURCES = \
+equ_client.c \
 equ_component.c \
 equ_controller.c \
 equ_core.c \

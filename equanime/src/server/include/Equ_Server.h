@@ -4,9 +4,6 @@
 #include "Eina.h"
 #include "Eet.h"
 
-#include "equ_enums.h"
-#include "equ_common.h"
-
 typedef int (*Equ_Cb)(void *data, void *user_data); /**< */
 
 typedef struct _Equ_Input Equ_Input;
@@ -21,6 +18,7 @@ typedef struct _Equ_Scaler Equ_Scaler;
 typedef struct _Equ_Csc Equ_Csc;
 typedef struct _Equ_Region Equ_Region;
 typedef struct _Equ_Pool Equ_Pool;
+typedef struct _Equ_Client Equ_Client;
 
 typedef struct _Equ_Controller_Backend Equ_Controller_Backend;
 typedef struct _Equ_Layer_Backend  Equ_Layer_Backend;
@@ -32,6 +30,8 @@ typedef struct _Equ_Pool_Backend Equ_Pool_Backend;
 
 typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 
+#include "equ_enums.h"
+#include "equ_common.h"
 #include "equ_server_private.h"
 
 typedef enum _Equ_Standard

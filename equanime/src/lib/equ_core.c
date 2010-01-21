@@ -4,6 +4,11 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+struct _Equanime
+{
+	Ecore_Con_Server *server;
+};
+
 static int _init = 0;
 
 static int _server_data(void *data, int type, void *event)
@@ -26,10 +31,6 @@ EAPI void equ_init(void)
 	eet_init();
 	ecore_init();
 	ecore_con_init();
-	/* try to connect to the server */
-	ecore_con_server_connect(ECORE_CON_LOCAL_USER, EQUANIME_NAME,
-			EQUANIME_PORT, NULL);
-	ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, NULL);
 }
 /**
  * To be documented
@@ -45,4 +46,21 @@ EAPI void equ_shutdown(void)
 		eina_shutdown();
 	}
 	_init--;
+}
+
+/**
+ * Connects to an Equanime server
+ * @param[in] port The port to use for the connection
+ * @return An equanime instance which identifies a server connection 
+ */
+EAPI Equanime * equ_new(int port)
+{
+	Equanime *eq;
+
+	eq = malloc(sizeof(Equanime));
+	ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, eq);
+	/* try to connect to the server */
+	eq->server = ecore_con_server_connect(ECORE_CON_LOCAL_USER, EQUANIME_NAME,
+			port, NULL);
+	return eq;
 }
