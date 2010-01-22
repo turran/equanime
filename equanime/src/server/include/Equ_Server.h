@@ -3,6 +3,7 @@
 
 #include "Eina.h"
 #include "Eet.h"
+#include "Ecore_Con.h"
 
 typedef int (*Equ_Cb)(void *data, void *user_data); /**< */
 

@@ -22,6 +22,7 @@ equ_scaler.c \
 equ_surface.c
 
 libequanime_la_LIBADD = \
+$(top_builddir)/src/common/libequ_common.la \
 @EQUANIME_LIB_LIBS@
 
 libequanime_la_DEPENDENCIES = \

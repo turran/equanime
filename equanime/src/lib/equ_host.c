@@ -44,13 +44,34 @@ EAPI void equ_host_components_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
 
 /**
  * Get all the available hosts registered
- * @param e The Equanime connection
- * @param cb The callback function to call whenever the data is received
- * @param cb_data The data to pass to the callback function
+ * @parami[in] e The Equanime connection
+ * @param[in] cb The callback function to call whenever the data is received
+ * @param[in] cb_data The data to pass to the callback function
  */
 EAPI void equ_hosts_get(Equanime *e, Equ_Cb cb, void *cb_data)
 {
-	Equ_Host *h;
+	Equ_Message_Hosts_Get m;
+	Equ_Reply_Hosts_Get *r;
+	Equ_Error error;
+	int i;
+
+	/* send the command to the server */
+	error = equ_message_server_send(e, EQU_MSG_TYPE_HOSTS_GET, &m, 0, (void **)&r);
+	if (error) return;
+	/* allocate all the hosts and give them back to the user */
+	for (i = 0; i < r->hosts_count; i++)
+	{
+		Equ_Host *h;
+
+		h = malloc(sizeof(Equ_Host));
+		printf("host %d %p\n", r->hosts[i].id, r->hosts[i].name);
+		h->name = strdup(r->hosts[i].name);
+		h->id = r->hosts[i].id;
+
+		if (!cb(h, cb_data))
+			break;
+	}
+	free(r);
 }
 
 EAPI const char * equ_host_name_get(Equanime *e, Equ_Host *h)
@@ -58,7 +79,12 @@ EAPI const char * equ_host_name_get(Equanime *e, Equ_Host *h)
 	return h->name;
 }
 
+/**
+ * Deletes a host
+ * @param[in] h The host to delete
+ */
 EAPI void equ_host_delete(Equ_Host *h)
 {
+	free(h->name);
 	free(h);
 }

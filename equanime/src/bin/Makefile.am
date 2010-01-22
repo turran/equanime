@@ -1,3 +1,3 @@
-SUBDIRS = mode info
+SUBDIRS = info
 
 MAINTAINERCLEANFILES = Makefile.in

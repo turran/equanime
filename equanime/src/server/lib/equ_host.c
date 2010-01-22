@@ -117,16 +117,15 @@ EAPI void equ_host_components_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
 
 EAPI void equ_hosts_get(Equ_Cb cb, void *cb_data)
 {
-	
-#if 0
-	Equ_Host *h;
-	Eina_List *l;
+	Eina_Iterator *it;
+	Equ_Host *host;
 
-	EINA_LIST_FOREACH(_hosts, l, h)
+	it = eina_hash_iterator_data_new(_hosts);
+	while (eina_iterator_next(it, &host))
 	{
-		cb(h, cb_data);
+		cb(host, cb_data);
 	}
-#endif
+	eina_iterator_free(it);
 }
 
 EAPI const char * equ_host_name_get(Equ_Host *h)

@@ -9,6 +9,21 @@
  * change the name from reply to payload, this is getting confusing
  */
 
+typedef int Equ_Common_Id;
+
+/* common data definitions */
+typedef struct _Equ_Common_Host
+{
+	Equ_Common_Id id;
+	char *name;
+} Equ_Common_Host;
+
+typedef enum
+{
+	EQU_DATA_HOST,
+	EQU_DATAS
+} Equ_Data;
+
 /* protocol structures */
 typedef enum
 {
@@ -48,7 +63,6 @@ typedef enum
 	EQU_MSG_TYPE_HOSTS_GETR   = ((EQU_MSG_NAME_HOSTS_GETR << 1) | EQU_MSG_NO_REPLY),
 } Equ_Message_Type;
 
-
 /*
  * A message is composed of:
  * +----+------+------+-----------------
@@ -85,19 +99,40 @@ typedef struct _Equ_Reply
 
 typedef struct _Equ_Reply_Hosts_Get
 {
-	int hosts_num;
-	Equ_Host *hosts;
+	int hosts_count;
+	Equ_Common_Host *hosts;
 } Equ_Reply_Hosts_Get;
 
-Equ_Error equ_server_send(Equ_Message *m, void *data, double timeout, void **rdata);
 
-inline Equ_Message_Name equ_message_name_get(Equ_Message_Type t);
-inline Eina_Bool equ_message_reply_has(Equ_Message_Type t);
-inline Eina_Bool equ_message_reply_name_get(Equ_Message_Type t, Equ_Message_Name *n);
+static inline Equ_Message_Name equ_message_name_get(Equ_Message_Type t)
+{
+	return (t & ~1) >> 1;
+}
+
+static inline Eina_Bool equ_message_reply_has(Equ_Message_Type t)
+{
+	if (t & EQU_MSG_REPLY)
+		return EINA_TRUE;
+	else
+		return EINA_FALSE;
+}
+
+/**
+ * Given a message type return the name of the reply. Note that the reply's
+ * name is always the message plus one.
+ */
+static inline Eina_Bool equ_message_reply_name_get(Equ_Message_Type t, Equ_Message_Name *n)
+{
+	if (equ_message_reply_has(t) == EINA_FALSE)
+		return EINA_FALSE;
+	*n = equ_message_name_get(t) + 1;
+	return EINA_TRUE;
+}
+
 void equ_message_init(void);
 void equ_message_shutdown(void);
+
 void * equ_message_encode(Equ_Message_Name name, const void *data, int *size);
 void * equ_message_decode(Equ_Message_Name name, const void *data, int size);
-Equ_Error equ_message_server_send(Equ_Message_Type type, void *data, double timeout, void **rdata);
 
 #endif /*_EQU_COMMON_H*/

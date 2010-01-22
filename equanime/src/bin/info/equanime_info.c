@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "Equanime.h"
 
+Equanime *eq;
+
 /*
  * This application just shows the host hierarchy, showing all controllers,
  * layers, outputs, inputs, etc.
@@ -85,7 +87,7 @@ int _controller_cb(Equ_Controller *c, void *data)
 
 static void _host_desc_dump(Equ_Host *h)
 {
-	printf("\t- name = %s\n", equ_host_name_get(h));
+	printf("\t- name = %s\n", equ_host_name_get(eq, h));
 }
 
 int _host_cb(Equ_Host *h, void *data)
@@ -108,7 +110,8 @@ int main(void)
 	int num_host;
 
 	equ_init();
-	equ_hosts_get(_host_cb, &num_host);
+	eq = equ_new(0xea);
+	equ_hosts_get(eq, _host_cb, &num_host);
 	equ_shutdown();
 
 	return 0;
