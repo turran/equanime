@@ -94,6 +94,7 @@ src/server/lib/Makefile
 src/bin/Makefile
 src/bin/mode/Makefile
 src/bin/info/Makefile
+src/bin/blit/Makefile
 src/include/Makefile
 ],[
 ])

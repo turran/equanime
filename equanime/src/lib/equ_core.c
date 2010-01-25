@@ -76,7 +76,7 @@ static int _server_data(void *data, int type, void *event)
 #if 0
 		{
 			Equ_Reply_Hosts_Get *rhg;
-		
+
 			rhg = eq->rbody;
 			printf("%p %d\n", rhg->hosts[0].name, rhg->hosts[1].id);
 			printf("[ %p %d\n", eq->buffer + sizeof(Equ_Reply), eq->reply->size);
@@ -214,7 +214,7 @@ EAPI void equ_shutdown(void)
 /**
  * Connects to an Equanime server
  * @param[in] port The port to use for the connection
- * @return An equanime instance which identifies a server connection 
+ * @return An equanime instance which identifies a server connection
  */
 EAPI Equanime * equ_new(int port)
 {

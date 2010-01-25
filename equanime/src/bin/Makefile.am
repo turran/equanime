@@ -1,3 +1,3 @@
-SUBDIRS = info
+SUBDIRS = info blit
 
 MAINTAINERCLEANFILES = Makefile.in

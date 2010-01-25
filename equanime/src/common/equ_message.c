@@ -69,6 +69,14 @@ void equ_message_init(void)
 	edd = eet_data_descriptor2_new(&_eddc);
 	_descriptors[EQU_MSG_NAME_HOSTS_GETR] = edd;
 	EET_DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Hosts_Get, "hosts", hosts, _ddescriptors[EQU_DATA_HOST]);
+	/* host get */
+	edd = eet_data_descriptor2_new(&_eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Host_Get, "name", name, EET_T_STRING);
+	_descriptors[EQU_MSG_NAME_HOST_GET] = edd;
+	edd = eet_data_descriptor2_new(&_eddc);
+	/* host get reply */
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Host_Get, "id", id, EET_T_UINT);
+	_descriptors[EQU_MSG_NAME_HOST_GETR] = edd;
 }
 
 void equ_message_shutdown(void)

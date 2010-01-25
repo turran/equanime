@@ -4,6 +4,13 @@
 #include "Enesim.h"
 #include "Equanime.h"
 
+/* This example should get a host
+ * get a controller
+ * get a layer
+ * get a surface
+ * and start blitting this surface into the layer every n seconds
+ */
+
 Equanime_Layer *rgb = NULL;
 Equanime_Layer *video = NULL;
 
