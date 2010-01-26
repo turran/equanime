@@ -39,9 +39,7 @@ typedef enum
 typedef enum
 {
 	EQU_ERR_NONE,
-	EQU_ERR_ACCESS,  /* permission errors */
-	EQU_ERR_EXIST,   /* a request for new segment that already exists */
-	EQU_ERR_NEXIST,  /* a request for a segment that no longer exists */
+	EQU_ERR_NEXIST,  /* a request for some element that doesnt exist */
 	EQU_ERR_CODEC,   /* bad encoding or decoding */
 	EQU_ERR_TIMEOUT, /* timeout error */
 	EQU_ERRORS,
@@ -71,12 +69,12 @@ typedef enum
 {
 	EQU_MSG_TYPE_HOSTS_GET        = ((EQU_MSG_NAME_HOSTS_GET << 1) | EQU_MSG_REPLY),
 	EQU_MSG_TYPE_HOSTS_GETR       = ((EQU_MSG_NAME_HOSTS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_HOST_GET         = ((EQU_MSG_NAME_HOST_GET << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_HOST_GETR        = ((EQU_MSG_NAME_HOST_GETR << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_HOST_GET         = ((EQU_MSG_NAME_HOST_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_HOST_GETR        = ((EQU_MSG_NAME_HOST_GETR << 1) | EQU_MSG_NO_REPLY),
 	EQU_MSG_TYPE_CONTROLLERS_GET  = ((EQU_MSG_NAME_CONTROLLERS_GET << 1) | EQU_MSG_REPLY),
 	EQU_MSG_TYPE_CONTROLLERS_GETR = ((EQU_MSG_NAME_CONTROLLERS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_CONTROLLER_GET   = ((EQU_MSG_NAME_CONTROLLER_GET << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_CONTROLLER_GETR  = ((EQU_MSG_NAME_CONTROLLER_GETR << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_CONTROLLER_GET   = ((EQU_MSG_NAME_CONTROLLER_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_CONTROLLER_GETR  = ((EQU_MSG_NAME_CONTROLLER_GETR << 1) | EQU_MSG_NO_REPLY),
 } Equ_Message_Type;
 
 /*
@@ -105,6 +103,7 @@ typedef struct _Equ_Message_Host_Get
 
 typedef struct _Equ_Message_Controllers_Get
 {
+	Equ_Common_Id host_id;
 } Equ_Message_Controllers_Get;
 
 typedef struct _Equ_Message_Controller_Get
@@ -138,8 +137,8 @@ typedef struct _Equ_Reply
 
 typedef struct _Equ_Reply_Hosts_Get
 {
-	int hosts_count;
-	Equ_Common_Host *hosts;
+	int ids_count;
+	Equ_Common_Id *ids;
 } Equ_Reply_Hosts_Get;
 
 typedef struct _Equ_Reply_Host_Get
@@ -149,8 +148,8 @@ typedef struct _Equ_Reply_Host_Get
 
 typedef struct _Equ_Reply_Controllers_Get
 {
-	int names_count;
-	char **names;
+	int ids_count;
+	Equ_Common_Id *ids;
 } Equ_Reply_Controllers_Get;
 
 typedef struct _Equ_Reply_Controller_Get

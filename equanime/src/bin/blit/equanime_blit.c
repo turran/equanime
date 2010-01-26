@@ -1,7 +1,4 @@
 #include <stdio.h>
-
-#include "Eina.h"
-#include "Enesim.h"
 #include "Equanime.h"
 
 /* This example should get a host
@@ -11,9 +8,12 @@
  * and start blitting this surface into the layer every n seconds
  */
 
-Equanime_Layer *rgb = NULL;
-Equanime_Layer *video = NULL;
-
+Equanime *eq;
+#if 0
+/*
+ * This application just shows the host hierarchy, showing all controllers,
+ * layers, outputs, inputs, etc.
+ */
 const char *layer_flags[] = {
 	"VISIBILITY",
 	"POSITION",
@@ -21,51 +21,107 @@ const char *layer_flags[] = {
 	"LEVEL",
 };
 
-int _layer_cb(Equanime_Layer *l, void *data)
+static void _output_desc_dump(Equ_Output *o)
 {
-	Equanime_Layer_Description *ld;
-	
-	ld = equanime_layer_description_get(l);
-	/* check if it supports RGB, if so, setup the correct
-	 * layer configuration */
-	rgb = ld;
-	 
+	printf("\t- name = %s\n", equ_output_name_get(o));
+}
+
+static int _output_cb(Equ_Output *o, void *data)
+{
+	int *num = data;
+	char *ptr;
+	int i;
+
+	printf("Output %d\n", *num);
+	*num = *num + 1;
+	_output_desc_dump(o);
+
 	return 1;
 }
 
-int _controller_cb(Equanime_Controller *c, void *data)
+static void _layer_desc_dump(const Equ_Layer *l)
 {
-	Equanime_Controller_Description *cd;
-	
-	cd = equanime_controller_description_get(c);
-	equanime_controller_layers_get(c, (Equanime_Cb)_layer_cb, NULL);
-	
+	int i = 0;
+	int flags;
+
+	printf("\t- name = %s\n", equ_layer_name_get(l));
+#if 0
+	printf("\t- flags = ");
+	while (flags)
+	{
+		if (flags & 1)
+		{
+			printf("%s ", layer_flags[i]);
+		}
+		flags = flags >> 1;
+		i++;
+	}
+	printf("\n");
+#endif
+}
+
+static int _layer_cb(Equ_Layer *l, void *data)
+{
+	int *num = data;
+	char *ptr;
+	int i;
+
+	printf("Layer %d\n", *num);
+	*num = *num + 1;
+	_layer_desc_dump(l);
+
 	return 1;
 }
 
-static void _play(void)
+static void _controller_desc_dump(Equ_Controller *c)
 {
-	Equanime_Surface *es;
-	Enesim_Surface *s;
-	
-	/* if we have an rgb layer */
-	es = equanime_layer_surface_get(l);
-	s = equanime_surface_enesim_surface_get(s);
-	/* do some tests */
-	/* if we have a yuv layer */
+	printf("\t- name = %s\n", equ_controller_name_get(c));
 }
 
+int _controller_cb(Equ_Controller *c, void *data)
+{
+	int *num = data;
+	int num_layer = 0;
+	int num_output = 0;
+
+	printf("Controller %d\n", *num++);
+	_controller_desc_dump(c);
+	equ_controller_layers_get(c, (Equ_Cb)_layer_cb, &num_layer);
+	equ_controller_outputs_get(c, (Equ_Cb)_output_cb, &num_output);
+
+	return 1;
+}
+
+static void _host_desc_dump(Equ_Host *h)
+{
+	printf("\t- name = %s\n", equ_host_name_get(eq, h));
+}
+
+int _host_cb(Equ_Host *h, void *data)
+{
+	int num_controller = 0;
+	int *num = data;
+
+	printf("Host %d\n", *num++);
+	_host_desc_dump(h);
+	equ_host_controllers_get(h, (Equ_Cb)_controller_cb, &num_controller);
+
+	return 1;
+}
+#endif
 /**
  * List all controllers, layers, inputs and ouputs.
  */
 int main(void)
 {
-	int num_controller = 0;
-	
-	equanime_init();
-	equanime_controllers_get((Equanime_Cb)_controller_cb, &num_controller);
-	/* lets play with the layers */
-	_play();
-	equanime_shutdown();
+	int num_host;
+
+	equ_init();
+	eq = equ_new(0xea);
+#if 0
+	equ_hosts_get(eq, _host_cb, &num_host);
+#endif
+	equ_shutdown();
+
 	return 0;
 }

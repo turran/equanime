@@ -1,4 +1,5 @@
 #include "Equ_Server.h"
+#include <string.h>
 /**
  * A host is just the main element that owns a controller, different
  * components, surface, allocators, etc
@@ -12,13 +13,16 @@ struct _Equ_Host
 	Equ_Host_Backend *backend;;
 	void *data;
 	const char *name;
+	Equ_Common_Id id;
 
 	Eina_List *controllers;
 	Eina_List *components;
 	Eina_List *pools;
 };
 
+/* FIXME this should be static but for some reason it is failing */
 Eina_Hash *_hosts = NULL;
+static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -30,7 +34,10 @@ EAPI Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 	Equ_Host *h;
 
 	if (!_hosts)
+	{
 		_hosts = eina_hash_string_superfast_new(NULL);
+		printf("NOOOOOOOOOOOO HOSTS %p\n", _hosts);
+	}
 
 	if (eina_hash_find(_hosts, name))
 		return EINA_FALSE;
@@ -38,6 +45,7 @@ EAPI Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 	h = calloc(1, sizeof(Equ_Host));
 	h->name = strdup(name);
 	h->backend = hb;
+	h->id = _ids++;
 	eina_hash_add(_hosts, name, h);
 	printf("host %s registered\n", name);
 
@@ -121,7 +129,7 @@ EAPI void equ_hosts_get(Equ_Cb cb, void *cb_data)
 	Equ_Host *host;
 
 	it = eina_hash_iterator_data_new(_hosts);
-	while (eina_iterator_next(it, &host))
+	while (eina_iterator_next(it, (void **)&host))
 	{
 		cb(host, cb_data);
 	}
@@ -141,6 +149,11 @@ EAPI void equ_host_data_set(Equ_Host *h, void *data)
 EAPI void * equ_host_data_get(Equ_Host *h)
 {
 	return h->data;
+}
+
+EAPI Equ_Common_Id equ_host_id_get(Equ_Host *h)
+{
+	return h->id;
 }
 
 EAPI Eina_Bool equ_host_init(const char *name)

@@ -16,6 +16,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, struct_type, name, member, subtype) \
+     { \
+	struct_type ___ett; \
+	\
+	eet_data_descriptor_element_add(edd, name, subtype, EET_G_VAR_ARRAY, \
+					(char *)(&(___ett.member)) - (char *)(&(___ett)), \
+					(char *)(&(___ett.member ## _count)) - (char *)(&(___ett)), /* 0,  */NULL, NULL); \
+     }
+
 Eet_Data_Descriptor_Class _eddc = {
 	.version = EET_DATA_DESCRIPTOR_CLASS_VERSION,
 	.name = "equ",
@@ -68,7 +77,7 @@ void equ_message_init(void)
 	/* hosts get reply */
 	edd = eet_data_descriptor2_new(&_eddc);
 	_descriptors[EQU_MSG_NAME_HOSTS_GETR] = edd;
-	EET_DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Hosts_Get, "hosts", hosts, _ddescriptors[EQU_DATA_HOST]);
+	DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Hosts_Get, "ids", ids, EET_T_UINT);
 	/* host get */
 	edd = eet_data_descriptor2_new(&_eddc);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Host_Get, "name", name, EET_T_STRING);
@@ -77,6 +86,15 @@ void equ_message_init(void)
 	/* host get reply */
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Host_Get, "id", id, EET_T_UINT);
 	_descriptors[EQU_MSG_NAME_HOST_GETR] = edd;
+
+	/* controllers get */
+	edd = eet_data_descriptor2_new(&_eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Controllers_Get, "host_id", host_id, EET_T_UINT);
+	_descriptors[EQU_MSG_NAME_CONTROLLERS_GET] = edd;
+	/* controllers get reply */
+	edd = eet_data_descriptor2_new(&_eddc);
+	_descriptors[EQU_MSG_NAME_CONTROLLERS_GETR] = edd;
+	DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Controllers_Get, "ids", ids, EET_T_UINT);
 }
 
 void equ_message_shutdown(void)

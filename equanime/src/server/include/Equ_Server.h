@@ -208,6 +208,7 @@ struct _Equ_Controller
 	const Equ_Controller_Backend *backend;
 	const char *name;
 	void *data;
+	Equ_Common_Id id;
 
 	Equ_Host *host;
 	Eina_List *layers;

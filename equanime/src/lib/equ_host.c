@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "Equanime.h"
 #include "equ_private.h"
 /**
@@ -31,9 +33,29 @@ EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 	return s;
 }
 
-EAPI void equ_host_controllers_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
+EAPI void equ_host_controllers_get(Equanime *e, Equ_Host *h, Equ_Cb cb,
+		void *cb_data)
 {
-	Equ_Controller *c;
+	Equ_Message_Controllers_Get m;
+	Equ_Reply_Controllers_Get *r = NULL;
+	Equ_Error error;
+	int i;
+
+	/* send the command to the server */
+	m.host_id = h->id;
+	error = equ_message_server_send(e, EQU_MSG_TYPE_CONTROLLERS_GET, &m, 0, (void **)&r);
+	if (error) return;
+	/* allocate all the hosts and give them back to the user */
+	for (i = 0; i < r->ids_count; i++)
+	{
+		if (!cb(r->ids[i], cb_data))
+			break;
+	}
+	free(r);
+}
+
+EAPI Equ_Controller * equ_host_controller_get(Equ_Host *h, const char *name)
+{
 
 }
 
@@ -43,15 +65,42 @@ EAPI void equ_host_components_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
 }
 
 /**
+ * Get a host from its name
+ * @param[in] e The Equanime connection
+ * @param[in] name The host name
+ * @return The host
+ */
+EAPI Equ_Host * equ_host_get(Equanime *e, const char *name)
+{
+	Equ_Host *h;
+	Equ_Message_Host_Get m;
+	Equ_Reply_Host_Get *r = NULL;
+	Equ_Error error;
+	int i;
+
+	m.name = name;
+	error = equ_message_server_send(e, EQU_MSG_TYPE_HOST_GET, &m, 0, (void **)&r);
+	if (error) return NULL;
+
+	h = malloc(sizeof(Equ_Host));
+	h->name = strdup(name);
+	h->id = r->id;
+
+	free(r);
+
+	return h;
+}
+
+/**
  * Get all the available hosts registered
- * @parami[in] e The Equanime connection
+ * @param[in] e The Equanime connection
  * @param[in] cb The callback function to call whenever the data is received
  * @param[in] cb_data The data to pass to the callback function
  */
 EAPI void equ_hosts_get(Equanime *e, Equ_Cb cb, void *cb_data)
 {
 	Equ_Message_Hosts_Get m;
-	Equ_Reply_Hosts_Get *r;
+	Equ_Reply_Hosts_Get *r = NULL;
 	Equ_Error error;
 	int i;
 
@@ -59,16 +108,9 @@ EAPI void equ_hosts_get(Equanime *e, Equ_Cb cb, void *cb_data)
 	error = equ_message_server_send(e, EQU_MSG_TYPE_HOSTS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
-	for (i = 0; i < r->hosts_count; i++)
+	for (i = 0; i < r->names_count; i++)
 	{
-		Equ_Host *h;
-
-		h = malloc(sizeof(Equ_Host));
-		printf("host %d %p\n", r->hosts[i].id, r->hosts[i].name);
-		h->name = strdup(r->hosts[i].name);
-		h->id = r->hosts[i].id;
-
-		if (!cb(h, cb_data))
+		if (!cb(r->names[i], cb_data))
 			break;
 	}
 	free(r);

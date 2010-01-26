@@ -8,6 +8,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -47,12 +48,12 @@ void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib,
  */
 void equ_controller_layer_unregister(Equ_Controller *c, Equ_Layer *l)
 {
-	eina_list_remove(c->layers, l);
+	c->layers = eina_list_remove(c->layers, l);
 }
 
 void equ_controller_output_unregister(Equ_Controller *c, Equ_Output *o)
 {
-	eina_list_remove(c->outputs, o);
+	c->outputs = eina_list_remove(c->outputs, o);
 }
 
 /**
@@ -67,6 +68,7 @@ EAPI Equ_Controller * equ_controller_new(Equ_Host *h,
 	c->host = h;
 	c->backend = cb;
 	c->name = name;
+	c->id = _ids++;
 
 	return c;
 }
