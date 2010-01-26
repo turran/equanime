@@ -9,10 +9,37 @@
  *                                  Local                                     *
  *============================================================================*/
 #define CHECK_FLAG(l, f) if (!(l->flags & f)) return;
-Equ_Region *_regions = NULL;
+
+struct _Equ_Layer
+{
+	Equ_Common_Id id;
+	Equ_Controller *controller;
+	const char *name;
+	/* FIXME check from here */
+	int flags; /** Layer flags */
+	const int *formats; /** Supported pixel formats */
+	int x;
+	int y;
+	int level;
+	unsigned char hidden;
+	Equ_Surface *surface;
+};
+
+static Equ_Region *_regions = NULL;
+static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Common_Id id)
+{
+	Equ_Layer *l;
+
+	l = calloc(1, sizeof(Equ_Layer));
+	l->controller = c;
+	l->id = id;
+
+	return l;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -8,6 +8,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Eina_Hash *_controllers = NULL;
 static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
@@ -59,16 +60,22 @@ void equ_controller_output_unregister(Equ_Controller *c, Equ_Output *o)
 /**
  *
  */
-EAPI Equ_Controller * equ_controller_new(Equ_Host *h,
+Equ_Controller * equ_controller_new(Equ_Host *h,
 		const char *name, Equ_Controller_Backend *cb)
 {
 	Equ_Controller *c;
+
+	if (!_controllers)
+	{
+		_controllers = eina_hash_int32_new(NULL);
+	}
 
 	c = calloc(1, sizeof(Equ_Controller));
 	c->host = h;
 	c->backend = cb;
 	c->name = name;
 	c->id = _ids++;
+	eina_hash_add(_controllers, &c->id, c);
 
 	return c;
 }
@@ -125,6 +132,16 @@ EAPI void equ_controller_outputs_get(Equ_Controller *c, Equ_Cb cb, void *cb_data
 		cb(o, cb_data);
 	}
 
+}
+
+EAPI Equ_Common_Id equ_controller_id_get(Equ_Controller *c)
+{
+	return c->id;
+}
+
+Equ_Controller * equ_controller_get(Equ_Common_Id id)
+{
+	return eina_hash_find(_controllers, &id);
 }
 
 /**

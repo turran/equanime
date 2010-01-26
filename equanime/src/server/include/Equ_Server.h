@@ -169,24 +169,6 @@ typedef struct _Equ_Component_Backend
 /**
  *
  */
-struct _Equ_Layer
-{
-	Equ_Controller *controller;
-	const char *name;
-	const Equ_Layer_Backend *backend;
-	void *data;
-
-	int flags; /** Layer flags */
-	const int *formats; /** Supported pixel formats */
-	int x;
-	int y;
-	int level;
-	unsigned char hidden;
-	Equ_Surface *surface;
-};
-/**
- *
- */
 struct _Equ_Region
 {
 	Equ_Layer *layer;

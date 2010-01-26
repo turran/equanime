@@ -8,7 +8,26 @@
  *                                  Local                                     *
  *============================================================================*/
 #define CHECK_FLAG(l, f) if (!(l->flags & f)) return;
-Equ_Region *_regions = NULL;
+
+struct _Equ_Layer
+{
+	Equ_Common_Id id;
+	Equ_Controller *controller;
+	const char *name;
+	const Equ_Layer_Backend *backend;
+	void *data;
+
+	int flags; /** Layer flags */
+	const int *formats; /** Supported pixel formats */
+	int x;
+	int y;
+	int level;
+	unsigned char hidden;
+	Equ_Surface *surface;
+};
+
+static Equ_Region *_regions = NULL;
+static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -21,6 +40,7 @@ Equ_Layer * equ_layer_new(Equ_Controller *c,
 	l->backend = b;
 	l->controller = c;
 	l->name = name;
+	l->id = _ids++;
 
 	return l;
 }
@@ -43,6 +63,11 @@ EAPI void equ_layer_unregister(Equ_Layer *l)
 EAPI const char * equ_layer_name_get(Equ_Layer *l)
 {
 	return l->name;
+}
+
+EAPI Equ_Common_Id equ_layer_id_get(Equ_Layer *l)
+{
+	return l->id;
 }
 /**
  *

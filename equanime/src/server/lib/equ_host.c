@@ -9,11 +9,11 @@
  *============================================================================*/
 struct _Equ_Host
 {
+	Equ_Common_Id id;
 	Eina_Bool initialized;
 	Equ_Host_Backend *backend;;
 	void *data;
 	const char *name;
-	Equ_Common_Id id;
 
 	Eina_List *controllers;
 	Eina_List *components;
@@ -35,21 +35,22 @@ EAPI Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 
 	if (!_hosts)
 	{
-		_hosts = eina_hash_string_superfast_new(NULL);
-		printf("NOOOOOOOOOOOO HOSTS %p\n", _hosts);
+		_hosts = eina_hash_int32_new(NULL);
 	}
-
-	if (eina_hash_find(_hosts, name))
-		return EINA_FALSE;
 
 	h = calloc(1, sizeof(Equ_Host));
 	h->name = strdup(name);
 	h->backend = hb;
 	h->id = _ids++;
-	eina_hash_add(_hosts, name, h);
+	eina_hash_add(_hosts, &h->id, h);
 	printf("host %s registered\n", name);
 
 	return EINA_TRUE;
+}
+
+EAPI Equ_Host * equ_host_get(Equ_Common_Id id)
+{
+	return eina_hash_find(_hosts, &id);
 }
 
 EAPI void equ_host_unregister(Equ_Host *h)
@@ -57,7 +58,7 @@ EAPI void equ_host_unregister(Equ_Host *h)
 	if (!h->backend->shutdown);
 		return;
 	h->backend->shutdown(h);
-	eina_hash_remove(_hosts, h->name);
+	eina_hash_remove(_hosts, &h->id);
 }
 
 EAPI Equ_Controller * equ_host_controller_register(Equ_Host *h,
@@ -67,6 +68,7 @@ EAPI Equ_Controller * equ_host_controller_register(Equ_Host *h,
 
 	c = equ_controller_new(h, cb, name);
 	h->controllers = eina_list_append(h->controllers, c);
+	printf("controller %s registered\n", name);
 
 	return c;
 }
@@ -156,12 +158,9 @@ EAPI Equ_Common_Id equ_host_id_get(Equ_Host *h)
 	return h->id;
 }
 
-EAPI Eina_Bool equ_host_init(const char *name)
+EAPI Eina_Bool equ_host_init(Equ_Host *h)
 {
-	Equ_Host *h;
-
-	h = eina_hash_find(_hosts, name);
-	if (!h ||  h->initialized) return EINA_FALSE;
+	if (!h || h->initialized) return EINA_FALSE;
 	if (!h->backend->init) return EINA_FALSE;
 
 	return h->backend->init(h);

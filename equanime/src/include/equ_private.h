@@ -35,23 +35,6 @@ struct _Equ_Csc
 /**
  *
  */
-struct _Equ_Layer
-{
-	Equ_Controller *controller;
-	const char *name;
-
-	int flags; /** Layer flags */
-	const int *formats; /** Supported pixel formats */
-	int x;
-	int y;
-	int level;
-	unsigned char hidden;
-	Equ_Surface *surface;
-};
-
-/**
- *
- */
 struct _Equ_Region
 {
 	Equ_Layer *layer;
@@ -63,19 +46,6 @@ struct _Equ_Region
 	int h;
 	int level;
 	unsigned char hidden;
-};
-/**
- *
- */
-struct _Equ_Controller
-{
-	const char *name;
-	void *data;
-
-	Equ_Host *host;
-	Eina_List *layers;
-	Eina_List *outputs;
-	Eina_List *inputs;
 };
 /**
  *

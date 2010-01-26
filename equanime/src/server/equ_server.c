@@ -155,6 +155,14 @@ shift:
 	return 0;
 }
 
+static Eina_Bool _hosts_cb(Equ_Host *h, const char *name)
+{
+
+	if (!strcmp(equ_host_name_get(h), name))
+		equ_host_init(h);
+}
+
+
 static void _server_init(void)
 {
 	Ecore_Con_Server *srv;
@@ -176,8 +184,7 @@ static void _server_shutdown(void)
 static void _server_setup(void)
 {
 	/* parse the cmd line options */
-	if (!equ_host_init("sdl"))
-		return;
+	equ_hosts_get(_hosts_cb, "sdl");
 }
 
 int main(int argc, char **argv)

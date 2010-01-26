@@ -11,8 +11,8 @@
  *============================================================================*/
 struct _Equ_Host
 {
-	char *name;
-	int id;
+	Equ_Common_Id id;
+	const char *name;
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -31,27 +31,6 @@ EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 	//s = equ_surface_new(h, w, h, fmt);
 
 	return s;
-}
-
-EAPI void equ_host_controllers_get(Equanime *e, Equ_Host *h, Equ_Cb cb,
-		void *cb_data)
-{
-	Equ_Message_Controllers_Get m;
-	Equ_Reply_Controllers_Get *r = NULL;
-	Equ_Error error;
-	int i;
-
-	/* send the command to the server */
-	m.host_id = h->id;
-	error = equ_message_server_send(e, EQU_MSG_TYPE_CONTROLLERS_GET, &m, 0, (void **)&r);
-	if (error) return;
-	/* allocate all the hosts and give them back to the user */
-	for (i = 0; i < r->ids_count; i++)
-	{
-		if (!cb(r->ids[i], cb_data))
-			break;
-	}
-	free(r);
 }
 
 EAPI Equ_Controller * equ_host_controller_get(Equ_Host *h, const char *name)
@@ -102,19 +81,53 @@ EAPI void equ_hosts_get(Equanime *e, Equ_Cb cb, void *cb_data)
 	Equ_Message_Hosts_Get m;
 	Equ_Reply_Hosts_Get *r = NULL;
 	Equ_Error error;
+	Equ_Host *h;
 	int i;
 
 	/* send the command to the server */
 	error = equ_message_server_send(e, EQU_MSG_TYPE_HOSTS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
-	for (i = 0; i < r->names_count; i++)
+	for (i = 0; i < r->ids_count; i++)
 	{
-		if (!cb(r->names[i], cb_data))
+		h = calloc(1, sizeof(Equ_Host));
+		h->id = r->ids[i];
+		if (!cb(h, cb_data))
 			break;
 	}
 	free(r);
 }
+
+/**
+ * Get all the controllers relative to a host
+ * @param[in] e The Equanime connection
+ * @param[in] h The host to get the controllers from
+ * @param[in] cb The callback function to call whenever the data is received
+ * @param[in] cb_data The data to pass to the callback function
+ */
+EAPI void equ_host_controllers_get(Equanime *e, Equ_Host *h, Equ_Cb cb,
+		void *cb_data)
+{
+	Equ_Message_Controllers_Get m;
+	Equ_Reply_Controllers_Get *r = NULL;
+	Equ_Error error;
+	Equ_Controller *c;
+	int i;
+
+	/* send the command to the server */
+	m.host_id = h->id;
+	error = equ_message_server_send(e, EQU_MSG_TYPE_CONTROLLERS_GET, &m, 0, (void **)&r);
+	if (error) return;
+	/* allocate all the hosts and give them back to the user */
+	for (i = 0; i < r->ids_count; i++)
+	{
+		c = equ_controller_new(h, r->ids[i]);
+		if (!cb(c, cb_data))
+			break;
+	}
+	free(r);
+}
+
 
 EAPI const char * equ_host_name_get(Equanime *e, Equ_Host *h)
 {
@@ -127,6 +140,7 @@ EAPI const char * equ_host_name_get(Equanime *e, Equ_Host *h)
  */
 EAPI void equ_host_delete(Equ_Host *h)
 {
-	free(h->name);
+	if (h->name)
+		free(h->name);
 	free(h);
 }

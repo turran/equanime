@@ -71,6 +71,7 @@ void equ_message_init(void)
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Common_Host, "name", name, EET_T_STRING);
 	_ddescriptors[EQU_DATA_HOST] = edd;
 	/* create all the messages' data descriptors */
+	/* Host messages/replies */
 	/* hosts get */
 	edd = eet_data_descriptor2_new(&_eddc);
 	_descriptors[EQU_MSG_NAME_HOSTS_GET] = edd;
@@ -87,6 +88,7 @@ void equ_message_init(void)
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Host_Get, "id", id, EET_T_UINT);
 	_descriptors[EQU_MSG_NAME_HOST_GETR] = edd;
 
+	/* Controllers messages/replies */
 	/* controllers get */
 	edd = eet_data_descriptor2_new(&_eddc);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Controllers_Get, "host_id", host_id, EET_T_UINT);
@@ -95,6 +97,18 @@ void equ_message_init(void)
 	edd = eet_data_descriptor2_new(&_eddc);
 	_descriptors[EQU_MSG_NAME_CONTROLLERS_GETR] = edd;
 	DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Controllers_Get, "ids", ids, EET_T_UINT);
+	
+	/* Layers messages/replies */
+	/* layers get */
+	edd = eet_data_descriptor2_new(&_eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Layers_Get, "controller_id", controller_id, EET_T_UINT);
+	_descriptors[EQU_MSG_NAME_LAYERS_GET] = edd;
+	/* layers get reply */
+	edd = eet_data_descriptor2_new(&_eddc);
+	_descriptors[EQU_MSG_NAME_LAYERS_GETR] = edd;
+	DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Layers_Get, "ids", ids, EET_T_UINT);
+	/* Pool messages/replies */
+	/* Surfaces messages/replies */
 }
 
 void equ_message_shutdown(void)
