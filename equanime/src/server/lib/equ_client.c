@@ -21,9 +21,10 @@ static int _hosts_get_cb(void *data, void *cb_data)
 	Equ_Host *h = data;
 	Equ_Reply_Hosts_Get *reply = cb_data;
 
-	reply->ids_count++;
-	reply->ids = realloc(reply->ids, reply->ids_count * sizeof(Equ_Common_Id));
-	reply->ids[reply->ids_count - 1] = equ_host_id_get(h);
+	reply->hosts_count++;
+	reply->hosts = realloc(reply->hosts, reply->hosts_count * sizeof(Equ_Common_Host));
+	reply->hosts[reply->hosts_count - 1].id = equ_host_id_get(h);
+	reply->hosts[reply->hosts_count - 1].name = equ_host_name_get(h);
 
 	return EINA_TRUE;
 }
@@ -48,21 +49,23 @@ static int _controllers_get_cb(void *data, void *cb_data)
 	Equ_Controller *c = data;
 	Equ_Reply_Controllers_Get *reply = cb_data;
 
-	reply->ids_count++;
-	reply->ids = realloc(reply->ids, reply->ids_count * sizeof(Equ_Common_Id));
-	reply->ids[reply->ids_count - 1] = equ_controller_id_get(c);
+	reply->controllers_count++;
+	reply->controllers = realloc(reply->controllers, reply->controllers_count * sizeof(Equ_Common_Controller));
+	reply->controllers[reply->controllers_count - 1].id = equ_controller_id_get(c);
+	reply->controllers[reply->controllers_count - 1].name = equ_controller_name_get(c);
 
 	return EINA_TRUE;
 }
 
 static int _layers_get_cb(void *data, void *cb_data)
 {
-	Equ_Layer *c = data;
+	Equ_Layer *l = data;
 	Equ_Reply_Layers_Get *reply = cb_data;
 
-	reply->ids_count++;
-	reply->ids = realloc(reply->ids, reply->ids_count * sizeof(Equ_Common_Id));
-	reply->ids[reply->ids_count - 1] = equ_layer_id_get(c);
+	reply->layers_count++;
+	reply->layers = realloc(reply->layers, reply->layers_count * sizeof(Equ_Common_Layer));
+	reply->layers[reply->layers_count - 1].id = equ_layer_id_get(l);
+	reply->layers[reply->layers_count - 1].name = equ_layer_name_get(l);
 
 	return EINA_TRUE;
 }
@@ -109,8 +112,10 @@ EAPI Equ_Error equ_client_controllers_get(Equ_Client *client, Equ_Message_Contro
 	Equ_Reply_Controllers_Get *r;
 	Equ_Host *h;
 
-	r = *reply = calloc(1, sizeof(Equ_Reply_Controllers_Get));
 	h = equ_host_get(m->host_id);
+	if (!h)
+		return EQU_ERR_NEXIST;
+	r = *reply = calloc(1, sizeof(Equ_Reply_Controllers_Get));
 	equ_host_controllers_get(h, _controllers_get_cb, r);
 
 	return EQU_ERR_NONE;
@@ -122,8 +127,10 @@ EAPI Equ_Error equ_client_layers_get(Equ_Client *client, Equ_Message_Layers_Get 
 	Equ_Reply_Layers_Get *r;
 	Equ_Controller *c;
 
-	r = *reply = calloc(1, sizeof(Equ_Reply_Layers_Get));
 	c = equ_controller_get(m->controller_id);
+	if (!c)
+		return EQU_ERR_NEXIST;
+	r = *reply = calloc(1, sizeof(Equ_Reply_Layers_Get));
 	equ_controller_layers_get(c, _layers_get_cb, r);
 
 	return EQU_ERR_NONE;
@@ -187,7 +194,7 @@ EAPI Equ_Error equ_client_process(Equ_Client *c, Equ_Message_Name name, void *ms
 		break;
 
 		case EQU_MSG_NAME_LAYERS_GET:
-		err = equ_client_controllers_get(c, msg, reply);
+		err = equ_client_layers_get(c, msg, reply);
 		break;
 
 		default:

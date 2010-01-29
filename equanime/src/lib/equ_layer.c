@@ -30,13 +30,14 @@ static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Common_Id id)
+Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Common_Id id, const char *name)
 {
 	Equ_Layer *l;
 
 	l = calloc(1, sizeof(Equ_Layer));
 	l->controller = c;
 	l->id = id;
+	l->name = strdup(name);
 
 	return l;
 }
@@ -46,7 +47,7 @@ Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Common_Id id)
 /**
  *
  */
-EAPI const char * equ_layer_name_get(Equ_Layer *l)
+EAPI const char * equ_layer_name_get(Equanime *e, Equ_Layer *l)
 {
 	return l->name;
 }

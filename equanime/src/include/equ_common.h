@@ -18,9 +18,23 @@ typedef struct _Equ_Common_Host
 	char *name;
 } Equ_Common_Host;
 
+typedef struct _Equ_Common_Controller
+{
+	Equ_Common_Id id;
+	char *name;
+} Equ_Common_Controller;
+
+typedef struct _Equ_Common_Layer
+{
+	Equ_Common_Id id;
+	char *name;
+} Equ_Common_Layer;
+
 typedef enum
 {
 	EQU_DATA_HOST,
+	EQU_DATA_CONTROLLER,
+	EQU_DATA_LAYER,
 	EQU_DATAS
 } Equ_Data;
 
@@ -160,8 +174,8 @@ typedef struct _Equ_Reply
 
 typedef struct _Equ_Reply_Hosts_Get
 {
-	int ids_count;
-	Equ_Common_Id *ids;
+	int hosts_count;
+	Equ_Common_Host *hosts;
 } Equ_Reply_Hosts_Get;
 
 typedef struct _Equ_Reply_Host_Get
@@ -171,8 +185,8 @@ typedef struct _Equ_Reply_Host_Get
 
 typedef struct _Equ_Reply_Controllers_Get
 {
-	int ids_count;
-	Equ_Common_Id *ids;
+	int controllers_count;
+	Equ_Common_Controller *controllers;
 } Equ_Reply_Controllers_Get;
 
 typedef struct _Equ_Reply_Controller_Get
@@ -182,8 +196,8 @@ typedef struct _Equ_Reply_Controller_Get
 
 typedef struct _Equ_Reply_Layers_Get
 {
-	int ids_count;
-	char **ids;
+	int layers_count;
+	Equ_Common_Layer *layers;
 } Equ_Reply_Layers_Get;
 
 typedef struct _Equ_Reply_Layer_Get

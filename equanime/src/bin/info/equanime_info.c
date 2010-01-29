@@ -68,7 +68,7 @@ static int _layer_cb(Equ_Layer *l, void *data)
 
 static void _controller_desc_dump(Equ_Controller *c)
 {
-	printf("\t- name = %p\n", equ_controller_name_get(eq, c));
+	printf("\t- name = %s\n", equ_controller_name_get(eq, c));
 }
 
 int _controller_cb(Equ_Controller *c, void *data)
@@ -87,7 +87,7 @@ int _controller_cb(Equ_Controller *c, void *data)
 
 static void _host_desc_dump(Equ_Host *h)
 {
-	printf("\t- name = %p\n", equ_host_name_get(eq, h));
+	printf("\t- name = %s\n", equ_host_name_get(eq, h));
 }
 
 int _host_cb(Equ_Host *h, void *data)

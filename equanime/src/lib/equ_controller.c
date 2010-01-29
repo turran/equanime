@@ -18,13 +18,15 @@ struct _Equ_Controller
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-EAPI Equ_Controller * equ_controller_new(Equ_Host *h, Equ_Common_Id id)
+EAPI Equ_Controller * equ_controller_new(Equ_Host *h, Equ_Common_Id id,
+		char *name)
 {
 	Equ_Controller *c;
 
 	c = calloc(1, sizeof(Equ_Controller));
 	c->host = h;
 	c->id = id;
+	c->name = strdup(name);
 
 	return c;
 }
@@ -60,9 +62,9 @@ EAPI void equ_controller_layers_get(Equanime *e, Equ_Controller *c, Equ_Cb cb, v
 	error = equ_message_server_send(e, EQU_MSG_TYPE_LAYERS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
-	for (i = 0; i < r->ids_count; i++)
+	for (i = 0; i < r->layers_count; i++)
 	{
-		l = equ_layer_new(c, r->ids[i]);
+		l = equ_layer_new(c, r->layers[i].id, r->layers[i].name);
 		if (!cb(l, cb_data))
 			break;
 	}

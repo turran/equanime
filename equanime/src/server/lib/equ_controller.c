@@ -8,7 +8,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static Eina_Hash *_controllers = NULL;
+Eina_Hash *_controllers = NULL;
 static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
@@ -23,6 +23,7 @@ Equ_Layer * equ_controller_layer_register(Equ_Controller *ec,
 
 	l = equ_layer_new(ec, name, lb);
 	ec->layers = eina_list_append(ec->layers, l);
+
 	return l;
 }
 
@@ -66,9 +67,7 @@ Equ_Controller * equ_controller_new(Equ_Host *h,
 	Equ_Controller *c;
 
 	if (!_controllers)
-	{
 		_controllers = eina_hash_int32_new(NULL);
-	}
 
 	c = calloc(1, sizeof(Equ_Controller));
 	c->host = h;

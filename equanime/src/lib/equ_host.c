@@ -88,10 +88,11 @@ EAPI void equ_hosts_get(Equanime *e, Equ_Cb cb, void *cb_data)
 	error = equ_message_server_send(e, EQU_MSG_TYPE_HOSTS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
-	for (i = 0; i < r->ids_count; i++)
+	for (i = 0; i < r->hosts_count; i++)
 	{
 		h = calloc(1, sizeof(Equ_Host));
-		h->id = r->ids[i];
+		h->id = r->hosts[i].id;
+		h->name = strdup(r->hosts[i].name);
 		if (!cb(h, cb_data))
 			break;
 	}
@@ -119,9 +120,9 @@ EAPI void equ_host_controllers_get(Equanime *e, Equ_Host *h, Equ_Cb cb,
 	error = equ_message_server_send(e, EQU_MSG_TYPE_CONTROLLERS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
-	for (i = 0; i < r->ids_count; i++)
+	for (i = 0; i < r->controllers_count; i++)
 	{
-		c = equ_controller_new(h, r->ids[i]);
+		c = equ_controller_new(h, r->controllers[i].id, r->controllers[i].name);
 		if (!cb(c, cb_data))
 			break;
 	}
@@ -140,7 +141,6 @@ EAPI const char * equ_host_name_get(Equanime *e, Equ_Host *h)
  */
 EAPI void equ_host_delete(Equ_Host *h)
 {
-	if (h->name)
-		free(h->name);
+	free(h->name);
 	free(h);
 }

@@ -43,7 +43,6 @@ EAPI Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 	h->backend = hb;
 	h->id = _ids++;
 	eina_hash_add(_hosts, &h->id, h);
-	printf("host %s registered\n", name);
 
 	return EINA_TRUE;
 }
@@ -66,9 +65,8 @@ EAPI Equ_Controller * equ_host_controller_register(Equ_Host *h,
 {
 	Equ_Controller *c;
 
-	c = equ_controller_new(h, cb, name);
+	c = equ_controller_new(h, name, c, cb);
 	h->controllers = eina_list_append(h->controllers, c);
-	printf("controller %s registered\n", name);
 
 	return c;
 }
