@@ -15,6 +15,34 @@ struct _Equ_Controller
 	const char *name;
 	Equ_Host *host;
 };
+
+typedef struct _Equ_Controller_Layer_Get_Cb
+{
+	Equanime *e;
+	Equ_Layer *layer;
+	const char *name;
+} Equ_Controller_Layer_Get_Cb;
+
+static int _controller_layer_get_cb(void *data, void *cb_data)
+{
+	Equ_Layer *l = data;
+	Equ_Controller_Layer_Get_Cb *cb = cb_data;
+
+	if (!cb->name)
+	{
+		cb->layer = l;
+		return EINA_FALSE;
+	}
+
+	if (!strcmp(equ_layer_name_get(cb->e, l), cb->name))
+	{
+		cb->layer = l;
+		return EINA_FALSE;
+	}
+	equ_layer_delete(l);
+
+	return EINA_TRUE;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -33,12 +61,11 @@ EAPI Equ_Controller * equ_controller_new(Equ_Host *h, Equ_Common_Id id,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Equ_Controller * equ_controller_get(Equanime *e, const char *hname,
-		const char *name)
+EAPI void equ_controller_delete(Equ_Controller *c)
 {
-
+	free(c->name);
+	free(c);
 }
-
 /**
  *
  */
@@ -64,12 +91,26 @@ EAPI void equ_controller_layers_get(Equanime *e, Equ_Controller *c, Equ_Cb cb, v
 	/* allocate all the hosts and give them back to the user */
 	for (i = 0; i < r->layers_count; i++)
 	{
-		l = equ_layer_new(c, r->layers[i].id, r->layers[i].name);
+		l = equ_layer_new(e, c, r->layers[i].id, r->layers[i].name);
 		if (!cb(l, cb_data))
 			break;
 	}
 	free(r);
 }
+
+EAPI Equ_Layer * equ_controller_layer_get(Equanime *e, Equ_Controller *c, const char *name)
+{
+	Equ_Controller_Layer_Get_Cb cb;
+
+	cb.e = e;
+	cb.name = name;
+	cb.layer = NULL;
+
+	equ_controller_layers_get(e, c, _controller_layer_get_cb, &cb);
+
+	return cb.layer;
+}
+
 #if 0
 /**
  *

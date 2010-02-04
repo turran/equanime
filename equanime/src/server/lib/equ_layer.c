@@ -11,12 +11,14 @@
 
 struct _Equ_Layer
 {
-	Equ_Common_Id id;
 	Equ_Controller *controller;
-	const char *name;
 	const Equ_Layer_Backend *backend;
 	void *data;
 
+	Equ_Layer_Info info;
+	Equ_Layer_Caps caps;
+	Equ_Layer_Status status;
+	/* FIXME remove this */
 	int flags; /** Layer flags */
 	const int *formats; /** Supported pixel formats */
 	int x;
@@ -26,6 +28,7 @@ struct _Equ_Layer
 	Equ_Surface *surface;
 };
 
+Eina_Hash *_layers = NULL;
 static Equ_Region *_regions = NULL;
 static Equ_Common_Id _ids = 0;
 /*============================================================================*
@@ -35,12 +38,17 @@ Equ_Layer * equ_layer_new(Equ_Controller *c,
 		const char *name, Equ_Layer_Backend *b)
 {
 	Equ_Layer *l;
+	
+	if (!_layers)
+		_layers = eina_hash_int32_new(NULL);
+
 
 	l = malloc(sizeof(Equ_Layer));
 	l->backend = b;
 	l->controller = c;
-	l->name = name;
-	l->id = _ids++;
+	l->info.name = name;
+	l->info.id = _ids++;
+	eina_hash_add(_layers, &l->info.id, l);
 
 	return l;
 }
@@ -52,75 +60,58 @@ void * equ_layer_data_get(Equ_Layer *l)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ *
+ */
 EAPI void equ_layer_unregister(Equ_Layer *l)
 {
 	equ_controller_layer_unregister(l->controller, l);
 }
-
+/**
+ *
+ */
+EAPI Equ_Layer * equ_layer_get(Equ_Common_Id id)
+{
+	return eina_hash_find(_layers, &id);
+}
 /**
  *
  */
 EAPI const char * equ_layer_name_get(Equ_Layer *l)
 {
-	return l->name;
+	return l->info.name;
 }
 
 EAPI Equ_Common_Id equ_layer_id_get(Equ_Layer *l)
 {
-	return l->id;
-}
-/**
- *
- */
-EAPI void equ_layer_surface_set(Equ_Layer *l, Equ_Surface *s)
-{
-
+	return l->info.id;
 }
 
-/**
- * Get the layer surface.
- * TODO What happens if a layer changes resolution, size, format ?
- * we should check that the surface is released?
- */
-EAPI Equ_Surface * equ_layer_surface_get(Equ_Layer *l)
+EAPI void equ_layer_status_get(Equ_Layer *l, Equ_Layer_Status *status)
 {
-	Equ_Surface *s;
-#if 0
-	if (!l->surface)
-	{
-		Enesim_Surface *es;
-		Enesim_Surface_Data sdata;
+	if (!status)
+		return;
+	*status = l->status;
+}
 
-		s = equ_surface_new();
-		l->surface = s;
-		/* switch for every format */
-		switch (l->format)
-		{
-		/* Enesim_Surface_Format f, int w, int h, Enesim_Surface_Data *sdata */
-		case ENESIM_SURFACE_ARGB8888:
-			sdata.argb8888.plane0 = l->fncs->ptr_get(l);
-			break;
-		case ENESIM_SURFACE_ARGB8888_PRE:
-			sdata.argb8888_pre.plane0 = l->fncs->ptr_get(l);
-			break;
-		case ENESIM_SURFACE_RGB565:
-			sdata.rgb565.plane0 = l->fncs->ptr_get(l);
-			sdata.rgb565.plane1 = malloc(sizeof(*sdata.rgb565.plane1) * l->w * l->h);
-			break;
-		case ENESIM_SURFACE_RGB888:
-			sdata.rgb888.plane0 = l->fncs->ptr_get(l);
-			sdata.rgb888.plane1 = malloc(sizeof(*sdata.rgb8888.plane1) * l->w * l->h);
-			break;
-		case ENESIM_SURFACE_A8:
-			sdata.a8.plane0 = l->fncs->ptr_get(l);
-			break;
-		}
-		es = enesim_surface_new(l->format, l->w, l->h, &sdata);
-	}
-	l->surface_ref++;
-#endif
+EAPI void equ_layer_caps_get(Equ_Layer *l, Equ_Layer_Caps *caps)
+{
+	if (!caps)
+		return;
+	*caps = l->caps;
+}
 
-	return s;
+EAPI void equ_layer_format_set(Equ_Layer *l, Equ_Format fmt)
+{
+	/* check the capabilities */
+	/* call the backend implementation */
+}
+
+
+EAPI void equ_layer_size_set(Equ_Layer *l, uint32_t w, uint32_t h)
+{
+
+
 }
 
 /**

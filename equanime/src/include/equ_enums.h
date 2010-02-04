@@ -36,11 +36,11 @@ typedef enum _Equ_Format
 /**
  *
  */
-typedef enum
+typedef enum _Equ_Surface_Type
 {
-	EQU_SURFACE_ONSCREEN, /**< Visible graphics memory */
-	EQU_SURFACE_OFFSCREEN, /**< Non visible graphics memory */
-	EQU_SURFACE_VIRTUAL, /**< Virtual space */
+	EQU_SURFACE_LOCAL,  /**< Client side surface */
+	EQU_SURFACE_REMOTE, /**< Server side surface */
+	EQU_SURFACE_SHARED, /**< Shared between the client and the server */
 } Equ_Surface_Type;
 
 

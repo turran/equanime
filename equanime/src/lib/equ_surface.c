@@ -7,15 +7,32 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+struct _Equ_Surface
+{
+	Equ_Common_Id id;
+
+	Equ_Surface_Type type;
+	Equ_Format fmt;
+	uint32_t w;
+	uint32_t h;
+
+	unsigned int pitch;
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Surface * equanime_surface_new(void)
+Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
+		Equ_Format fmt, Equ_Surface_Type type)
 {
 	Equ_Surface *s;
 
 	s = calloc(1, sizeof(Equ_Surface));
-	/* TODO handle the magic */
+	s->id = id;
+	s->w = w;
+	s->h = h;
+	s->fmt = fmt;
+	s->type = type;
+
 	return s;
 }
 /*============================================================================*

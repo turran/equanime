@@ -24,17 +24,33 @@ typedef struct _Equ_Common_Controller
 	char *name;
 } Equ_Common_Controller;
 
-typedef struct _Equ_Common_Layer
+typedef struct _Equ_Layer_Info
 {
 	Equ_Common_Id id;
 	char *name;
-} Equ_Common_Layer;
+} Equ_Layer_Info;
+
+typedef struct _Equ_Layer_Caps
+{
+	uint32_t fmt_mask;
+} Equ_Layer_Caps;
+
+typedef struct _Equ_Layer_Status
+{
+	int32_t x;
+	int32_t y;
+	uint32_t w;
+	uint32_t h;
+	Equ_Format fmt;
+} Equ_Layer_Status;
 
 typedef enum
 {
 	EQU_DATA_HOST,
 	EQU_DATA_CONTROLLER,
 	EQU_DATA_LAYER,
+	EQU_DATA_LAYER_CAPS,
+	EQU_DATA_LAYER_STATUS,
 	EQU_DATAS
 } Equ_Data;
 
@@ -62,20 +78,18 @@ typedef enum
 /* A reply should always be the same value as the message this reply replies to
  * plus one
  */
-typedef enum
+typedef enum _Equ_Message_Name
 {
 	EQU_MSG_NAME_HOSTS_GET,
 	EQU_MSG_NAME_HOSTS_GETR,
-	EQU_MSG_NAME_HOST_GET,
-	EQU_MSG_NAME_HOST_GETR,
 	EQU_MSG_NAME_CONTROLLERS_GET,
 	EQU_MSG_NAME_CONTROLLERS_GETR,
-	EQU_MSG_NAME_CONTROLLER_GET,
-	EQU_MSG_NAME_CONTROLLER_GETR,
 	EQU_MSG_NAME_LAYERS_GET,
 	EQU_MSG_NAME_LAYERS_GETR,
-	EQU_MSG_NAME_LAYER_GET,
-	EQU_MSG_NAME_LAYER_GETR,
+	EQU_MSG_NAME_LAYER_CAPS_GET,
+	EQU_MSG_NAME_LAYER_CAPS_GETR,
+	EQU_MSG_NAME_LAYER_STATUS_GET,
+	EQU_MSG_NAME_LAYER_STATUS_GETR,
 	EQU_MSG_NAME_SURFACE_GET,
 	EQU_MSG_NAME_SURFACE_GETR,
 	EQU_MSG_NAME_SURFACE_PUT,
@@ -83,20 +97,20 @@ typedef enum
 	EQU_MSG_NAMES
 } Equ_Message_Name;
 
-typedef enum
+typedef enum _Equ_Message_Type
 {
-	EQU_MSG_TYPE_HOSTS_GET        = ((EQU_MSG_NAME_HOSTS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_HOSTS_GETR       = ((EQU_MSG_NAME_HOSTS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_HOST_GET         = ((EQU_MSG_NAME_HOST_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_HOST_GETR        = ((EQU_MSG_NAME_HOST_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_CONTROLLERS_GET  = ((EQU_MSG_NAME_CONTROLLERS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_CONTROLLERS_GETR = ((EQU_MSG_NAME_CONTROLLERS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_CONTROLLER_GET   = ((EQU_MSG_NAME_CONTROLLER_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_CONTROLLER_GETR  = ((EQU_MSG_NAME_CONTROLLER_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_LAYERS_GET       = ((EQU_MSG_NAME_LAYERS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_LAYERS_GETR      = ((EQU_MSG_NAME_LAYERS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_LAYER_GET        = ((EQU_MSG_NAME_LAYER_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_LAYER_GETR       = ((EQU_MSG_NAME_LAYER_GETR << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_HOSTS_GET         = ((EQU_MSG_NAME_HOSTS_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_HOSTS_GETR        = ((EQU_MSG_NAME_HOSTS_GETR << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_CONTROLLERS_GET   = ((EQU_MSG_NAME_CONTROLLERS_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_CONTROLLERS_GETR  = ((EQU_MSG_NAME_CONTROLLERS_GETR << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_LAYERS_GET        = ((EQU_MSG_NAME_LAYERS_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_LAYERS_GETR       = ((EQU_MSG_NAME_LAYERS_GETR << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_LAYER_CAPS_GET    = ((EQU_MSG_NAME_LAYER_CAPS_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_LAYER_CAPS_GETR   = ((EQU_MSG_NAME_LAYER_CAPS_GETR << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_LAYER_STATUS_GET  = ((EQU_MSG_NAME_LAYER_STATUS_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_LAYER_STATUS_GETR = ((EQU_MSG_NAME_LAYER_STATUS_GETR << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_SURFACE_GET       = ((EQU_MSG_NAME_SURFACE_GET << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_SURFACE_GETR      = ((EQU_MSG_NAME_SURFACE_GETR << 1) | EQU_MSG_NO_REPLY),
 } Equ_Message_Type;
 
 /*
@@ -118,36 +132,33 @@ typedef struct _Equ_Message_Hosts_Get
 {
 } Equ_Message_Hosts_Get;
 
-typedef struct _Equ_Message_Host_Get
-{
-	char *name;
-} Equ_Message_Host_Get;
-
 typedef struct _Equ_Message_Controllers_Get
 {
 	Equ_Common_Id host_id;
 } Equ_Message_Controllers_Get;
-
-typedef struct _Equ_Message_Controller_Get
-{
-	char *name;
-} Equ_Message_Controller_Get;
 
 typedef struct _Equ_Message_Layers_Get
 {
 	Equ_Common_Id controller_id;
 } Equ_Message_Layers_Get;
 
-typedef struct _Equ_Message_Layer_Get
+typedef struct _Equ_Message_Layer_Caps_Get
 {
-	char *name;
-} Equ_Message_Layer_Get;
+	Equ_Common_Id layer_id;
+} Equ_Message_Layer_Caps_Get;
+
+typedef struct _Equ_Message_Layer_Status_Get
+{
+	Equ_Common_Id layer_id;
+} Equ_Message_Layer_Status_Get;
 
 typedef struct _Equ_Message_Surface_Get
 {
+	Equ_Common_Id host_id;
 	unsigned int w;
 	unsigned int h;
-	/* TODO */
+	Equ_Format fmt;
+	Equ_Surface_Type type;
 } Equ_Message_Surface_Get;
 
 typedef struct _Equ_Message_Surface_Put
@@ -178,37 +189,31 @@ typedef struct _Equ_Reply_Hosts_Get
 	Equ_Common_Host *hosts;
 } Equ_Reply_Hosts_Get;
 
-typedef struct _Equ_Reply_Host_Get
-{
-	Equ_Common_Id id;
-} Equ_Reply_Host_Get;
-
 typedef struct _Equ_Reply_Controllers_Get
 {
 	int controllers_count;
 	Equ_Common_Controller *controllers;
 } Equ_Reply_Controllers_Get;
 
-typedef struct _Equ_Reply_Controller_Get
-{
-	Equ_Common_Id id;
-} Equ_Reply_Controller_Get;
-
 typedef struct _Equ_Reply_Layers_Get
 {
 	int layers_count;
-	Equ_Common_Layer *layers;
+	Equ_Layer_Info *layers;
 } Equ_Reply_Layers_Get;
 
-typedef struct _Equ_Reply_Layer_Get
+typedef struct _Equ_Reply_Layer_Caps_Get
 {
-	Equ_Common_Id id;
-} Equ_Reply_Layer_Get;
+	Equ_Layer_Caps caps;
+} Equ_Reply_Layer_Caps_Get;
+
+typedef struct _Equ_Reply_Layer_Status_Get
+{
+	Equ_Layer_Status status;
+} Equ_Reply_Layer_Status_Get;
 
 typedef struct _Equ_Reply_Surface_Get
 {
 	Equ_Common_Id id;
-	/* TODO */
 } Equ_Reply_Surface_Get;
 
 typedef struct _Equ_Reply_Surface_Put

@@ -12,17 +12,22 @@
  * Equanime aims to be a simple hardware based media library for embedded
  * devices.
  *
+ * @code
  * Host
  * +-----> Controller
  *         +-----> Layer
  *                 +-----> Region
  * +-----> Component
+ * @endcode
  *
- * Drivers:
+ * @section drivers Drivers
  * - mp25xxf: MagicEyes (www.mesdigital.com) based SoC. Note that you *need*
  * the code.google.com/p/gp2x-linux26 kernel :)
  * - dm320: Texas Instruments DM320 based SoC.
  * - dummy: UIO dummy driver.
+ *
+ * @section dependencies Dependencies
+ * - Eina
  *
  * @file
  * @brief Equanime API
@@ -39,11 +44,12 @@
  * - Define the concept of regions, layers with no regions in hw means one region
  *   in sw with the size and properties of the layer but can't change anything?
  * - Support for differnt hw blocks: Colorspace converter, Resizer, Rotator, etc
- * Add support for vidoe events, like vsync, signal status, etc
+ * - Add support for video events, like vsync, signal status, etc
  */
 
 #include "equ_core.h"
 #include "equ_enums.h"
+#include "equ_common.h"
 #include "equ_surface.h"
 #include "equ_host.h"
 #include "equ_mode.h"
@@ -58,9 +64,8 @@ typedef struct _Equ_Rotator Equ_Rotator;
 typedef struct _Equ_Scaler Equ_Scaler;
 typedef struct _Equ_Csc Equ_Csc;
 
-
 /**
  * @}
- * @}
  */
+
 #endif /*_EQUANIME_H*/

@@ -138,7 +138,7 @@ EAPI Equ_Common_Id equ_controller_id_get(Equ_Controller *c)
 	return c->id;
 }
 
-Equ_Controller * equ_controller_get(Equ_Common_Id id)
+EAPI Equ_Controller * equ_controller_get(Equ_Common_Id id)
 {
 	return eina_hash_find(_controllers, &id);
 }

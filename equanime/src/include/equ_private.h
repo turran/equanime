@@ -69,17 +69,4 @@ struct _Equ_Input
 	Equ_Mode *mode;
 };
 
-/**
- *
- */
-struct _Equ_Surface
-{
-	Equ_Surface_Type type;
-	Equ_Format fmt;
-	unsigned int w;
-	unsigned int h;
-	unsigned int pitch;
-	void *data;
-};
-
 #endif /*_EQUANIME_PRIVATE_H*/

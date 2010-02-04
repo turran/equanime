@@ -12,9 +12,11 @@
 
 struct _Equ_Layer
 {
-	Equ_Common_Id id;
+	Equ_Layer_Info info;
+	Equ_Layer_Caps caps;
+	Equ_Layer_Status status;
 	Equ_Controller *controller;
-	const char *name;
+
 	/* FIXME check from here */
 	int flags; /** Layer flags */
 	const int *formats; /** Supported pixel formats */
@@ -30,79 +32,80 @@ static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Layer * equ_layer_new(Equ_Controller *c, Equ_Common_Id id, const char *name)
+Equ_Layer * equ_layer_new(Equanime *e, Equ_Controller *c, Equ_Common_Id id,
+		const char *name)
 {
 	Equ_Layer *l;
 
 	l = calloc(1, sizeof(Equ_Layer));
 	l->controller = c;
-	l->id = id;
-	l->name = strdup(name);
+	l->info.id = id;
+	l->info.name = strdup(name);
 
 	return l;
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI void equ_layer_delete(Equ_Layer *l)
+{
+	free(l->info.name);
+	free(l);
+}
 /**
- *
+ * Get the name of a layer
+ * @param[in] e The Equanime connection
+ * @param[in] l The layer to get the name from
+ * @return The name of the layer
  */
 EAPI const char * equ_layer_name_get(Equanime *e, Equ_Layer *l)
 {
-	return l->name;
-}
-/**
- *
- */
-EAPI void equ_layer_surface_set(Equ_Layer *l, Equ_Surface *s)
-{
-
+	return l->info.name;
 }
 
 /**
- * Get the layer surface.
- * TODO What happens if a layer changes resolution, size, format ?
- * we should check that the surface is released?
+ * Get the capabilities of a layer
+ * @param[in] e The Equanime connection
+ * @param[in] l The Layer to get the capabilities from
+ * @param[in,out] caps 
  */
-EAPI Equ_Surface * equ_layer_surface_get(Equ_Layer *l)
+EAPI void equ_layer_caps_get(Equanime *e, Equ_Layer *l, Equ_Layer_Caps *caps)
 {
-	Equ_Surface *s;
-#if 0
-	if (!l->surface)
-	{
-		Enesim_Surface *es;
-		Enesim_Surface_Data sdata;
+	Equ_Message_Layer_Caps_Get m;
+	Equ_Reply_Layer_Caps_Get *r = NULL;
+	Equ_Error error;
 
-		s = equ_surface_new();
-		l->surface = s;
-		/* switch for every format */
-		switch (l->format)
-		{
-		/* Enesim_Surface_Format f, int w, int h, Enesim_Surface_Data *sdata */
-		case ENESIM_SURFACE_ARGB8888:
-			sdata.argb8888.plane0 = l->fncs->ptr_get(l);
-			break;
-		case ENESIM_SURFACE_ARGB8888_PRE:
-			sdata.argb8888_pre.plane0 = l->fncs->ptr_get(l);
-			break;
-		case ENESIM_SURFACE_RGB565:
-			sdata.rgb565.plane0 = l->fncs->ptr_get(l);
-			sdata.rgb565.plane1 = malloc(sizeof(*sdata.rgb565.plane1) * l->w * l->h);
-			break;
-		case ENESIM_SURFACE_RGB888:
-			sdata.rgb888.plane0 = l->fncs->ptr_get(l);
-			sdata.rgb888.plane1 = malloc(sizeof(*sdata.rgb8888.plane1) * l->w * l->h);
-			break;
-		case ENESIM_SURFACE_A8:
-			sdata.a8.plane0 = l->fncs->ptr_get(l);
-			break;
-		}
-		es = enesim_surface_new(l->format, l->w, l->h, &sdata);
-	}
-	l->surface_ref++;
-#endif
+	if (!caps) return;
 
-	return s;
+	/* send the command to the server */
+	m.layer_id = l->info.id;
+	error = equ_message_server_send(e, EQU_MSG_TYPE_LAYER_CAPS_GET, &m, 0, (void **)&r);
+	if (error) return;
+	*caps = r->caps;
+
+	free(r);
+}
+
+/**
+ * @param[in] e The Equanime connection
+ * @param[in] l The Layer to get the status from
+ * @param[in,out] status
+ */
+EAPI void equ_layer_status_get(Equanime *e, Equ_Layer *l, Equ_Layer_Status *status)
+{
+	Equ_Message_Layer_Caps_Get m;
+	Equ_Reply_Layer_Status_Get *r = NULL;
+	Equ_Error error;
+
+	if (!status) return;
+
+	/* send the command to the server */
+	m.layer_id = l->info.id;
+	error = equ_message_server_send(e, EQU_MSG_TYPE_LAYER_STATUS_GET, &m, 0, (void **)&r);
+	if (error) return;
+	*status = r->status;
+
+	free(r);
 }
 
 /**

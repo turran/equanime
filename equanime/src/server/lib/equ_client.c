@@ -7,13 +7,6 @@ struct _Equ_Client
 	Ecore_Con_Client *client;
 };
 
-typedef struct _Equ_Host_Get_Cb
-{
-	char *name;
-	Equ_Reply_Host_Get *reply;
-	Equ_Error error;
-} Equ_Host_Get_Cb;
-
 typedef Equ_Error (*Equanime_Message_Cb)(Equ_Client *c, void *msg, void **reply);
 
 static int _hosts_get_cb(void *data, void *cb_data)
@@ -25,21 +18,6 @@ static int _hosts_get_cb(void *data, void *cb_data)
 	reply->hosts = realloc(reply->hosts, reply->hosts_count * sizeof(Equ_Common_Host));
 	reply->hosts[reply->hosts_count - 1].id = equ_host_id_get(h);
 	reply->hosts[reply->hosts_count - 1].name = equ_host_name_get(h);
-
-	return EINA_TRUE;
-}
-
-static int _host_get_cb(void *data, void *cb_data)
-{
-	Equ_Host *h = data;
-	Equ_Host_Get_Cb *hgc = cb_data;
-
-	if (!strcmp(equ_host_name_get(h), hgc->name))
-	{
-		hgc->reply->id = equ_host_id_get(h);
-		hgc->error = EQU_ERR_NONE;
-		return EINA_FALSE;
-	}
 
 	return EINA_TRUE;
 }
@@ -63,7 +41,7 @@ static int _layers_get_cb(void *data, void *cb_data)
 	Equ_Reply_Layers_Get *reply = cb_data;
 
 	reply->layers_count++;
-	reply->layers = realloc(reply->layers, reply->layers_count * sizeof(Equ_Common_Layer));
+	reply->layers = realloc(reply->layers, reply->layers_count * sizeof(Equ_Layer_Info));
 	reply->layers[reply->layers_count - 1].id = equ_layer_id_get(l);
 	reply->layers[reply->layers_count - 1].name = equ_layer_name_get(l);
 
@@ -84,26 +62,6 @@ EAPI Equ_Error equ_client_hosts_get(Equ_Client *client, Equ_Message_Hosts_Get *m
 	equ_hosts_get(_hosts_get_cb, rhg);
 
 	return EQU_ERR_NONE;
-}
-
-EAPI Equ_Error equ_client_host_get(Equ_Client *client, Equ_Message_Host_Get *m,
-		Equ_Reply_Host_Get **reply)
-{
-	Equ_Reply_Host_Get *r;
-	Equ_Host_Get_Cb cb_data;
-
-	r = *reply = calloc(1, sizeof(Equ_Reply_Host_Get));
-	cb_data.reply = r;
-	cb_data.name = m->name;
-	cb_data.error = EQU_ERR_NEXIST;
-	equ_hosts_get(_host_get_cb, &cb_data);
-
-	if (cb_data.error)
-	{
-		free(r);
-		*reply = NULL;
-	}
-	return cb_data.error;
 }
 
 EAPI Equ_Error equ_client_controllers_get(Equ_Client *client, Equ_Message_Controllers_Get *m,
@@ -136,26 +94,35 @@ EAPI Equ_Error equ_client_layers_get(Equ_Client *client, Equ_Message_Layers_Get 
 	return EQU_ERR_NONE;
 }
 
-EAPI Equ_Error equ_client_controller_get(Equ_Client *client, Equ_Message_Host_Get *m,
-		Equ_Reply_Host_Get **reply)
+EAPI Equ_Error equ_client_layer_status_get(Equ_Client *client, Equ_Message_Layer_Status_Get *m,
+		Equ_Reply_Layer_Status_Get **reply)
 {
-	Equ_Reply_Host_Get *r;
-	Equ_Host_Get_Cb cb_data;
+	Equ_Reply_Layer_Status_Get *r;
+	Equ_Layer *l;
 
-	r = *reply = calloc(1, sizeof(Equ_Reply_Host_Get));
-	cb_data.reply = r;
-	cb_data.name = m->name;
-	cb_data.error = EQU_ERR_NEXIST;
-	equ_hosts_get(_host_get_cb, &cb_data);
+	l = equ_layer_get(m->layer_id);
+	if (!l)
+		return EQU_ERR_NEXIST;
+	r = *reply = calloc(1, sizeof(Equ_Reply_Layer_Status_Get));
+	equ_layer_status_get(l, &r->status);
 
-	if (cb_data.error)
-	{
-		free(r);
-		*reply = NULL;
-	}
-	return cb_data.error;
+	return EQU_ERR_NONE;
 }
 
+EAPI Equ_Error equ_client_layer_caps_get(Equ_Client *client, Equ_Message_Layer_Caps_Get *m,
+		Equ_Reply_Layer_Caps_Get **reply)
+{
+	Equ_Reply_Layer_Caps_Get *r;
+	Equ_Layer *l;
+
+	l = equ_layer_get(m->layer_id);
+	if (!l)
+		return EQU_ERR_NEXIST;
+	r = *reply = calloc(1, sizeof(Equ_Reply_Layer_Caps_Get));
+	equ_layer_caps_get(l, &r->caps);
+
+	return EQU_ERR_NONE;
+}
 
 EAPI Equ_Client * equ_client_new(Ecore_Con_Client *conn)
 {
@@ -181,20 +148,20 @@ EAPI Equ_Error equ_client_process(Equ_Client *c, Equ_Message_Name name, void *ms
 		err = equ_client_hosts_get(c, msg, reply);
 		break;
 
-		case EQU_MSG_NAME_HOST_GET:
-		err = equ_client_host_get(c, msg, reply);
-		break;
-
 		case EQU_MSG_NAME_CONTROLLERS_GET:
 		err = equ_client_controllers_get(c, msg, reply);
 		break;
 
-		case EQU_MSG_NAME_CONTROLLER_GET:
-		err = equ_client_controller_get(c, msg, reply);
-		break;
-
 		case EQU_MSG_NAME_LAYERS_GET:
 		err = equ_client_layers_get(c, msg, reply);
+		break;
+		
+		case EQU_MSG_NAME_LAYER_STATUS_GET:
+		err = equ_client_layer_status_get(c, msg, reply);
+		break;
+		
+		case EQU_MSG_NAME_LAYER_CAPS_GET:
+		err = equ_client_layer_caps_get(c, msg, reply);
 		break;
 
 		default:

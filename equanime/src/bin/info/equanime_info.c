@@ -62,6 +62,7 @@ static int _layer_cb(Equ_Layer *l, void *data)
 	printf("Layer %d\n", *num);
 	*num = *num + 1;
 	_layer_desc_dump(l);
+	equ_layer_delete(l);
 
 	return 1;
 }
@@ -81,6 +82,7 @@ int _controller_cb(Equ_Controller *c, void *data)
 	_controller_desc_dump(c);
 	equ_controller_layers_get(eq, c, (Equ_Cb)_layer_cb, &num_layer);
 	//equ_controller_outputs_get(c, (Equ_Cb)_output_cb, &num_output);
+	equ_controller_delete(c);
 
 	return 1;
 }
