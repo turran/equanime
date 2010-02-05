@@ -33,6 +33,7 @@ typedef struct _Equ_Layer_Info
 typedef struct _Equ_Layer_Caps
 {
 	uint32_t fmt_mask;
+	uint32_t flags_mask;
 } Equ_Layer_Caps;
 
 typedef struct _Equ_Layer_Status
@@ -43,6 +44,16 @@ typedef struct _Equ_Layer_Status
 	uint32_t h;
 	Equ_Format fmt;
 } Equ_Layer_Status;
+
+typedef struct _Equ_Surface_Data
+{
+	Equ_Format fmt;
+	union {
+		struct {
+			uint32_t *plane0;
+		} rgb888;
+	} data;
+} Equ_Surface_Data;
 
 typedef enum
 {

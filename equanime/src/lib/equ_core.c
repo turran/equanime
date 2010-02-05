@@ -109,6 +109,12 @@ static int _server_data(void *data, int type, void *event)
 	return 0;
 }
 
+static int _server_del(void *data, int type, void *event)
+{
+	printf("Server deleeeeeted\n");
+	ecore_main_loop_quit();
+}
+
 static int _timeout_cb(void *data)
 {
 	printf("timer!!!\n");
@@ -222,6 +228,7 @@ EAPI Equanime * equ_new(int port)
 
 	eq = calloc(1, sizeof(Equanime));
 	ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, eq);
+	ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL, _server_del, eq);
 	/* try to connect to the server */
 	eq->svr = ecore_con_server_connect(ECORE_CON_LOCAL_USER, EQUANIME_NAME,
 			port, NULL);

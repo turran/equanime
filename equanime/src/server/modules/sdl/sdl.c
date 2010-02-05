@@ -1,6 +1,8 @@
 #include "Equ_Server.h"
 #include "SDL.h"
 
+#include "Ecore.h"
+
 /* The SDL module has only one controller and
  * one output
  */
@@ -10,6 +12,8 @@ typedef struct _SDL
 	Equ_Controller *controller;
 	Equ_Layer *layer;
 	Equ_Output *output;
+	Equ_Server_Backend *server;
+	Ecore_Timer *timer;
 } SDL;
 
 static Eina_Bool _output_mode_set(Equ_Output *o, Equ_Mode *m)
@@ -31,13 +35,45 @@ static Equ_Controller_Backend _cbackend = {
 };
 
 static Equ_Layer_Backend _lbackend = {
-
+	/* FIXME put the layer size set callback */
 };
 
-static Eina_Bool _host_init(Equ_Host *h)
+static int _events_cb(void *data)
+{
+	SDL_Event event;
+	SDL *sdl = data;
+
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+			case SDL_QUIT:
+			sdl->server->quit();
+			break;
+		}
+	}
+	return 1;
+}
+
+static inline void _layer_setup(SDL *sdl)
+{
+	Equ_Layer_Caps caps = {
+		.flags_mask = EQU_LAYER_SIZE,
+	};
+	Equ_Layer_Status status = {
+		.w = 320,
+		.h = 240,
+		.fmt = EQU_FORMAT_RGB888,
+	};
+
+	sdl->layer = equ_controller_layer_register(sdl->controller,
+			"layer0", &_lbackend, &caps, &status);
+}
+
+static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend)
 {
 	SDL *sdl;
-	Uint32 flags = 0;
+	Uint32 flags = SDL_RESIZABLE;
 	SDL_Surface *s;
 
 	sdl = malloc(sizeof(SDL));
@@ -47,8 +83,11 @@ static Eina_Bool _host_init(Equ_Host *h)
 			"controller0", &_cbackend);
 	sdl->output = equ_controller_output_register(sdl->controller,
 			"output0", &_obackend);
-	sdl->layer = equ_controller_layer_register(sdl->controller,
-			"layer0", &_lbackend);
+
+	/* setup the timer callback to check for events */
+	sdl->server = sbackend;
+	sdl->timer = ecore_timer_add(0.005, _events_cb, sdl);
+	_layer_setup(sdl);
 	equ_host_data_set(h, sdl);
 
 	return EINA_TRUE;

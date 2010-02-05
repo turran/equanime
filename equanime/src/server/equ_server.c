@@ -28,7 +28,23 @@ static void _help(void)
 	printf("                          Use 'list' to list the available modules\n");
 	printf("-p <port>               : The server port to listen connections on\n");
 	printf("-n                      : Dont detach from the console\n");
+	printf("-o <options>            : Module options\n");
+	printf("                          Use 'help' to list the module's options\n");
+	printf("-h                      : This help screen\n");
 }
+
+static void _quit(void)
+{
+	/* TODO send the message to quit every client */
+	/* wait until all clients have finished */
+	/* quit the main loop */
+	printf("quittttting\n");
+	ecore_main_loop_quit();
+}
+
+static Equ_Server_Backend _backend = {
+	.quit = _quit,	
+};
 
 static void _module_init(void)
 {
@@ -159,7 +175,7 @@ static Eina_Bool _hosts_cb(Equ_Host *h, const char *name)
 {
 
 	if (!strcmp(equ_host_name_get(h), name))
-		equ_host_init(h);
+		equ_host_init(h, &_backend);
 }
 
 
@@ -189,12 +205,17 @@ static void _server_setup(void)
 
 int main(int argc, char **argv)
 {
+	if (argc > 1)
+	{
+		printf("parse command line!\n");
+		_help();
+		return 0;
+	}
 	/* initialize every system */
 	eina_init();
 	ecore_init();
 	ecore_con_init();
 	equ_message_init();
-	_help();
 	_module_init();
 	_server_init();
 	/* setup the system */

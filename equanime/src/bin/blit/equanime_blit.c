@@ -11,6 +11,7 @@ int main(void)
 	Equ_Layer *l;
 	Equ_Layer_Status status;
 	Equ_Layer_Status caps;
+	Equ_Surface *s;
 
 	equ_init();
 	eq = equ_new(0xea);
@@ -29,11 +30,12 @@ int main(void)
 	printf("layer %s\n", equ_layer_name_get(eq, l));
 
 	/* get the format of the layer */
-	//equ_layer_caps_get(eq, l, &caps);
 	equ_layer_status_get(eq, l, &status);
 	/* get a surface */
+	s = equ_host_surface_get(eq, h, 160, 120, status.fmt, EQU_SURFACE_LOCAL);
+	printf("%p\n", s);
 	/* put it on x,y */
-
+	ecore_main_loop_begin();
 	equ_shutdown();
 
 	return 0;

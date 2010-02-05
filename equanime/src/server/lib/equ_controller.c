@@ -17,11 +17,12 @@ static Equ_Common_Id _ids = 0;
  *
  */
 Equ_Layer * equ_controller_layer_register(Equ_Controller *ec,
-		const char *name, Equ_Layer_Backend *lb)
+		const char *name, Equ_Layer_Backend *lb,
+		Equ_Layer_Caps *caps, Equ_Layer_Status *status)
 {
 	Equ_Layer *l;
 
-	l = equ_layer_new(ec, name, lb);
+	l = equ_layer_new(ec, name, lb, caps, status);
 	ec->layers = eina_list_append(ec->layers, l);
 
 	return l;

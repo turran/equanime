@@ -14,6 +14,14 @@ const char *layer_flags[] = {
 	"LEVEL",
 };
 
+const char *format_name[] = {
+	[EQU_FORMAT_ARGB8888] = "argb8888",
+	[EQU_FORMAT_RGB888] = "rgb888",
+	[EQU_FORMAT_RGB565] = "rgb565",
+	[EQU_FORMAT_Ab31] = "ab31",
+	[EQU_FORMAT_YUV422] = "yuv422",
+};
+
 static void _output_desc_dump(Equ_Output *o)
 {
 	printf("\t- name = %s\n", equ_output_name_get(o));
@@ -34,23 +42,31 @@ static int _output_cb(Equ_Output *o, void *data)
 
 static void _layer_desc_dump(const Equ_Layer *l)
 {
+	Equ_Layer_Caps caps;
+	Equ_Layer_Status status;
 	int i = 0;
 	int flags;
 
 	printf("\t- name = %s\n", equ_layer_name_get(eq, l));
-#if 0
-	printf("\t- flags = ");
+	equ_layer_caps_get(eq, l, &caps);
+	printf("\t- caps:\n");
+	printf("\t\t + flags =");
+	flags = caps.flags_mask;
 	while (flags)
 	{
 		if (flags & 1)
-		{
-			printf("%s ", layer_flags[i]);
-		}
+			printf(" %s", layer_flags[i]);
 		flags = flags >> 1;
 		i++;
 	}
 	printf("\n");
-#endif
+	equ_layer_status_get(eq, l, &status);
+	printf("\t- status:\n");
+	printf("\t\t + x = %d\n", status.x);
+	printf("\t\t + y = %d\n", status.y);
+	printf("\t\t + w = %d\n", status.w);
+	printf("\t\t + h = %d\n", status.h);
+	printf("\t\t + format = %s\n", format_name[status.fmt]);
 }
 
 static int _layer_cb(Equ_Layer *l, void *data)

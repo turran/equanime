@@ -87,17 +87,13 @@ EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 	Equ_Pool *p;
 	Eina_List *l;
 	Equ_Surface *s;
-	void *data = NULL;
 
 	EINA_LIST_FOREACH(host->pools, l, p)
 	{
-		if (data = equ_pool_alloc(p, w * h * fmt, type))
-			break;
+		s = equ_surface_new(p, w, h, fmt, type);
+		if (s) break;
 	}
-	if (!data)
-		return NULL;
 
-	s = equ_surface_new(p, w, h, fmt, type, data);
 	return s;
 }
 
@@ -156,10 +152,10 @@ EAPI Equ_Common_Id equ_host_id_get(Equ_Host *h)
 	return h->id;
 }
 
-EAPI Eina_Bool equ_host_init(Equ_Host *h)
+EAPI Eina_Bool equ_host_init(Equ_Host *h, Equ_Server_Backend *sbackend)
 {
 	if (!h || h->initialized) return EINA_FALSE;
 	if (!h->backend->init) return EINA_FALSE;
 
-	return h->backend->init(h);
+	return h->backend->init(h, sbackend);
 }

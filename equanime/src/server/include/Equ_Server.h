@@ -28,6 +28,7 @@ typedef struct _Equ_Input_Backend  Equ_Input_Backend;
 typedef struct _Equ_Region_Backend  Equ_Region_Backend;
 typedef struct _Equ_Host_Backend Equ_Host_Backend;
 typedef struct _Equ_Pool_Backend Equ_Pool_Backend;
+typedef struct _Equ_Server_Backend Equ_Server_Backend;
 
 typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 
@@ -77,7 +78,7 @@ typedef struct _Equ_Mode
 
 struct _Equ_Host_Backend
 {
-	Eina_Bool (*init)(Equ_Host *);
+	Eina_Bool (*init)(Equ_Host *, Equ_Server_Backend *sbackend);
 	void (*shutdown)(Equ_Host *);
 };
 
@@ -120,8 +121,6 @@ struct _Equ_Layer_Backend
 	Eina_Bool (*visibility_set)(Equ_Layer *l, Eina_Bool show);
 	Eina_Bool (*format_set)(Equ_Layer *l, Equ_Format fmt);
 	Eina_Bool (*surface_put)(Equ_Layer *l, Equ_Surface *s, int x, int y);
-	//Eina_Bool (*surface_set)(Equ_Layer *l, Equ_Surface *s);
-	//Equ_Format * (*format_get)(Equ_Layer *l, int num_formats);
 	//Eina_Bool (*input_set)(Equ_Layer *l, Equ_Input *i);
 };
 
@@ -211,14 +210,30 @@ struct _Equ_Input
 	Equ_Mode *mode;
 };
 
+/**
+ *
+ */
+struct _Equ_Server_Backend
+{
+	void (*quit)(void);
+	/* TODO do we suppose that ecore will handle
+	 * the main loop always? if so, we dont need
+	 * to abstract different calls like timer_add
+	 * fd_read, whatever, if not, define some
+	 * functions here
+	 */
+};
+
 Equ_Output * equ_output_new(Equ_Controller *c,
 		const char *name, Equ_Output_Backend *ob);
 Equ_Output *equ_controller_output_register(Equ_Controller *c,
 		const char *name, Equ_Output_Backend *backend);
 Equ_Layer * equ_layer_new(Equ_Controller *c,
-		const char *name, Equ_Layer_Backend *lb);
+		const char *name, Equ_Layer_Backend *lb,
+		Equ_Layer_Caps *caps, Equ_Layer_Status *status);
 Equ_Layer * equ_controller_layer_register(Equ_Controller *c,
-		const char *name, Equ_Layer_Backend *lb);
+		const char *name, Equ_Layer_Backend *lb,
+		Equ_Layer_Caps *caps, Equ_Layer_Status *status);
 Equ_Controller * equ_host_controller_register(Equ_Host *h,
 		const char *name, Equ_Controller_Backend *backend);
 

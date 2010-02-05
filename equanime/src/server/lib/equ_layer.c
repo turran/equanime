@@ -34,8 +34,9 @@ static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Layer * equ_layer_new(Equ_Controller *c,
-		const char *name, Equ_Layer_Backend *b)
+Equ_Layer * equ_layer_new(Equ_Controller *c, const char *name,
+		Equ_Layer_Backend *b, Equ_Layer_Caps *caps,
+		Equ_Layer_Status *status)
 {
 	Equ_Layer *l;
 	
@@ -43,11 +44,13 @@ Equ_Layer * equ_layer_new(Equ_Controller *c,
 		_layers = eina_hash_int32_new(NULL);
 
 
-	l = malloc(sizeof(Equ_Layer));
+	l = calloc(1, sizeof(Equ_Layer));
 	l->backend = b;
 	l->controller = c;
 	l->info.name = name;
 	l->info.id = _ids++;
+	if (status) l->status = *status;
+	if (caps) l->caps = *caps;
 	eina_hash_add(_layers, &l->info.id, l);
 
 	return l;
@@ -86,7 +89,9 @@ EAPI Equ_Common_Id equ_layer_id_get(Equ_Layer *l)
 {
 	return l->info.id;
 }
-
+/**
+ *
+ */
 EAPI void equ_layer_status_get(Equ_Layer *l, Equ_Layer_Status *status)
 {
 	if (!status)
@@ -107,11 +112,13 @@ EAPI void equ_layer_format_set(Equ_Layer *l, Equ_Format fmt)
 	/* call the backend implementation */
 }
 
-
+/**
+ *
+ */
 EAPI void equ_layer_size_set(Equ_Layer *l, uint32_t w, uint32_t h)
 {
-
-
+	/* check the capabilities */
+	/* call the backend implementation */
 }
 
 /**

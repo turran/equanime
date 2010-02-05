@@ -70,19 +70,6 @@ void equ_message_init(void)
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Common_Host, "name", name, EET_T_STRING);
 	_ddescriptors[EQU_DATA_LAYER] = edd;
 
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Layer_Caps", sizeof(Equ_Layer_Caps));
-	edd = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Layer_Caps, "fmt_mask", fmt_mask, EET_T_UINT);
-	_ddescriptors[EQU_DATA_LAYER_CAPS] = edd;
-	
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Layer_Status", sizeof(Equ_Layer_Status));
-	edd = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Layer_Status, "x", x, EET_T_INT);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Layer_Status, "y", y, EET_T_INT);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Layer_Status, "w", w, EET_T_UINT);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Layer_Status, "h", h, EET_T_UINT);
-	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Layer_Status, "fmt", fmt, EET_T_UINT);
-	_ddescriptors[EQU_DATA_LAYER_STATUS] = edd;
 	/* create all the messages' data descriptors */
 	/* Host messages/replies */
 	/* hosts get */
@@ -126,7 +113,8 @@ void equ_message_init(void)
 	/* layer caps get reply */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Reply_Layer_Caps_Get", sizeof(Equ_Reply_Layer_Caps_Get));
 	edd = eet_data_descriptor_stream_new(&eddc);
-	EET_DATA_DESCRIPTOR_ADD_SUB(edd, Equ_Reply_Layer_Caps_Get, "caps", caps, _ddescriptors[EQU_DATA_LAYER_CAPS]);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Layer_Caps_Get, "fmt_mask", caps.fmt_mask, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Layer_Caps_Get, "flags_mask", caps.flags_mask, EET_T_UINT);
 	_descriptors[EQU_MSG_NAME_LAYER_CAPS_GETR] = edd;
 	/* layer status get */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Message_Layer_Status_Get", sizeof(Equ_Message_Layer_Status_Get));
@@ -144,6 +132,7 @@ void equ_message_init(void)
 	_descriptors[EQU_MSG_NAME_LAYER_STATUS_GETR] = edd;
 	/* Pool messages/replies */
 	/* Surfaces messages/replies */
+	/* surface get */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Message_Surface_Get", sizeof(Equ_Message_Surface_Get));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[EQU_MSG_NAME_SURFACE_GET] = edd;
@@ -152,6 +141,10 @@ void equ_message_init(void)
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Get, "h", h, EET_T_UINT);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Get, "fmt", fmt, EET_T_UINT);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Get, "type", type, EET_T_UINT);
+	/* surface get reply */
+	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Reply_Surface_Get", sizeof(Equ_Reply_Surface_Get));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[EQU_MSG_NAME_SURFACE_GETR] = edd;
 }
 
 void equ_message_shutdown(void)
