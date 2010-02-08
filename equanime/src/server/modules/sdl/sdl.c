@@ -16,6 +16,11 @@ typedef struct _SDL
 	Ecore_Timer *timer;
 } SDL;
 
+static Equ_Option op = {
+	{ EQU_VALUE_INT, {50, NULL}, "resizable", "Make the SDL window resizable"},
+	{ EQU_VALUE_NONE, 0, NULL, NULL},
+};
+
 static Eina_Bool _output_mode_set(Equ_Output *o, Equ_Mode *m)
 {
 	return EINA_TRUE;
@@ -91,6 +96,11 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend)
 	equ_host_data_set(h, sdl);
 
 	return EINA_TRUE;
+}
+
+static Equ_Option * _host_options(Equ_Host *h)
+{
+	return &op;
 }
 
 static void _host_shutdown(Equ_Host *h)

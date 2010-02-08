@@ -36,6 +36,25 @@ typedef struct _Equ_Hal_I2C Equ_Hal_I2C;
 #include "equ_common.h"
 #include "equ_server_private.h"
 
+typedef enum _Equ_Value
+{
+	EQU_VALUE_NONE,
+	EQU_VALUE_INT,
+	EQU_VALUE_STRING,
+} Equ_Value;
+
+typedef struct _Equ_Option
+{
+	Equ_Value type;
+	union
+	{
+		int i;
+		char *str;
+	} value;
+	const char *name;
+	const char *description;
+} Equ_Option;
+
 typedef enum _Equ_Standard
 {
 	EQU_STANDARD_CUSTOM,
