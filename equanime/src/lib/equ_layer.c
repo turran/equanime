@@ -67,7 +67,7 @@ EAPI const char * equ_layer_name_get(Equanime *e, Equ_Layer *l)
  * Get the capabilities of a layer
  * @param[in] e The Equanime connection
  * @param[in] l The Layer to get the capabilities from
- * @param[in,out] caps 
+ * @param[in,out] caps
  */
 EAPI void equ_layer_caps_get(Equanime *e, Equ_Layer *l, Equ_Layer_Caps *caps)
 {
@@ -106,6 +106,13 @@ EAPI void equ_layer_status_get(Equanime *e, Equ_Layer *l, Equ_Layer_Status *stat
 	*status = r->status;
 
 	free(r);
+}
+
+
+EAPI void equ_layer_surface_put(Equanime *e, Equ_Layer *l, Equ_Surface *s,
+		int x, int y, Eina_Rectangle *src)
+{
+
 }
 
 /**

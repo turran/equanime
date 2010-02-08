@@ -3,6 +3,16 @@
 
 Equanime *eq;
 
+static void _surface_info(Equ_Surface *s)
+{
+	Equ_Surface_Type t;
+	int w, h;
+
+	equ_surface_size_get(s, &w, &h);
+	t = equ_surface_type_get(s);
+	printf("surface = %p w = %d, h = %d type = %d\n", s, w, h, t);
+}
+
 int main(void)
 {
 	int num_host;
@@ -12,6 +22,7 @@ int main(void)
 	Equ_Layer_Status status;
 	Equ_Layer_Status caps;
 	Equ_Surface *s;
+	Eina_Rectangle rect;
 
 	equ_init();
 	eq = equ_new(0xea);
@@ -32,9 +43,14 @@ int main(void)
 	/* get the format of the layer */
 	equ_layer_status_get(eq, l, &status);
 	/* get a surface */
-	s = equ_host_surface_get(eq, h, 160, 120, status.fmt, EQU_SURFACE_LOCAL);
-	printf("%p\n", s);
+	eina_rectangle_coords_from(&rect, 0, 0, 160, 120);
+	s = equ_host_surface_get(eq, h, rect.w, rect.h, status.fmt, EQU_SURFACE_LOCAL);
+	if (!s) goto end;
+
+	_surface_info(s);
 	/* put it on x,y */
+	equ_layer_surface_put(eq, l, s, 0, 0, &rect);
+end:
 	ecore_main_loop_begin();
 	equ_shutdown();
 

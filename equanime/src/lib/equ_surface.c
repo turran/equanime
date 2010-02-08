@@ -37,7 +37,7 @@ Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 		switch (fmt)
 		{
 			case EQU_FORMAT_RGB888:
-			s->data.data.rgb888.plane0 = calloc(w * h, sizeof(uint32_t));	
+			s->data.data.rgb888.plane0 = calloc(w * h, sizeof(uint32_t));
 			break;
 		}
 	}
@@ -58,7 +58,7 @@ EAPI void equ_surface_size_get(Equ_Surface *s, unsigned int *w, unsigned int *h)
 	if (h) *h = s->h;
 }
 
-EAPI Equ_Surface_Type equanime_surface_type_get(const Equ_Surface *s)
+EAPI Equ_Surface_Type equ_surface_type_get(const Equ_Surface *s)
 {
 	return s->type;
 }
