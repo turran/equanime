@@ -14,11 +14,13 @@ typedef struct _SDL
 	Equ_Output *output;
 	Equ_Server_Backend *server;
 	Ecore_Timer *timer;
+	/* options */
+	Eina_Bool resizable;
 } SDL;
 
-static Equ_Option op = {
-	{ EQU_VALUE_INT, {50, NULL}, "resizable", "Make the SDL window resizable"},
-	{ EQU_VALUE_NONE, 0, NULL, NULL},
+static Equ_Option _options[] = {
+	{ "0", "resizable", "Make the SDL window resizable"},
+	{ NULL, NULL, NULL},
 };
 
 static Eina_Bool _output_mode_set(Equ_Output *o, Equ_Mode *m)
@@ -75,13 +77,20 @@ static inline void _layer_setup(SDL *sdl)
 			"layer0", &_lbackend, &caps, &status);
 }
 
-static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend)
+static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
+		const char *options)
 {
 	SDL *sdl;
-	Uint32 flags = SDL_RESIZABLE;
+	Uint32 flags = 0;
 	SDL_Surface *s;
 
 	sdl = malloc(sizeof(SDL));
+	/* parse the options */
+	equ_option_parse(&_options[0], options, EQU_OPTION_BOOL,
+			&sdl->resizable);
+	if (sdl->resizable)
+		flags |= SDL_RESIZABLE;
+	/* initialize sdl */
 	SDL_Init(SDL_INIT_VIDEO);
 	sdl->surface = SDL_SetVideoMode(320, 240, 32, flags);
 	sdl->controller = equ_host_controller_register(h,
@@ -100,7 +109,7 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend)
 
 static Equ_Option * _host_options(Equ_Host *h)
 {
-	return &op;
+	return &_options;
 }
 
 static void _host_shutdown(Equ_Host *h)

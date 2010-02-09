@@ -152,10 +152,11 @@ EAPI Equ_Common_Id equ_host_id_get(Equ_Host *h)
 	return h->id;
 }
 
-EAPI Eina_Bool equ_host_init(Equ_Host *h, Equ_Server_Backend *sbackend)
+EAPI Eina_Bool equ_host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
+		const char *options)
 {
 	if (!h || h->initialized) return EINA_FALSE;
 	if (!h->backend->init) return EINA_FALSE;
 
-	return h->backend->init(h, sbackend);
+	return h->backend->init(h, sbackend, options);
 }

@@ -20,6 +20,7 @@ typedef struct _Equanime
 static Eina_Array *_modules = NULL;
 static Equanime _equd;
 static int _log_dom = -1;
+char *options = NULL;
 
 static void _help(void)
 {
@@ -43,7 +44,7 @@ static void _quit(void)
 }
 
 static Equ_Server_Backend _backend = {
-	.quit = _quit,	
+	.quit = _quit,
 };
 
 static void _module_init(void)
@@ -175,7 +176,9 @@ static Eina_Bool _hosts_cb(Equ_Host *h, const char *name)
 {
 
 	if (!strcmp(equ_host_name_get(h), name))
-		equ_host_init(h, &_backend);
+	{
+		equ_host_init(h, &_backend, options);
+	}
 }
 
 
@@ -205,11 +208,20 @@ static void _server_setup(void)
 
 int main(int argc, char **argv)
 {
+	int i;
+
+#if 0
 	if (argc > 1)
 	{
 		printf("parse command line!\n");
 		_help();
 		return 0;
+	}
+#endif
+	for (i = 1; i < argc; i++)
+	{
+		if (!strcmp(argv[i], "-o"))
+			options = strdup(argv[i + 1]);
 	}
 	/* initialize every system */
 	eina_init();
