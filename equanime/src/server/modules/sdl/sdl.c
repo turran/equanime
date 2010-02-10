@@ -20,7 +20,7 @@ typedef struct _SDL
 
 static Equ_Option _options[] = {
 	{ "0", "resizable", "Make the SDL window resizable"},
-	{ NULL, NULL, NULL},
+	NULL,
 };
 
 static Eina_Bool _output_mode_set(Equ_Output *o, Equ_Mode *m)
@@ -109,7 +109,7 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 
 static Equ_Option * _host_options(Equ_Host *h)
 {
-	return &_options;
+	return _options;
 }
 
 static void _host_shutdown(Equ_Host *h)
@@ -127,6 +127,7 @@ static void _host_shutdown(Equ_Host *h)
 Equ_Host_Backend _hbackend = {
 	.init = _host_init,
 	.shutdown = _host_shutdown,
+	.options_get = _host_options,
 };
 
 static Eina_Bool module_init(void)

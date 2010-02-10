@@ -160,3 +160,9 @@ EAPI Eina_Bool equ_host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 
 	return h->backend->init(h, sbackend, options);
 }
+
+EAPI Equ_Option * equ_host_options_get(Equ_Host *h)
+{
+	if (!h->backend->options_get) return NULL;
+	return h->backend->options_get(h);
+}

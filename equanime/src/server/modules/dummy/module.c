@@ -48,13 +48,13 @@ static Equ_Controller_Functions dummy_functions =
 #endif
 Eina_Bool module_init(void)
 {
-	printf("Dummy Module init\n");
+	//printf("Dummy Module init\n");
 	return EINA_TRUE;
 }
 
 void module_shutdown(void)
 {
-	printf("Dummy Module exit\n");
+	//printf("Dummy Module exit\n");
 }
 
 EINA_MODULE_INIT(module_init);

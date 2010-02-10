@@ -150,7 +150,7 @@ static Eina_Bool module_init(void)
 	Equ_Host *h;
 	void *mem;
 
-	printf("Initializing Neuros OSD2 Board\n");
+	//printf("Initializing Neuros OSD2 Board\n");
 	/* get the UIO devices */
 	hd = equanime_hal_uio_open("dm6446_media");
 	if (!hd)

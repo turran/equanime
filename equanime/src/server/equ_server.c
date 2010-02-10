@@ -21,6 +21,9 @@ static Eina_Array *_modules = NULL;
 static Equanime _equd;
 static int _log_dom = -1;
 char *options = NULL;
+char *module = NULL;
+Eina_Bool options_help = EINA_FALSE;
+Eina_Bool modules_list = EINA_FALSE;
 
 static void _help(void)
 {
@@ -174,10 +177,25 @@ shift:
 
 static Eina_Bool _hosts_cb(Equ_Host *h, const char *name)
 {
-
-	if (!strcmp(equ_host_name_get(h), name))
+	if (modules_list)
+		printf("%s\n", equ_host_name_get(h));
+	else if (!strcmp(equ_host_name_get(h), name))
 	{
-		equ_host_init(h, &_backend, options);
+		if (options_help)
+		{
+			Equ_Option *op;
+			op = equ_host_options_get(h);
+			if (!op) return;
+			while (op->name != NULL)
+			{
+				printf("%s\t: %s (%s)\n", op->name, op->description, op->def);
+				op++;
+			}
+		}
+		else
+		{
+			equ_host_init(h, &_backend, options);
+		}
 	}
 }
 
@@ -203,25 +221,62 @@ static void _server_shutdown(void)
 static void _server_setup(void)
 {
 	/* parse the cmd line options */
-	equ_hosts_get(_hosts_cb, "sdl");
+	equ_hosts_get(_hosts_cb, module);
 }
 
 int main(int argc, char **argv)
 {
 	int i;
+	int parameter = 0;
+	char option = 0;
 
-#if 0
-	if (argc > 1)
-	{
-		printf("parse command line!\n");
-		_help();
-		return 0;
-	}
-#endif
+	if (argc < 2) goto cmd_error;
 	for (i = 1; i < argc; i++)
 	{
-		if (!strcmp(argv[i], "-o"))
-			options = strdup(argv[i + 1]);
+		char *v = argv[i];
+
+		if (parameter)
+		{
+			if (*v == '-')
+				goto cmd_error;
+			switch (option)
+			{
+				case 'o':
+				if (!strcmp(v, "help"))
+					options_help = EINA_TRUE;
+				else
+					options = strdup(v);
+				break;
+
+				case 'm':
+				if (!strcmp(v, "list"))
+					modules_list = EINA_TRUE;
+				else
+					module = strdup(v);
+				break;
+			}
+			parameter = 0;
+		}
+		else if (*v == '-')
+		{
+			option = *(v + 1);
+			switch (option)
+			{
+				case 'o':
+				parameter = 1;
+				break;
+
+				/* the module to use */
+				case 'm':
+				parameter = 1;
+				break;
+
+				default:
+				goto cmd_error;
+			}
+		}
+		else
+			goto cmd_error;
 	}
 	/* initialize every system */
 	eina_init();
@@ -232,9 +287,12 @@ int main(int argc, char **argv)
 	_server_init();
 	/* setup the system */
 	_server_setup();
+	if (modules_list || options_help)
+		goto module_exit;
 	/* listen to the messages */
 	ecore_main_loop_begin();
 	/* shutdown every system */
+module_exit:
 	_server_shutdown();
 	_module_shutdown();
 	equ_message_shutdown();
@@ -242,5 +300,9 @@ int main(int argc, char **argv)
 	ecore_shutdown();
 	eina_shutdown();
 
+	return 0;
+
+cmd_error:
+	_help();
 	return 0;
 }

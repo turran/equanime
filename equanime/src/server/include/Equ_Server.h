@@ -97,6 +97,7 @@ struct _Equ_Host_Backend
 {
 	Eina_Bool (*init)(Equ_Host *, Equ_Server_Backend *sbackend, const char *options);
 	void (*shutdown)(Equ_Host *);
+	Equ_Option * (*options_get)(Equ_Host *h);
 };
 
 struct _Equ_Input_Backend
