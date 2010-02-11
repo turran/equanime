@@ -86,7 +86,7 @@ EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 {
 	Equ_Pool *p;
 	Eina_List *l;
-	Equ_Surface *s;
+	Equ_Surface *s = NULL;
 
 	EINA_LIST_FOREACH(host->pools, l, p)
 	{

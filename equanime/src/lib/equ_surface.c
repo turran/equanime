@@ -44,6 +44,11 @@ Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 
 	return s;
 }
+
+Equ_Common_Id equ_surface_id_get(Equ_Surface *s)
+{
+	return s->id;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -108,11 +108,30 @@ EAPI void equ_layer_status_get(Equanime *e, Equ_Layer *l, Equ_Layer_Status *stat
 	free(r);
 }
 
-
+/**
+ * @param[in] e The Equanime connection
+ * @param[in] l The Layer to put the surface on
+ * @param[in] s The Surface to put on the layer
+ * @param[in] x The x coordinate to put the surface
+ * @param[in] y The y coordinate to put the surface
+ * @param[in] src The clip rectangle for the surface
+ */
 EAPI void equ_layer_surface_put(Equanime *e, Equ_Layer *l, Equ_Surface *s,
 		int x, int y, Eina_Rectangle *src)
 {
+	Equ_Message_Surface_Put m;
+	Equ_Error error;
 
+	/* send the command to the server */
+	m.layer_id = l->info.id;
+	m.surface_id = equ_surface_id_get(s);
+	m.dx = x;
+	m.dy = y;
+	m.cx = src->x;
+	m.cy = src->y;
+	m.cw = src->w;
+	m.ch = src->h;
+	error = equ_message_server_send(e, EQU_MSG_TYPE_SURFACE_PUT, &m, 0, NULL);
 }
 
 /**

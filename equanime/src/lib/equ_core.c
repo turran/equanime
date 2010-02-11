@@ -62,27 +62,7 @@ static int _server_data(void *data, int type, void *event)
 	{
 		equ_message_reply_name_get(eq->msg->type, &rname);
 		DBG("Decoding data[%d] %d", rname, eq->reply->size);
-#if 0
-		{
-			char *buf = eq->buffer + sizeof(Equ_Reply);
-			int i;
-			for (i = 0; i < eq->reply->size; i++)
-			{
-				printf("buf = %c\n", *buf++);
-			}
-		}
-#endif
 		eq->rbody = equ_message_decode(rname, eq->buffer + sizeof(Equ_Reply), eq->reply->size);
-#if 0
-		{
-			Equ_Reply_Hosts_Get *rhg;
-
-			rhg = eq->rbody;
-			printf("%p %d\n", rhg->hosts[0].name, rhg->hosts[1].id);
-			printf("[ %p %d\n", eq->buffer + sizeof(Equ_Reply), eq->reply->size);
-			eet_data_text_dump(eq->buffer + sizeof(Equ_Reply), eq->reply->size, output, NULL);
-		}
-#endif
 	}
 	/* copy the reply into a new buffer */
 	eq->reply = malloc(sizeof(Equ_Reply));
@@ -233,4 +213,14 @@ EAPI Equanime * equ_new(int port)
 	eq->svr = ecore_con_server_connect(ECORE_CON_LOCAL_USER, EQUANIME_NAME,
 			port, NULL);
 	return eq;
+}
+
+/**
+ * Flushes every message and waits until the server
+ * has processed every message
+ * @param[in] Equanime The equanime connection
+ */
+EAPI void equ_sync(Equanime *e)
+{
+
 }

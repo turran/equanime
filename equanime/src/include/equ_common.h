@@ -104,7 +104,6 @@ typedef enum _Equ_Message_Name
 	EQU_MSG_NAME_SURFACE_GET,
 	EQU_MSG_NAME_SURFACE_GETR,
 	EQU_MSG_NAME_SURFACE_PUT,
-	EQU_MSG_NAME_SURFACE_PUTR,
 	EQU_MSG_NAMES
 } Equ_Message_Name;
 
@@ -122,6 +121,7 @@ typedef enum _Equ_Message_Type
 	EQU_MSG_TYPE_LAYER_STATUS_GETR = ((EQU_MSG_NAME_LAYER_STATUS_GETR << 1) | EQU_MSG_NO_REPLY),
 	EQU_MSG_TYPE_SURFACE_GET       = ((EQU_MSG_NAME_SURFACE_GET << 1) | EQU_MSG_REPLY),
 	EQU_MSG_TYPE_SURFACE_GETR      = ((EQU_MSG_NAME_SURFACE_GETR << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_SURFACE_PUT       = ((EQU_MSG_NAME_SURFACE_PUT << 1) | EQU_MSG_NO_REPLY),
 } Equ_Message_Type;
 
 /*
@@ -174,9 +174,14 @@ typedef struct _Equ_Message_Surface_Get
 
 typedef struct _Equ_Message_Surface_Put
 {
-	Equ_Common_Id src;
-	Equ_Common_Id dst;
-	/* TODO */
+	Equ_Common_Id surface_id;
+	Equ_Common_Id layer_id;
+	int dx;
+	int dy;
+	int cx;
+	int cy;
+	int cw;
+	int ch;
 } Equ_Message_Surface_Put;
 
 /*
@@ -226,11 +231,6 @@ typedef struct _Equ_Reply_Surface_Get
 {
 	Equ_Common_Id id;
 } Equ_Reply_Surface_Get;
-
-typedef struct _Equ_Reply_Surface_Put
-{
-	/* TODO */
-} Equ_Reply_Surface_Put;
 
 static inline Equ_Message_Name equ_message_name_get(Equ_Message_Type t)
 {

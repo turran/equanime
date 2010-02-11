@@ -81,7 +81,7 @@ void equ_message_init(void)
 	edd = eet_data_descriptor_stream_new(&eddc);
 	EET_DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Hosts_Get, "hosts", hosts, _ddescriptors[EQU_DATA_HOST]);
 	_descriptors[EQU_MSG_NAME_HOSTS_GETR] = edd;
-	
+
 	/* Controllers messages/replies */
 	/* controllers get */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Message_Controllers_Get", sizeof(Equ_Message_Controllers_Get));
@@ -93,7 +93,7 @@ void equ_message_init(void)
 	edd = eet_data_descriptor_stream_new(&eddc);
 	EET_DATA_DESCRIPTOR_ADD_VAR_ARRAY(edd, Equ_Reply_Controllers_Get, "controllers", controllers, _ddescriptors[EQU_DATA_CONTROLLER]);
 	_descriptors[EQU_MSG_NAME_CONTROLLERS_GETR] = edd;
-	
+
 	/* Layers messages/replies */
 	/* layers get */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Message_Layers_Get", sizeof(Equ_Message_Layers_Get));
@@ -130,6 +130,18 @@ void equ_message_init(void)
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Layer_Status_Get, "h", status.h, EET_T_UINT);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Layer_Status_Get, "fmt", status.fmt, EET_T_UINT);
 	_descriptors[EQU_MSG_NAME_LAYER_STATUS_GETR] = edd;
+	/* layer surface put */
+	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Message_Surface_Put", sizeof(Equ_Message_Surface_Put));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[EQU_MSG_NAME_SURFACE_PUT] = edd;
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "layer_id", layer_id, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "surface_id", surface_id, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "dx", dx, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "dy", dy, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "cx", cx, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "cy", cy, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "cw", cw, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Put, "ch", ch, EET_T_UINT);
 	/* Pool messages/replies */
 	/* Surfaces messages/replies */
 	/* surface get */
