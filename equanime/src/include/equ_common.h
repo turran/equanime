@@ -262,5 +262,6 @@ void equ_message_shutdown(void);
 
 void * equ_message_encode(Equ_Message_Name name, const void *data, int *size);
 void * equ_message_decode(Equ_Message_Name name, const void *data, int size);
+Equ_Message * equ_message_new(Equ_Message_Type type);
 
 #endif /*_EQU_COMMON_H*/

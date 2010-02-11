@@ -113,12 +113,12 @@ static Equanime_Hal_Device * _parse_uio(const char *sysfs_dirname)
 				snprintf(filename, PATH_MAX, "%s/maps/%s/addr", sysfs_dirname, maps_entry->d_name);
 				if (!_read_file(filename, line))
 					continue;
-				sscanf(line,"0x%lx",&d->maps[index].addr);
+				sscanf(line, "0x%lx", &d->maps[index].addr);
 
 				snprintf(filename, PATH_MAX, "%s/maps/%s/size", sysfs_dirname, maps_entry->d_name);
 				if (!_read_file(filename, line))
 					continue;
-				sscanf(line,"0x%lx",&d->maps[index].size);
+				sscanf(line, "0x%x", &d->maps[index].size);
 				index++;
 			}
 			d->maps_num = index;
@@ -242,6 +242,6 @@ EAPI void equanime_hal_uio_dump(Equanime_Hal_Device *d)
 	for (i = 0; i < d->maps_num; i++)
 	{
 		m = &d->maps[i];
-		printf("\t%d: 0x%lx 0x%lx\n", i, m->addr, m->size);
+		printf("\t%d: 0x%lx 0x%x\n", i, m->addr, m->size);
 	}
 }

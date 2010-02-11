@@ -204,21 +204,6 @@ struct _Equ_Region
 /**
  *
  */
-struct _Equ_Controller
-{
-	const Equ_Controller_Backend *backend;
-	const char *name;
-	void *data;
-	Equ_Common_Id id;
-
-	Equ_Host *host;
-	Eina_List *layers;
-	Eina_List *outputs;
-	Eina_List *inputs;
-};
-/**
- *
- */
 struct _Equ_Input
 {
 	Equ_Input_Backend *backend;
@@ -244,25 +229,35 @@ struct _Equ_Server_Backend
 
 Equ_Output * equ_output_new(Equ_Controller *c,
 		const char *name, Equ_Output_Backend *ob);
-Equ_Output *equ_controller_output_register(Equ_Controller *c,
-		const char *name, Equ_Output_Backend *backend);
-Equ_Layer * equ_layer_new(Equ_Controller *c,
-		const char *name, Equ_Layer_Backend *lb,
-		Equ_Layer_Caps *caps, Equ_Layer_Status *status);
+Equ_Controller * equ_host_controller_register(Equ_Host *h,
+		const char *name, Equ_Controller_Backend *backend);
+const char * equ_host_name_get(Equ_Host *h);
+Equ_Host * equ_host_get(Equ_Common_Id id);
+Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
+		Equ_Format fmt, Equ_Surface_Type type);
+
+
 Equ_Layer * equ_controller_layer_register(Equ_Controller *c,
 		const char *name, Equ_Layer_Backend *lb,
 		Equ_Layer_Caps *caps, Equ_Layer_Status *status);
-Equ_Controller * equ_host_controller_register(Equ_Host *h,
-		const char *name, Equ_Controller_Backend *backend);
-
+void equ_controller_input_register(Equ_Controller *ec,
+		Equ_Input_Backend *ib, const char *nane, void *data);
+Equ_Output *equ_controller_output_register(Equ_Controller *c,
+		const char *name, Equ_Output_Backend *backend);
 void equ_controller_unregister(Equ_Controller *c);
 void * equ_controller_data_get(Equ_Controller *c);
+const char * equ_controller_name_get(Equ_Controller *c);
+Equ_Controller * equ_controller_get(Equ_Common_Id id);
 
-void equ_controller_input_register(Equ_Controller *ec, Equ_Input_Backend *ib, const char *nane, void *data);
-
+Equ_Layer * equ_layer_new(Equ_Controller *c,
+		const char *name, Equ_Layer_Backend *lb,
+		Equ_Layer_Caps *caps, Equ_Layer_Status *status);
+const char * equ_layer_name_get(Equ_Layer *l);
 void equ_layer_unregister(Equ_Layer *l);
 void * equ_layer_data_get(Equ_Layer *l);
+Equ_Layer * equ_layer_get(Equ_Common_Id id);
 
+Equ_Surface * equ_surface_get(Equ_Common_Id id);
 
 Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib, const char *name, void *data);
 

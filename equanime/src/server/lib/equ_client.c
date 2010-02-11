@@ -120,7 +120,7 @@ static Equ_Error _layer_caps_get(Equ_Client *client, Equ_Message_Layer_Caps_Get 
 }
 
 static Equ_Error _surface_get(Equ_Client *client, Equ_Message_Surface_Get *m,
-		Equ_Reply_Layer_Caps_Get **reply)
+		Equ_Reply_Surface_Get **reply)
 {
 	Equ_Reply_Surface_Get *r;
 	Equ_Host *h;
@@ -168,13 +168,13 @@ static Equ_Error _layer_surface_put(Equ_Client *client, Equ_Message_Surface_Put 
 
 
 static Equanime_Message_Cb _cbs[EQU_MSG_NAMES] = {
-	[EQU_MSG_NAME_HOSTS_GET] = _hosts_get,
-	[EQU_MSG_NAME_CONTROLLERS_GET] = _controllers_get,
-	[EQU_MSG_NAME_LAYERS_GET] = _layers_get,
-	[EQU_MSG_NAME_LAYER_STATUS_GET] = _layer_status_get,
-	[EQU_MSG_NAME_LAYER_CAPS_GET] = _layer_caps_get,
-	[EQU_MSG_NAME_SURFACE_GET] = _surface_get,
-	[EQU_MSG_NAME_SURFACE_PUT] = _layer_surface_put,
+	[EQU_MSG_NAME_HOSTS_GET] = (Equanime_Message_Cb)_hosts_get,
+	[EQU_MSG_NAME_CONTROLLERS_GET] = (Equanime_Message_Cb)_controllers_get,
+	[EQU_MSG_NAME_LAYERS_GET] = (Equanime_Message_Cb)_layers_get,
+	[EQU_MSG_NAME_LAYER_STATUS_GET] = (Equanime_Message_Cb)_layer_status_get,
+	[EQU_MSG_NAME_LAYER_CAPS_GET] = (Equanime_Message_Cb)_layer_caps_get,
+	[EQU_MSG_NAME_SURFACE_GET] = (Equanime_Message_Cb)_surface_get,
+	[EQU_MSG_NAME_SURFACE_PUT] = (Equanime_Message_Cb)_layer_surface_put,
 };
 /*============================================================================*
  *                                 Global                                     *

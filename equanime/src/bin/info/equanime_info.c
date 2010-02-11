@@ -40,7 +40,7 @@ static int _output_cb(Equ_Output *o, void *data)
 	return 1;
 }
 
-static void _layer_desc_dump(const Equ_Layer *l)
+static void _layer_desc_dump(Equ_Layer *l)
 {
 	Equ_Layer_Caps caps;
 	Equ_Layer_Status status;
@@ -130,7 +130,7 @@ int main(void)
 
 	equ_init();
 	eq = equ_new(0xea);
-	equ_hosts_get(eq, _host_cb, &num_host);
+	equ_hosts_get(eq, (Equ_Cb)_host_cb, &num_host);
 	equ_shutdown();
 
 	return 0;

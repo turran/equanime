@@ -6,7 +6,7 @@
  * @{
  */
 
-typedef struct _Equ_Layer Equ_Layer; /**< Opaque handler */
+EAPI const char * equ_layer_name_get(Equanime *e, Equ_Layer *l);
 
 EAPI void equ_layer_regions_get(Equ_Layer *l, void *cb, void *cb_data);
 

@@ -57,7 +57,7 @@ static int _server_data(void *data, int type, void *event)
 		return 0;
 
 	/* ok we have a full message */
-	DBG("Reply received %d %d", eq->reply->id);
+	DBG("Reply received %d", eq->reply->id);
 	if (eq->reply->size)
 	{
 		equ_message_reply_name_get(eq->msg->type, &rname);

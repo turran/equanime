@@ -12,7 +12,7 @@
 struct _Equ_Host
 {
 	Equ_Common_Id id;
-	const char *name;
+	char *name;
 };
 
 typedef struct _Equ_Host_Get_Cb

@@ -12,7 +12,7 @@
 struct _Equ_Controller
 {
 	Equ_Common_Id id;
-	const char *name;
+	char *name;
 	Equ_Host *host;
 };
 

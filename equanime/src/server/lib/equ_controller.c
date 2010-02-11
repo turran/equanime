@@ -1,4 +1,5 @@
 #include "Equ_Server.h"
+#include "equ_server_private.h"
 /**
  * A controller is in charge of controlling the global output, disabling and
  * enabling specific layers and change their priority. Also setting the
@@ -8,6 +9,22 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/**
+ *
+ */
+struct _Equ_Controller
+{
+	const Equ_Controller_Backend *backend;
+	const char *name;
+	void *data;
+	Equ_Common_Id id;
+
+	Equ_Host *host;
+	Eina_List *layers;
+	Eina_List *outputs;
+	Eina_List *inputs;
+};
+
 Eina_Hash *_controllers = NULL;
 static Equ_Common_Id _ids = 0;
 /*============================================================================*
