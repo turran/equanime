@@ -71,6 +71,15 @@ void equ_message_init(void)
 	_ddescriptors[EQU_DATA_LAYER] = edd;
 
 	/* create all the messages' data descriptors */
+	/* Core messages */
+	/* sync */
+	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Message_Sync", sizeof(Equ_Message_Sync));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[EQU_MSG_NAME_SYNC] = edd;
+	/* sync */
+	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Reply_Sync", sizeof(Equ_Reply_Sync));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[EQU_MSG_NAME_SYNCR] = edd;
 	/* Host messages/replies */
 	/* hosts get */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Message_Hosts_Get", sizeof(Equ_Message_Hosts_Get));

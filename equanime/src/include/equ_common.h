@@ -91,6 +91,8 @@ typedef enum
  */
 typedef enum _Equ_Message_Name
 {
+	EQU_MSG_NAME_SYNC,
+	EQU_MSG_NAME_SYNCR,
 	EQU_MSG_NAME_HOSTS_GET,
 	EQU_MSG_NAME_HOSTS_GETR,
 	EQU_MSG_NAME_CONTROLLERS_GET,
@@ -109,6 +111,8 @@ typedef enum _Equ_Message_Name
 
 typedef enum _Equ_Message_Type
 {
+	EQU_MSG_TYPE_SYNC              = ((EQU_MSG_NAME_SYNC << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_SYNCR             = ((EQU_MSG_NAME_SYNC << 1) | EQU_MSG_NO_REPLY),
 	EQU_MSG_TYPE_HOSTS_GET         = ((EQU_MSG_NAME_HOSTS_GET << 1) | EQU_MSG_REPLY),
 	EQU_MSG_TYPE_HOSTS_GETR        = ((EQU_MSG_NAME_HOSTS_GETR << 1) | EQU_MSG_NO_REPLY),
 	EQU_MSG_TYPE_CONTROLLERS_GET   = ((EQU_MSG_NAME_CONTROLLERS_GET << 1) | EQU_MSG_REPLY),
@@ -138,6 +142,10 @@ typedef struct _Equ_Message
 	Equ_Message_Type type; /* type of message */
 	unsigned int size; /* size of the body */
 } Equ_Message;
+
+typedef struct _Equ_Message_Sync
+{
+} Equ_Message_Sync;
 
 typedef struct _Equ_Message_Hosts_Get
 {
@@ -198,6 +206,10 @@ typedef struct _Equ_Reply
 	unsigned int error; /* in case of any error set by the daemon */
 	unsigned int size; /* size of the body */
 } Equ_Reply;
+
+typedef struct _Equ_Reply_Sync
+{
+} Equ_Reply_Sync;
 
 typedef struct _Equ_Reply_Hosts_Get
 {

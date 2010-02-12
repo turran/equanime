@@ -14,6 +14,7 @@ typedef int (*Equ_Cb)(void *data, void *user_data); /**< */
 EAPI void equ_init(void);
 EAPI void equ_shutdown(void);
 EAPI Equanime * equ_new(int port);
+EAPI void equ_sync(Equanime *e);
 
 /** @} */
 

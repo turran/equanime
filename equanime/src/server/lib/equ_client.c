@@ -48,6 +48,17 @@ static int _layers_get_cb(void *data, void *cb_data)
 	return EINA_TRUE;
 }
 
+static Equ_Error _sync(Equ_Client *client, Equ_Message_Sync *m,
+		Equ_Reply_Sync **reply)
+{
+	Equ_Reply_Sync *r;
+	Equ_Layer *l;
+
+	r = *reply = calloc(1, sizeof(Equ_Reply_Sync));
+
+	return EQU_ERR_NONE;
+}
+
 static Equ_Error _hosts_get(Equ_Client *client, Equ_Message_Hosts_Get *mhg,
 		Equ_Reply_Hosts_Get **reply)
 {
@@ -168,6 +179,7 @@ static Equ_Error _layer_surface_put(Equ_Client *client, Equ_Message_Surface_Put 
 
 
 static Equanime_Message_Cb _cbs[EQU_MSG_NAMES] = {
+	[EQU_MSG_NAME_SYNC] = (Equanime_Message_Cb)_sync,
 	[EQU_MSG_NAME_HOSTS_GET] = (Equanime_Message_Cb)_hosts_get,
 	[EQU_MSG_NAME_CONTROLLERS_GET] = (Equanime_Message_Cb)_controllers_get,
 	[EQU_MSG_NAME_LAYERS_GET] = (Equanime_Message_Cb)_layers_get,

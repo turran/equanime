@@ -50,6 +50,7 @@ int main(void)
 	_surface_info(s);
 	/* put it on x,y */
 	equ_layer_surface_put(eq, l, s, 0, 0, &rect);
+	equ_sync(eq);
 end:
 	ecore_main_loop_begin();
 	equ_shutdown();
