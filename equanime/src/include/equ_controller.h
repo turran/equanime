@@ -2,6 +2,7 @@
 #define _EQU_CONTROLLER_H
 
 /**
+ * @ingroup Equanime_Client
  * @defgroup Equanime_Controllers_Group Controllers
  * @{
  */

@@ -2,6 +2,7 @@
 #define _EQU_HOST_H
 
 /**
+ * @ingroup Equanime_Client
  * @defgroup Equanime_Host_Group Host
  * @{
  */

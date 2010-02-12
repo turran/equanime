@@ -5,6 +5,11 @@
 #include "Eet.h"
 #include "Ecore_Con.h"
 
+/**
+ * @defgroup Equanime_Server Server Side API
+ * @{
+ */
+
 typedef int (*Equ_Cb)(void *data, void *user_data); /**< */
 
 typedef struct _Equ_Input Equ_Input;
@@ -98,6 +103,8 @@ struct _Equ_Host_Backend
 	Eina_Bool (*init)(Equ_Host *, Equ_Server_Backend *sbackend, const char *options);
 	void (*shutdown)(Equ_Host *);
 	Equ_Option * (*options_get)(Equ_Host *h);
+	void * (*surface_new)(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type);
+	void (*surface_delete)(Equ_Host *h, void *s);
 };
 
 struct _Equ_Input_Backend
@@ -305,5 +312,7 @@ EAPI void equanime_hal_uio_dump(Equanime_Hal_Device *d);
 void equ_hal_i2c_init(void);
 void equ_hal_i2c_shutdown(void);
 Equ_Hal_I2C * equ_hal_i2c_get(int addr);
+
+/** @} */
 
 #endif /*EQU_SERVER_H_*/

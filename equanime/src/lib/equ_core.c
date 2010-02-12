@@ -218,7 +218,7 @@ EAPI Equanime * equ_new(int port)
 /**
  * Flushes every message and waits until the server
  * has processed every message
- * @param[in] Equanime The equanime connection
+ * @param[in] e Equanime The equanime connection
  */
 EAPI void equ_sync(Equanime *e)
 {

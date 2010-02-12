@@ -2,6 +2,7 @@
 #define _EQU_SURFACE_H
 
 /**
+ * @ingroup Equanime_Client
  * @defgroup Equanime_Surface_Group Surfaces
  * @{
  */

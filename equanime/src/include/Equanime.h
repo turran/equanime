@@ -29,9 +29,7 @@
  * @section dependencies Dependencies
  * - Eina
  *
- * @file
- * @brief Equanime API
- * @defgroup Equanime_Group API
+ * @defgroup Equanime_Client Client Side API
  * @{
  *
  * @todo
@@ -45,6 +43,7 @@
  *   in sw with the size and properties of the layer but can't change anything?
  * - Support for differnt hw blocks: Colorspace converter, Resizer, Rotator, etc
  * - Add support for video events, like vsync, signal status, etc
+ *
  */
 
 #include "equ_core.h"
@@ -60,12 +59,6 @@
 #include "equ_region.h"
 #include "equ_component.h"
 
-typedef struct _Equ_Rotator Equ_Rotator;
-typedef struct _Equ_Scaler Equ_Scaler;
-typedef struct _Equ_Csc Equ_Csc;
-
-/**
- * @}
- */
+/** @} */
 
 #endif /*_EQUANIME_H*/

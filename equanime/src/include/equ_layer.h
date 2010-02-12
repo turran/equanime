@@ -2,6 +2,7 @@
 #define _EQU_LAYER_H
 
 /**
+ * @ingroup Equanime_Client
  * @defgroup Equanime_Layer_Group Layers
  * @{
  */

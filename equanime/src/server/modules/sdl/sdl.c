@@ -107,11 +107,6 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 	return EINA_TRUE;
 }
 
-static Equ_Option * _host_options(Equ_Host *h)
-{
-	return _options;
-}
-
 static void _host_shutdown(Equ_Host *h)
 {
 	SDL *sdl;
@@ -124,10 +119,34 @@ static void _host_shutdown(Equ_Host *h)
 	equ_host_unregister(h);
 }
 
+
+static Equ_Option * _host_options(Equ_Host *h)
+{
+	return _options;
+}
+
+static void * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type)
+{
+	Uint32 flags = SDL_SWSURFACE;
+	Uint32 rm, gm, bm, am;
+	int depth;
+
+	return SDL_CreateRGBSurface(flags, width, height, depth, rm, gm, bm, am); 
+}
+
+static void _host_surface_delete(Equ_Host *h, void *s)
+{
+	SDL_Surface *surface = s;
+
+	SDL_FreeSurface(surface);
+}
+
 Equ_Host_Backend _hbackend = {
 	.init = _host_init,
 	.shutdown = _host_shutdown,
 	.options_get = _host_options,
+	.surface_new = _host_surface_new,
+	.surface_delete = _host_surface_delete,
 };
 
 static Eina_Bool module_init(void)
