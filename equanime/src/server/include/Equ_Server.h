@@ -229,13 +229,16 @@ struct _Equ_Server_Backend
 
 Equ_Output * equ_output_new(Equ_Controller *c,
 		const char *name, Equ_Output_Backend *ob);
+Equ_Controller * equ_output_controller_get(Equ_Output *o);
+
 Equ_Controller * equ_host_controller_register(Equ_Host *h,
 		const char *name, Equ_Controller_Backend *backend);
 const char * equ_host_name_get(Equ_Host *h);
 Equ_Host * equ_host_get(Equ_Common_Id id);
+void * equ_host_data_get(Equ_Host *h);
 Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type);
-
+Equ_Option * equ_host_options_get(Equ_Host *h);
 
 Equ_Layer * equ_controller_layer_register(Equ_Controller *c,
 		const char *name, Equ_Layer_Backend *lb,
@@ -248,6 +251,8 @@ void equ_controller_unregister(Equ_Controller *c);
 void * equ_controller_data_get(Equ_Controller *c);
 const char * equ_controller_name_get(Equ_Controller *c);
 Equ_Controller * equ_controller_get(Equ_Common_Id id);
+Equ_Controller * equ_controller_new(Equ_Host *h, const char *name,
+		Equ_Controller_Backend *cb);
 
 Equ_Layer * equ_layer_new(Equ_Controller *c,
 		const char *name, Equ_Layer_Backend *lb,
@@ -258,8 +263,16 @@ void * equ_layer_data_get(Equ_Layer *l);
 Equ_Layer * equ_layer_get(Equ_Common_Id id);
 
 Equ_Surface * equ_surface_get(Equ_Common_Id id);
+Equ_Surface * equ_surface_new(Equ_Pool *p, uint32_t w, uint32_t h, Equ_Format fmt, Equ_Surface_Type type);
 
 Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib, const char *name, void *data);
+
+Equ_Pool * equ_pool_new(Equ_Host *h, Equ_Pool_Backend *pb, const char *name, uint32_t mask);
+void * equ_pool_alloc(Equ_Pool *p, size_t bytes);
+
+Equ_Client * equ_client_new(Ecore_Con_Client *conn);
+Equ_Error equ_client_process(Equ_Client *c, Equ_Message_Name name, void *msg, void **rpely);
+
 
 /* for now place hal info here */
 /* maybe place the uio stuff in another header ? */

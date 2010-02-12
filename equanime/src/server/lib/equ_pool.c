@@ -13,7 +13,7 @@ struct _Equ_Pool
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Equ_Pool * equ_pool_new(Equ_Controller *c, Equ_Input_Backend *pb,
+Equ_Pool * equ_pool_new(Equ_Host *h, Equ_Pool_Backend *pb,
 		const char *name, uint32_t stype)
 {
 	Equ_Pool *p;

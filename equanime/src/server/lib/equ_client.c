@@ -17,7 +17,7 @@ static int _hosts_get_cb(void *data, void *cb_data)
 	reply->hosts_count++;
 	reply->hosts = realloc(reply->hosts, reply->hosts_count * sizeof(Equ_Common_Host));
 	reply->hosts[reply->hosts_count - 1].id = equ_host_id_get(h);
-	reply->hosts[reply->hosts_count - 1].name = equ_host_name_get(h);
+	reply->hosts[reply->hosts_count - 1].name = (char *)equ_host_name_get(h);
 
 	return EINA_TRUE;
 }
@@ -30,7 +30,7 @@ static int _controllers_get_cb(void *data, void *cb_data)
 	reply->controllers_count++;
 	reply->controllers = realloc(reply->controllers, reply->controllers_count * sizeof(Equ_Common_Controller));
 	reply->controllers[reply->controllers_count - 1].id = equ_controller_id_get(c);
-	reply->controllers[reply->controllers_count - 1].name = equ_controller_name_get(c);
+	reply->controllers[reply->controllers_count - 1].name = (char *)equ_controller_name_get(c);
 
 	return EINA_TRUE;
 }
@@ -43,7 +43,7 @@ static int _layers_get_cb(void *data, void *cb_data)
 	reply->layers_count++;
 	reply->layers = realloc(reply->layers, reply->layers_count * sizeof(Equ_Layer_Info));
 	reply->layers[reply->layers_count - 1].id = equ_layer_id_get(l);
-	reply->layers[reply->layers_count - 1].name = equ_layer_name_get(l);
+	reply->layers[reply->layers_count - 1].name = (char *)equ_layer_name_get(l);
 
 	return EINA_TRUE;
 }

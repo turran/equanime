@@ -65,7 +65,7 @@ EAPI Equ_Controller * equ_host_controller_register(Equ_Host *h,
 {
 	Equ_Controller *c;
 
-	c = equ_controller_new(h, name, c, cb);
+	c = equ_controller_new(h, name, cb);
 	h->controllers = eina_list_append(h->controllers, c);
 
 	return c;

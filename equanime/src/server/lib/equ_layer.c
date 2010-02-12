@@ -39,7 +39,7 @@ Equ_Layer * equ_layer_new(Equ_Controller *c, const char *name,
 		Equ_Layer_Status *status)
 {
 	Equ_Layer *l;
-	
+
 	if (!_layers)
 		_layers = eina_hash_int32_new(NULL);
 
@@ -47,7 +47,7 @@ Equ_Layer * equ_layer_new(Equ_Controller *c, const char *name,
 	l = calloc(1, sizeof(Equ_Layer));
 	l->backend = b;
 	l->controller = c;
-	l->info.name = name;
+	l->info.name = strdup(name);
 	l->info.id = _ids++;
 	if (status) l->status = *status;
 	if (caps) l->caps = *caps;
@@ -69,6 +69,8 @@ void * equ_layer_data_get(Equ_Layer *l)
 EAPI void equ_layer_unregister(Equ_Layer *l)
 {
 	equ_controller_layer_unregister(l->controller, l);
+	free(l->info.name);
+	free(l);
 }
 /**
  *

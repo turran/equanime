@@ -86,7 +86,7 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 
 	sdl = malloc(sizeof(SDL));
 	/* parse the options */
-	equ_option_parse(&_options[0], options, EQU_OPTION_BOOL,
+	equ_option_parse(&_options[0], (char *)options, EQU_OPTION_BOOL,
 			&sdl->resizable);
 	if (sdl->resizable)
 		flags |= SDL_RESIZABLE;
