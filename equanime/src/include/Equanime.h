@@ -21,13 +21,21 @@
  * @endcode
  *
  * @section drivers Drivers
+ * - dm6446: Texas Instruments DM6446 based SoC
+ * - dm320: Texas Instruments DM320 based SoC.
  * - mp25xxf: MagicEyes (www.mesdigital.com) based SoC. Note that you *need*
  * the code.google.com/p/gp2x-linux26 kernel :)
- * - dm320: Texas Instruments DM320 based SoC.
+ *
+ * @section modules Modules
+ * - SDL: SDL driver
+ * - Neuros OSD 2: Neuros Technologies OSD 2 board
  * - dummy: UIO dummy driver.
  *
  * @section dependencies Dependencies
  * - Eina
+ * - Ecore
+ * - Ecore Con
+ * - Eet
  *
  * @defgroup Equanime_Client Client Side API
  * @{

@@ -26,6 +26,11 @@ static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+void equ_host_surface_delete(Equ_Host *h, void *sd)
+{
+	if (h->backend->surface_delete)
+		h->backend->surface_delete(h, sd);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -84,16 +89,27 @@ EAPI Equ_Pool * equ_host_pool_register(Equ_Host *h,
 EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type)
 {
+#if 0
 	Equ_Pool *p;
 	Eina_List *l;
+#endif
 	Equ_Surface *s = NULL;
 
+#if 0
 	EINA_LIST_FOREACH(host->pools, l, p)
 	{
 		s = equ_surface_new(p, w, h, fmt, type);
 		if (s) break;
 	}
+#else
+	if (host->backend->surface_new)
+	{
+		void *sd;
 
+		sd = host->backend->surface_new(host, w, h, fmt, type);
+		s = equ_surface_new(host, sd, w, h, fmt, type);
+	}
+#endif
 	return s;
 }
 

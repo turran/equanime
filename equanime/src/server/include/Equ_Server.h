@@ -270,7 +270,10 @@ void * equ_layer_data_get(Equ_Layer *l);
 Equ_Layer * equ_layer_get(Equ_Common_Id id);
 
 Equ_Surface * equ_surface_get(Equ_Common_Id id);
+
+#if 0
 Equ_Surface * equ_surface_new(Equ_Pool *p, uint32_t w, uint32_t h, Equ_Format fmt, Equ_Surface_Type type);
+#endif
 
 Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib, const char *name, void *data);
 

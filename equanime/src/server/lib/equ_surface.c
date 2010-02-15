@@ -9,7 +9,12 @@
 struct _Equ_Surface
 {
 	Equ_Common_Id id;
+#if 0
 	Equ_Pool *pool;
+#else
+	Equ_Host *host;
+	void *hd;
+#endif
 	uint32_t w;
 	uint32_t h;
 	Equ_Surface_Type type;
@@ -21,10 +26,17 @@ static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+#if 0
 Equ_Surface * equ_surface_new(Equ_Pool *p, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type)
+#else
+Equ_Surface * equ_surface_new(Equ_Host *host, void *data,
+		uint32_t w, uint32_t h,
+		Equ_Format fmt, Equ_Surface_Type type)
+#endif
 {
 	Equ_Surface *s;
+#if 0
 	Equ_Surface_Data data;
 
 	/* first try to allocate the surface data */
@@ -38,12 +50,17 @@ Equ_Surface * equ_surface_new(Equ_Pool *p, uint32_t w, uint32_t h,
 			break;
 		}
 	}
-
+#endif
 	s = calloc(1, sizeof(Equ_Surface));
+#if 0
 	s->pool = p;
+	s->data = data;
+#else
+	s->host = host;
+	s->hd = data;
+#endif
 	s->w = w;
 	s->h = h;
-	s->data = data;
 	s->type = type;
 	s->data.fmt = fmt;
 	s->id = _ids++;
