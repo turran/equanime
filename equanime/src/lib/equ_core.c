@@ -104,7 +104,7 @@ static int _timeout_cb(void *data)
 static Equ_Error _server_send(Equanime *e, Equ_Message *m, void *data,
 		double timeout, void **rdata)
 {
-	Equ_Error error;
+	Equ_Error error = EQU_ERR_NONE;
 	Ecore_Timer *timer;
 	int ret;
 
@@ -115,7 +115,7 @@ static Equ_Error _server_send(Equanime *e, Equ_Message *m, void *data,
 	ret = ecore_con_server_send(e->svr, data, m->size);
 
 	if (equ_message_reply_has(m->type) == EINA_FALSE)
-		return EQU_ERR_NONE;
+		goto no_reply;
 
 	/* TODO register a timeout callback */
 	if (timeout)
@@ -135,6 +135,7 @@ static Equ_Error _server_send(Equanime *e, Equ_Message *m, void *data,
 	if (rdata)
 		*rdata = e->rbody;
 	free(e->reply);
+no_reply:
 	free(e->msg);
 	e->msg = NULL;
 	e->reply = NULL;

@@ -114,6 +114,7 @@ int _client_data(void *data, int type, void *event)
 		_equd.length += cdata->size;
 		cdata->data = NULL;
 	}
+message:
 	if (_equd.length < sizeof(Equ_Message))
 		return 0;
 	/* ok, we have at least a message header */
@@ -164,8 +165,10 @@ shift:
 		n_length = _equd.length - m_length;
 
 		_equd.buffer = malloc(n_length);
+		_equd.length = n_length;
 		memcpy(_equd.buffer, tmp + m_length, n_length);
 		free(tmp);
+		goto message;
 	}
 	else
 	{

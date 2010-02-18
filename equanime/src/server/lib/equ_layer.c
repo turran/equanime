@@ -75,6 +75,15 @@ EAPI void equ_layer_unregister(Equ_Layer *l)
 /**
  *
  */
+EAPI void equ_layer_surface_put(Equ_Layer *l, Equ_Surface *s,
+		int x, int y, Eina_Rectangle *src)
+{
+	printf("putting a surface into a layer\n");
+}
+
+/**
+ *
+ */
 EAPI Equ_Layer * equ_layer_get(Equ_Common_Id id)
 {
 	return eina_hash_find(_layers, &id);

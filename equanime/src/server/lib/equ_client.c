@@ -148,9 +148,7 @@ static Equ_Error _surface_get(Equ_Client *client, Equ_Message_Surface_Get *m,
 		// FIXME fix this error
 		return EQU_ERR_NEXIST;
 	}
-	printf("0\n");
 	r->id = equ_surface_id_get(s);
-	printf("1\n");
 
 	return EQU_ERR_NONE;
 }
@@ -160,23 +158,23 @@ static Equ_Error _layer_surface_put(Equ_Client *client, Equ_Message_Surface_Put 
 {
 	Equ_Layer *l;
 	Equ_Surface *s;
+	Eina_Rectangle rect;
 
-	printf("entering surface get %d %d\n", m->layer_id, m->surface_id);
 	l = equ_layer_get(m->layer_id);
 	if (!l)
 	{
-		printf("ok1\n");
 		return EQU_ERR_NEXIST;
 	}
 	s = equ_surface_get(m->surface_id);
 	if (!s)
 	{
-		printf("ok2\n");
 		return EQU_ERR_NEXIST;
 	}
-	printf("ok!!!! sendinng the surface to the layer\n");
-}
 
+	eina_rectangle_coords_from(&rect, m->cx, m->cy, m->cw, m->ch);
+	equ_layer_surface_put(l, s, m->dx, m->dy, &rect);
+	return EQU_ERR_NONE;
+}
 
 static Equanime_Message_Cb _cbs[EQU_MSG_NAMES] = {
 	[EQU_MSG_NAME_SYNC] = (Equanime_Message_Cb)_sync,
