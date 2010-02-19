@@ -186,3 +186,8 @@ EAPI Eina_Bool equ_controller_output_set(Equ_Controller *c, Equ_Output *o)
 		return c->backend->output_set(c, o);
 	return EINA_FALSE;
 }
+
+EAPI Equ_Host * equ_controller_host_get(Equ_Controller *c)
+{
+	return c->host;
+}

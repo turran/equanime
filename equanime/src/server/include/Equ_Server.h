@@ -145,7 +145,7 @@ struct _Equ_Layer_Backend
 	Eina_Bool (*position_set)(Equ_Layer *l, int x, int y);
 	Eina_Bool (*visibility_set)(Equ_Layer *l, Eina_Bool show);
 	Eina_Bool (*format_set)(Equ_Layer *l, Equ_Format fmt);
-	Eina_Bool (*surface_put)(Equ_Layer *l, Equ_Surface *s, int x, int y);
+	Eina_Bool (*surface_put)(Equ_Layer *l, Equ_Surface *s, int x, int y, Eina_Rectangle *rect);
 	//Eina_Bool (*input_set)(Equ_Layer *l, Equ_Input *i);
 };
 

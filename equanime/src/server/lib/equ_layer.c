@@ -78,7 +78,8 @@ EAPI void equ_layer_unregister(Equ_Layer *l)
 EAPI void equ_layer_surface_put(Equ_Layer *l, Equ_Surface *s,
 		int x, int y, Eina_Rectangle *src)
 {
-	printf("putting a surface into a layer\n");
+	if (l->backend->surface_put)
+		l->backend->surface_put(l, s, x, y, src);
 }
 
 /**
@@ -250,3 +251,9 @@ EAPI Equ_Controller * equ_layer_controller_get(Equ_Layer *l)
 {
 	return l->controller;
 }
+
+EAPI Equ_Host * equ_layer_host_get(Equ_Layer *l)
+{
+	return equ_controller_host_get(l->controller);
+}
+

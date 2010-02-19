@@ -109,3 +109,7 @@ EAPI Equ_Surface * equ_surface_get(Equ_Common_Id id)
 	return eina_hash_find(_surfaces, &id);
 }
 
+EAPI void * equ_surface_data_get(Equ_Surface *s)
+{
+	return s->hd;
+}

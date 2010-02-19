@@ -41,10 +41,6 @@ static Equ_Controller_Backend _cbackend = {
 	.output_set = _controller_output_set,
 };
 
-static Equ_Layer_Backend _lbackend = {
-	/* FIXME put the layer size set callback */
-};
-
 static int _events_cb(void *data)
 {
 	SDL_Event event;
@@ -61,6 +57,37 @@ static int _events_cb(void *data)
 	}
 	return 1;
 }
+
+static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
+		Eina_Rectangle *rect)
+{
+	SDL *sdl;
+	SDL_Surface *src;
+	Equ_Host *h;
+	SDL_Rect srect, drect;
+
+	h = equ_layer_host_get(l);
+	sdl = equ_host_data_get(h);
+	src = equ_surface_data_get(s);
+	srect.x = rect->x;
+	srect.y = rect->y;
+	srect.w = rect->w;
+	srect.h = rect->h;
+
+	drect.x = x;
+	drect.y = y;
+	drect.w = rect->w;
+	drect.h = rect->h;
+
+	SDL_BlitSurface(src, &srect, sdl->surface, &drect);
+	//SDL_FillRect(sdl->surface, &srect, 0xffff0000);
+	SDL_UpdateRect(sdl->surface, srect.x, srect.y, srect.w, srect.h);
+}
+
+static Equ_Layer_Backend _lbackend = {
+	/* FIXME put the layer size set callback */
+	.surface_put = _layer_surface_put,
+};
 
 static inline void _layer_setup(SDL *sdl)
 {
