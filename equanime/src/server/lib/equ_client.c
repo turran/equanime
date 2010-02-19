@@ -153,6 +153,34 @@ static Equ_Error _surface_get(Equ_Client *client, Equ_Message_Surface_Get *m,
 	return EQU_ERR_NONE;
 }
 
+static Equ_Error _surface_download(Equ_Client *client, Equ_Message_Surface_Download *m,
+		Equ_Reply_Surface_Download **reply)
+{
+	Equ_Surface *s;
+
+	s = equ_surface_get(m->surface_id);
+	if (!s)
+	{
+		return EQU_ERR_NEXIST;
+	}
+
+
+	return EQU_ERR_NONE;
+}
+
+static Equ_Error _surface_upload(Equ_Client *client, Equ_Message_Surface_Upload *m,
+		void **reply)
+{
+	Equ_Surface *s;
+
+	s = equ_surface_get(m->surface_id);
+	if (!s)
+	{
+		return EQU_ERR_NEXIST;
+	}
+	return EQU_ERR_NONE;
+}
+
 static Equ_Error _layer_surface_put(Equ_Client *client, Equ_Message_Surface_Put *m,
 		void **reply)
 {
@@ -185,6 +213,8 @@ static Equanime_Message_Cb _cbs[EQU_MSG_NAMES] = {
 	[EQU_MSG_NAME_LAYER_CAPS_GET] = (Equanime_Message_Cb)_layer_caps_get,
 	[EQU_MSG_NAME_SURFACE_GET] = (Equanime_Message_Cb)_surface_get,
 	[EQU_MSG_NAME_SURFACE_PUT] = (Equanime_Message_Cb)_layer_surface_put,
+	[EQU_MSG_NAME_SURFACE_DOWNLOAD] = (Equanime_Message_Cb)_surface_download,
+	[EQU_MSG_NAME_SURFACE_UPLOAD] = (Equanime_Message_Cb)_surface_upload,
 };
 /*============================================================================*
  *                                 Global                                     *

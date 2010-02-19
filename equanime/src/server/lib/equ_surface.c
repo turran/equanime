@@ -113,3 +113,15 @@ EAPI void * equ_surface_data_get(Equ_Surface *s)
 {
 	return s->hd;
 }
+
+EAPI void equ_surface_pixels_upload(Equ_Surface *s,
+	Equ_Surface_Data *data, Eina_Rectangle *r)
+{
+	equ_host_surface_upload(s->host, s->hd, data, r);
+}
+
+EAPI void equ_surface_pixels_download(Equ_Surface *s,
+	Equ_Surface_Data *data, Eina_Rectangle *rect)
+{
+	equ_host_surface_download(s->host, s->hd, data, rect);
+}

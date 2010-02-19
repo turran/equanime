@@ -80,8 +80,8 @@ static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
 	drect.h = rect->h;
 
 	SDL_BlitSurface(src, &srect, sdl->surface, &drect);
-	//SDL_FillRect(sdl->surface, &srect, 0xffff0000);
-	SDL_UpdateRect(sdl->surface, srect.x, srect.y, srect.w, srect.h);
+	SDL_FillRect(sdl->surface, &drect, 0xffff0000);
+	SDL_UpdateRect(sdl->surface, drect.x, drect.y, drect.w, drect.h);
 }
 
 static Equ_Layer_Backend _lbackend = {
@@ -152,6 +152,20 @@ static Equ_Option * _host_options(Equ_Host *h)
 	return _options;
 }
 
+static void _host_surface_upload(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect)
+{
+	/* lock the surface */
+	/* put the pixels at rect */
+	/* unlock the surface */
+}
+
+static void _host_surface_download(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect)
+{
+	/* lock the surface */
+	/* get the pixels from rect */
+	/* unlock the surface */
+}
+
 static void * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type)
 {
 	Uint32 flags = SDL_SWSURFACE;
@@ -174,6 +188,8 @@ Equ_Host_Backend _hbackend = {
 	.options_get = _host_options,
 	.surface_new = _host_surface_new,
 	.surface_delete = _host_surface_delete,
+	.surface_upload = _host_surface_upload,
+	.surface_download = _host_surface_download,
 };
 
 static Eina_Bool module_init(void)

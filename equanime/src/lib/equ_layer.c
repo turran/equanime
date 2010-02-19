@@ -147,6 +147,7 @@ EAPI void equ_layer_regions_get(Equ_Layer *l, void *cb, void *cb_data)
  */
 EAPI void equ_layer_size_get(Equ_Layer *l, int *w, int *h)
 {
+#if 0
 	if (!l->surface)
 	{
 		if (w) *w = 0;
@@ -155,6 +156,7 @@ EAPI void equ_layer_size_get(Equ_Layer *l, int *w, int *h)
 		return;
 	}
 	equ_surface_size_get(l->surface, w, h);
+#endif
 }
 
 /**

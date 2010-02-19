@@ -165,8 +165,8 @@ Equ_Error equ_message_server_send(Equanime *e, Equ_Message_Type type,
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * Initialize the Equanime library. You must call this function before any
+ * other call to an Equanime function.
  */
 EAPI void equ_init(void)
 {
@@ -181,8 +181,8 @@ EAPI void equ_init(void)
 	equ_log = eina_log_domain_register("equ", NULL);
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Shutdowns the Equanime library. Once you have finished using Equanime
+ * call this function to deinitialize everything
  */
 EAPI void equ_shutdown(void)
 {
@@ -206,13 +206,19 @@ EAPI void equ_shutdown(void)
 EAPI Equanime * equ_new(int port)
 {
 	Equanime *eq;
+	Ecore_Con_Server *svr;
+
+	/* try to connect to the server */
+	svr = ecore_con_server_connect(ECORE_CON_LOCAL_USER, EQUANIME_NAME,
+			port, NULL);
+
+	if (!svr) return NULL;
 
 	eq = calloc(1, sizeof(Equanime));
+	eq->svr = svr;
 	ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, eq);
 	ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL, _server_del, eq);
-	/* try to connect to the server */
-	eq->svr = ecore_con_server_connect(ECORE_CON_LOCAL_USER, EQUANIME_NAME,
-			port, NULL);
+
 	return eq;
 }
 

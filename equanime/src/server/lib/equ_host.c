@@ -113,6 +113,20 @@ EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 	return s;
 }
 
+EAPI void equ_host_surface_upload(Equ_Host *h, void *s, Equ_Surface_Data *data,
+		Eina_Rectangle *r)
+{
+	if (h->backend->surface_upload)
+		h->backend->surface_upload(h, s, data, r);
+}
+
+EAPI void equ_host_surface_download(Equ_Host *h, void *s, Equ_Surface_Data *data,
+		Eina_Rectangle *r)
+{
+	if (h->backend->surface_download)
+		h->backend->surface_download(h, s, data, r);
+}
+
 EAPI void equ_host_controllers_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
 {
 	Equ_Controller *c;

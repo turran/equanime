@@ -124,6 +124,10 @@ message:
 		return 0;
 	/* parse the header */
 	DBG("Message received of type %d with msg num %d of size %d", m->type, m->id, m->size);
+	if (m->type > EQU_MSG_TYPE_SURFACE_DOWNLOADR) {
+		ERR("Invalid message type %d", m->type);
+		goto end;
+	}
 
 	body = equ_message_decode(equ_message_name_get(m->type), (unsigned char *)m + sizeof(Equ_Message), m->size);
 	if (!body)
@@ -155,6 +159,7 @@ shift:
 		if (r.size)
 			ecore_con_client_send(cdata->client, rbody, r.size);
 	}
+end:
 	/* free in case we have served a complete message */
 	if (_equd.length > m_length)
 	{

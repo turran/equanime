@@ -52,6 +52,9 @@ typedef struct _Equ_Surface_Data
 		struct {
 			uint32_t *plane0;
 		} rgb888;
+		struct {
+			uint32_t *plane0;
+		} argb8888;
 	} data;
 } Equ_Surface_Data;
 
@@ -101,11 +104,15 @@ typedef enum _Equ_Message_Name
 	EQU_MSG_NAME_LAYERS_GETR,
 	EQU_MSG_NAME_LAYER_CAPS_GET,
 	EQU_MSG_NAME_LAYER_CAPS_GETR,
+	
 	EQU_MSG_NAME_LAYER_STATUS_GET,
 	EQU_MSG_NAME_LAYER_STATUS_GETR,
 	EQU_MSG_NAME_SURFACE_GET,
 	EQU_MSG_NAME_SURFACE_GETR,
 	EQU_MSG_NAME_SURFACE_PUT,
+	EQU_MSG_NAME_SURFACE_UPLOAD,
+	EQU_MSG_NAME_SURFACE_DOWNLOAD,
+	EQU_MSG_NAME_SURFACE_DOWNLOADR,
 	EQU_MSG_NAMES
 } Equ_Message_Name;
 
@@ -121,11 +128,15 @@ typedef enum _Equ_Message_Type
 	EQU_MSG_TYPE_LAYERS_GETR       = ((EQU_MSG_NAME_LAYERS_GETR << 1) | EQU_MSG_NO_REPLY),
 	EQU_MSG_TYPE_LAYER_CAPS_GET    = ((EQU_MSG_NAME_LAYER_CAPS_GET << 1) | EQU_MSG_REPLY),
 	EQU_MSG_TYPE_LAYER_CAPS_GETR   = ((EQU_MSG_NAME_LAYER_CAPS_GETR << 1) | EQU_MSG_NO_REPLY),
+
 	EQU_MSG_TYPE_LAYER_STATUS_GET  = ((EQU_MSG_NAME_LAYER_STATUS_GET << 1) | EQU_MSG_REPLY),
 	EQU_MSG_TYPE_LAYER_STATUS_GETR = ((EQU_MSG_NAME_LAYER_STATUS_GETR << 1) | EQU_MSG_NO_REPLY),
 	EQU_MSG_TYPE_SURFACE_GET       = ((EQU_MSG_NAME_SURFACE_GET << 1) | EQU_MSG_REPLY),
 	EQU_MSG_TYPE_SURFACE_GETR      = ((EQU_MSG_NAME_SURFACE_GETR << 1) | EQU_MSG_NO_REPLY),
 	EQU_MSG_TYPE_SURFACE_PUT       = ((EQU_MSG_NAME_SURFACE_PUT << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_SURFACE_UPLOAD    = ((EQU_MSG_NAME_SURFACE_UPLOAD << 1) | EQU_MSG_NO_REPLY),
+	EQU_MSG_TYPE_SURFACE_DOWNLOAD  = ((EQU_MSG_NAME_SURFACE_DOWNLOAD << 1) | EQU_MSG_REPLY),
+	EQU_MSG_TYPE_SURFACE_DOWNLOADR = ((EQU_MSG_NAME_SURFACE_DOWNLOADR << 1) | EQU_MSG_NO_REPLY),
 } Equ_Message_Type;
 
 /*
@@ -192,6 +203,26 @@ typedef struct _Equ_Message_Surface_Put
 	int ch;
 } Equ_Message_Surface_Put;
 
+typedef struct _Equ_Message_Surface_Upload
+{
+	Equ_Common_Id surface_id;
+	int sx;
+	int sy;
+	int sw;
+	int sh;
+	void *pixels;
+	int pixels_size;
+} Equ_Message_Surface_Upload;
+
+typedef struct _Equ_Message_Surface_Download
+{
+	Equ_Common_Id surface_id;
+	int sx;
+	int sy;
+	int sw;
+	int sh;
+} Equ_Message_Surface_Download;
+
 /*
  * A reply is composed of:
  * +----+-------+------+-----------------
@@ -243,6 +274,12 @@ typedef struct _Equ_Reply_Surface_Get
 {
 	Equ_Common_Id id;
 } Equ_Reply_Surface_Get;
+
+typedef struct _Equ_Reply_Surface_Download
+{
+	void *pixels;
+	int pixels_size;
+} Equ_Reply_Surface_Download;
 
 static inline Equ_Message_Name equ_message_name_get(Equ_Message_Type t)
 {

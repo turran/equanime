@@ -105,6 +105,8 @@ struct _Equ_Host_Backend
 	Equ_Option * (*options_get)(Equ_Host *h);
 	void * (*surface_new)(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type);
 	void (*surface_delete)(Equ_Host *h, void *s);
+	void (*surface_upload)(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect);
+	void (*surface_download)(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect);
 };
 
 struct _Equ_Input_Backend
