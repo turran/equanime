@@ -1,5 +1,6 @@
 #include "Equanime.h"
 #include "equ_private.h"
+
 /**
  * A surface ...
  *
@@ -16,12 +17,13 @@ struct _Equ_Surface
 	uint32_t h;
 	Equ_Surface_Data data;
 	unsigned int pitch;
+	Eshm_Segment *segment;
 };
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
-		Equ_Format fmt, Equ_Surface_Type type)
+		Equ_Format fmt, Equ_Surface_Type type, char *shid)
 {
 	Equ_Surface *s;
 
@@ -40,6 +42,13 @@ Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 			s->data.data.rgb888.plane0 = calloc(w * h, sizeof(uint32_t));
 			break;
 		}
+	}
+	else if (s->type == EQU_SURFACE_SHARED)
+	{
+		void *data;
+
+		s->segment = eshm_segment_get(shid, 0, EINA_FALSE);
+		data = eshm_segment_data_get(s->segment);
 	}
 
 	return s;
@@ -85,6 +94,7 @@ EAPI void equ_surface_pixels_upload(Equanime *e, Equ_Surface *s,
 	if (!data) return;
 	if (s->data.fmt != data->fmt) return;
 
+	/* TODO in case of a local | shared buffer just write directly */
 	/* serialize the data into a single buffer */
 	switch (s->data.fmt)
 	{
@@ -115,7 +125,7 @@ EAPI void equ_surface_pixels_upload(Equanime *e, Equ_Surface *s,
  * Download the pixels from the surface
  * @param[in] e The Equanime connection
  * @param[in] s The surface to download the pixels from
- * @param[in,out] data The surface pixels container to put the downloaded pixels on
+ * @param[out] data The surface pixels container to put the downloaded pixels on
  * @param[in] rect The rectangle area of the surface to download the pixels from
  */
 EAPI void equ_surface_pixels_download(Equanime *e, Equ_Surface *s,
@@ -131,10 +141,12 @@ EAPI void equ_surface_pixels_download(Equanime *e, Equ_Surface *s,
 	m.sw = rect->w;
 	m.sh = rect->h;
 
+	/* TODO in case of a local | shared buffer just read directly */
 	error = equ_message_server_send(e, EQU_MSG_TYPE_SURFACE_DOWNLOAD, &m, 0, (void **)&r);
 	if (error) return;
 
 	/* de-serialize the raw pixels into the surface data */
+	data->fmt = s->data.fmt;
 	switch (s->data.fmt)
 	{
 		case EQU_FORMAT_ARGB8888:
@@ -152,3 +164,22 @@ EAPI void equ_surface_pixels_download(Equanime *e, Equ_Surface *s,
 	}
 	free(r);
 }
+
+/**
+ * Gets the locally modifiable surface data.
+ * This function is only valid if the surface is local or shared
+ * @param[in] e The Equanime connection
+ * @param[in] s The surface to get the data from
+ * @param[out] d The surface data where the modifiable pointers are stored
+ */
+EAPI Eina_Bool equ_surface_data_get(Equanime *e, Equ_Surface *s, Equ_Surface_Data *d)
+{
+	if (!d)
+		return EINA_FALSE;
+	if (s->type == EQU_SURFACE_REMOTE)
+		return EINA_FALSE;
+
+	*d = s->data;
+	return EINA_TRUE;
+}
+

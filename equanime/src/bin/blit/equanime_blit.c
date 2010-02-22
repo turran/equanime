@@ -89,7 +89,8 @@ int main(int argc, char **argv)
 	equ_layer_status_get(eq, l, &status);
 	/* get a surface */
 	eina_rectangle_coords_from(&rect, 0, 0, width, height);
-	s = equ_host_surface_get(eq, h, rect.w, rect.h, status.fmt, EQU_SURFACE_LOCAL);
+	//s = equ_host_surface_get(eq, h, rect.w, rect.h, status.fmt, EQU_SURFACE_LOCAL);
+	s = equ_host_surface_get(eq, h, rect.w, rect.h, status.fmt, EQU_SURFACE_SHARED);
 	if (!s) goto end;
 
 	_surface_info(s);

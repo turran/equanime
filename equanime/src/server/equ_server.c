@@ -3,6 +3,7 @@
 #include "Equ_Server.h"
 #include "Ecore.h"
 #include "Ecore_Con.h"
+#include "Eshm.h"
 
 #define ERR(...) EINA_LOG_DOM_ERR(_log_dom, __VA_ARGS__)
 #define INF(...) EINA_LOG_DOM_INFO(_log_dom, __VA_ARGS__)
@@ -97,6 +98,10 @@ int _client_data(void *data, int type, void *event)
 	void *reply = NULL;
 	unsigned int m_length;
 	Equ_Error err;
+	Equanime *eq;
+
+	eq = data;
+	if (eq != &_equd) return 0;
 
 	c = ecore_con_client_data_get(cdata->client);
 	if (!c) return 0;
@@ -216,7 +221,7 @@ static void _server_init(void)
 			EQUANIME_NAME, EQUANIME_PORT, NULL);
 	ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_ADD, _client_add, NULL);
 	ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DEL, _client_del, NULL);
-	ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, _client_data, NULL);
+	ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, _client_data, &_equd);
 	_equd.buffer = NULL;
 	_log_dom = eina_log_domain_register("equd", NULL);
 }
@@ -287,6 +292,8 @@ int main(int argc, char **argv)
 			goto cmd_error;
 	}
 	/* initialize every system */
+	if (!eshm_init())
+		return 0;
 	eina_init();
 	ecore_init();
 	ecore_con_init();

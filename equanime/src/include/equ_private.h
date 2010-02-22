@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "Eshm.h"
 #include "equ_common.h"
 
 #define ERR(...) EINA_LOG_DOM_ERR(equ_log, __VA_ARGS__)
@@ -75,7 +76,7 @@ struct _Equ_Input
 
 Equ_Layer * equ_layer_new(Equanime *e, Equ_Controller *c, Equ_Common_Id id, const char * name);
 Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h, Equ_Format fmt,
-		Equ_Surface_Type type);
+		Equ_Surface_Type type, char *shid);
 Equ_Controller * equ_controller_new(Equ_Host *h, Equ_Common_Id id, char *name);
 
 #endif /*_EQUANIME_PRIVATE_H*/

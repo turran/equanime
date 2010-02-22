@@ -172,6 +172,7 @@ EAPI void equ_init(void)
 {
 	if (_init) return;
 
+	if (!eshm_init) return;
 	_init++;
 	eina_init();
 	eet_init();
@@ -194,6 +195,7 @@ EAPI void equ_shutdown(void)
 		ecore_shutdown();
 		eet_shutdown();
 		eina_shutdown();
+		eshm_shutdown();
 	}
 	_init--;
 }

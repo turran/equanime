@@ -6,7 +6,7 @@
 
 /*
  * TODO
- * - Add a way to send messages from the server to the client that are *not* replies 
+ * - Add a way to send messages from the server to the client that are *not* replies
  */
 
 typedef int Equ_Common_Id;
@@ -104,7 +104,7 @@ typedef enum _Equ_Message_Name
 	EQU_MSG_NAME_LAYERS_GETR,
 	EQU_MSG_NAME_LAYER_CAPS_GET,
 	EQU_MSG_NAME_LAYER_CAPS_GETR,
-	
+
 	EQU_MSG_NAME_LAYER_STATUS_GET,
 	EQU_MSG_NAME_LAYER_STATUS_GETR,
 	EQU_MSG_NAME_SURFACE_GET,
@@ -273,6 +273,7 @@ typedef struct _Equ_Reply_Layer_Status_Get
 typedef struct _Equ_Reply_Surface_Get
 {
 	Equ_Common_Id id;
+	char *sh_id;
 } Equ_Reply_Surface_Get;
 
 typedef struct _Equ_Reply_Surface_Download

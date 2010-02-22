@@ -10,7 +10,8 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libequ_common.la
 
 libequ_common_la_SOURCES = \
-equ_message.c
+equ_message.c \
+equ_format.c
 
 libequ_common_la_LIBADD = \
 @EQUANIME_COMMON_LIBS@

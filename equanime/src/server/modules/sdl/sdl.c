@@ -16,10 +16,14 @@ typedef struct _SDL
 	Ecore_Timer *timer;
 	/* options */
 	Eina_Bool resizable;
+	int width;
+	int height;
 } SDL;
 
 static Equ_Option _options[] = {
 	{ "0", "resizable", "Make the SDL window resizable"},
+	{ "320", "width", "Width of the window"},
+	{ "240", "height", "Height of the window"},
 	NULL,
 };
 
@@ -91,14 +95,15 @@ static Equ_Layer_Backend _lbackend = {
 
 static inline void _layer_setup(SDL *sdl)
 {
-	Equ_Layer_Caps caps = {
-		.flags_mask = EQU_LAYER_SIZE,
-	};
-	Equ_Layer_Status status = {
-		.w = 320,
-		.h = 240,
-		.fmt = EQU_FORMAT_RGB888,
-	};
+	Equ_Layer_Caps caps;
+	Equ_Layer_Status status;
+
+	if (sdl->resizable)
+		caps.flags_mask = EQU_LAYER_SIZE;
+
+	status.w = sdl->width;
+	status.h = sdl->height;
+	status.fmt = EQU_FORMAT_RGB888;
 
 	sdl->layer = equ_controller_layer_register(sdl->controller,
 			"layer0", &_lbackend, &caps, &status);
@@ -112,6 +117,10 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 	SDL_Surface *s;
 
 	sdl = malloc(sizeof(SDL));
+	/* set the default options */
+	sdl->width = 320;
+	sdl->height = 240;
+	sdl->resizable = EINA_FALSE;
 	/* parse the options */
 	equ_option_parse(&_options[0], (char *)options, EQU_OPTION_BOOL,
 			&sdl->resizable);
@@ -119,7 +128,7 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 		flags |= SDL_RESIZABLE;
 	/* initialize sdl */
 	SDL_Init(SDL_INIT_VIDEO);
-	sdl->surface = SDL_SetVideoMode(320, 240, 32, flags);
+	sdl->surface = SDL_SetVideoMode(sdl->width, sdl->height, 32, flags);
 	sdl->controller = equ_host_controller_register(h,
 			"controller0", &_cbackend);
 	sdl->output = equ_controller_output_register(sdl->controller,
@@ -168,11 +177,29 @@ static void _host_surface_download(Equ_Host *h, void *s, Equ_Surface_Data *data,
 
 static void * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type)
 {
-	Uint32 flags = SDL_SWSURFACE;
 	Uint32 rm, gm, bm, am;
 	int depth;
+	int pitch;
 
-	return SDL_CreateRGBSurface(flags, width, height, depth, rm, gm, bm, am); 
+	depth = equ_format_depth_get(fmt);
+	pitch = equ_format_pitch_get(fmt, width);
+	equ_format_components_masks(fmt, &rm, &gm, &bm, &am, NULL, NULL, NULL);
+	if (type == EQU_SURFACE_REMOTE)
+	{
+		Uint32 flags = SDL_SWSURFACE;
+		return SDL_CreateRGBSurface(flags, width, height, depth, rm, gm, bm, am);
+	}
+	else if (type  == EQU_SURFACE_SHARED)
+	{
+		Eshm_Segment *segment;
+		size_t bytes;
+
+		bytes = equ_format_size_get(fmt, width, height);
+		segment = eshm_segment_new("myname", bytes);
+		return SDL_CreateRGBSurfaceFrom(eshm_segment_data_get(segment),
+				width, height, depth, pitch,
+				rm, gm, bm, am);
+	}
 }
 
 static void _host_surface_delete(Equ_Host *h, void *s)
