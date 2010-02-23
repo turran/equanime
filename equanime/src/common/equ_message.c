@@ -164,6 +164,8 @@ void equ_message_init(void)
 	/* surface get reply */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Equ_Reply_Surface_Get", sizeof(Equ_Reply_Surface_Get));
 	edd = eet_data_descriptor_stream_new(&eddc);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Surface_Get, "id", id, EET_T_UINT);
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Surface_Get, "sh_id", sh_id, EET_T_STRING);
 	_descriptors[EQU_MSG_NAME_SURFACE_GETR] = edd;
 }
 

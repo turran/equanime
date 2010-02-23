@@ -104,8 +104,10 @@ static int _client_data(void *data, int type, void *event)
 	unsigned int m_length;
 	Equ_Error err;
 	Equanime *eq;
+	/* FIXME */
+	Ecore_Con_Client *cl = cdata->client; /* workaround for the event loop */
 
-	printf("1 cdata %p\n", cdata->client);
+	printf("1 cdata %p %p\n", cl, cdata->client);
 	if (ecore_con_client_server_get(cdata->client) != _equd.srv)
 		return ECORE_CALLBACK_RENEW;
 	c = ecore_con_client_data_get(cdata->client);
@@ -117,7 +119,7 @@ static int _client_data(void *data, int type, void *event)
 		_equd.length = cdata->size;
 		cdata->data = NULL;
 	}
-	else if (!cdata->data)
+	else if (cdata->data)
 	{
 		_equd.buffer = realloc(_equd.buffer, _equd.length + cdata->size);
 		memcpy(((unsigned char *)_equd.buffer) + _equd.length, cdata->data, cdata->size);
@@ -150,9 +152,9 @@ message:
 		goto shift;
 	}
 	/* check for the reply */
-	printf("2 cdata %p\n", cdata->client);
+	printf("2 cdata %p %p\n", cl, cdata->client);
 	err = equ_client_process(c, equ_message_name_get(m->type), body, &reply);
-	printf("3 cdata %p\n", cdata->client);
+	printf("3 cdata %p %p\n", cl, cdata->client);
 shift:
 	if (equ_message_reply_has(m->type) == EINA_TRUE)
 	{
@@ -169,10 +171,10 @@ shift:
 		else
 			r.size = 0;
 		DBG("Sending reply %d %d %d", r.id, r.error, r.size);
-		printf("4 cdata %p\n", cdata->client);
-		ecore_con_client_send(cdata->client, &r, sizeof(Equ_Reply));
+		printf("4 cdata %p %p\n", cl, cdata->client);
+		ecore_con_client_send(cl, &r, sizeof(Equ_Reply));
 		if (r.size)
-			ecore_con_client_send(cdata->client, rbody, r.size);
+			ecore_con_client_send(cl, rbody, r.size);
 	}
 end:
 	/* free in case we have served a complete message */

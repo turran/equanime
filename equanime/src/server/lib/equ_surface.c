@@ -9,14 +9,11 @@
 struct _Equ_Surface
 {
 	Equ_Common_Id id;
-#if 0
-	Equ_Pool *pool;
-#else
 	Equ_Host *host;
 	void *hd;
-#endif
 	uint32_t w;
 	uint32_t h;
+	char *shid;
 	Equ_Surface_Type type;
 	Equ_Surface_Data data;
 };
@@ -26,44 +23,23 @@ static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-#if 0
-Equ_Surface * equ_surface_new(Equ_Pool *p, uint32_t w, uint32_t h,
-		Equ_Format fmt, Equ_Surface_Type type)
-#else
-Equ_Surface * equ_surface_new(Equ_Host *host, void *data,
+Equ_Surface * equ_surface_new(Equ_Host *host,
 		uint32_t w, uint32_t h,
-		Equ_Format fmt, Equ_Surface_Type type)
-#endif
+		Equ_Format fmt, Equ_Surface_Type type,
+		const char *shid, void *data)
 {
 	Equ_Surface *s;
-#if 0
-	Equ_Surface_Data data;
 
-	/* first try to allocate the surface data */
-	if (type != EQU_SURFACE_LOCAL)
-	{
-		switch (fmt)
-		{
-			case EQU_FORMAT_RGB888:
-			data.data.rgb888.plane0 = equ_pool_alloc(p, w * h * 4);
-			if (!data.data.rgb888.plane0) return NULL;
-			break;
-		}
-	}
-#endif
 	s = calloc(1, sizeof(Equ_Surface));
-#if 0
-	s->pool = p;
-	s->data = data;
-#else
 	s->host = host;
 	s->hd = data;
-#endif
 	s->w = w;
 	s->h = h;
 	s->type = type;
 	s->data.fmt = fmt;
 	s->id = _ids++;
+	if (shid)
+		s->shid = strdup(shid);
 	/* allocate the surface data from the pools */
 	if (!_surfaces)
 	{
@@ -114,14 +90,19 @@ EAPI void * equ_surface_data_get(Equ_Surface *s)
 	return s->hd;
 }
 
+EAPI const char * equ_surface_shid_get(Equ_Surface *s)
+{
+	return s->shid;
+}
+
 EAPI void equ_surface_pixels_upload(Equ_Surface *s,
 	Equ_Surface_Data *data, Eina_Rectangle *r)
 {
-	equ_host_surface_upload(s->host, s->hd, data, r);
+	equ_host_surface_upload(s->host, s, data, r);
 }
 
 EAPI void equ_surface_pixels_download(Equ_Surface *s,
 	Equ_Surface_Data *data, Eina_Rectangle *rect)
 {
-	equ_host_surface_download(s->host, s->hd, data, rect);
+	equ_host_surface_download(s->host, s, data, rect);
 }

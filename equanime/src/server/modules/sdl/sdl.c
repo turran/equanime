@@ -20,6 +20,12 @@ typedef struct _SDL
 	int height;
 } SDL;
 
+typedef struct _Surface
+{
+	SDL_Surface *surface;
+	Eshm_Segment *segment;
+} Surface;
+
 static Equ_Option _options[] = {
 	{ "0", "resizable", "Make the SDL window resizable"},
 	{ "320", "width", "Width of the window"},
@@ -73,6 +79,7 @@ static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
 	h = equ_layer_host_get(l);
 	sdl = equ_host_data_get(h);
 	src = equ_surface_data_get(s);
+	printf("layer data = %p\n", src);
 	srect.x = rect->x;
 	srect.y = rect->y;
 	srect.w = rect->w;
@@ -161,25 +168,28 @@ static Equ_Option * _host_options(Equ_Host *h)
 	return _options;
 }
 
-static void _host_surface_upload(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect)
+static void _host_surface_upload(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data *data, Eina_Rectangle *rect)
 {
 	/* lock the surface */
 	/* put the pixels at rect */
 	/* unlock the surface */
 }
 
-static void _host_surface_download(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect)
+static void _host_surface_download(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data *data, Eina_Rectangle *rect)
 {
 	/* lock the surface */
 	/* get the pixels from rect */
 	/* unlock the surface */
 }
 
-static void * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type)
+static Equ_Surface * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type)
 {
 	Uint32 rm, gm, bm, am;
 	int depth;
 	int pitch;
+	Equ_Surface *s;
+	void *data = NULL;
+	char *shid = NULL;
 
 	depth = equ_format_depth_get(fmt);
 	pitch = equ_format_pitch_get(fmt, width);
@@ -187,24 +197,62 @@ static void * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t height, Eq
 	if (type == EQU_SURFACE_REMOTE)
 	{
 		Uint32 flags = SDL_SWSURFACE;
-		return SDL_CreateRGBSurface(flags, width, height, depth, rm, gm, bm, am);
+		data = SDL_CreateRGBSurface(flags, width, height, depth, rm, gm, bm, am);
 	}
 	else if (type  == EQU_SURFACE_SHARED)
 	{
 		Eshm_Segment *segment;
 		size_t bytes;
+		void *shdata;
 
 		bytes = equ_format_size_get(fmt, width, height);
-		segment = eshm_segment_new("myname", bytes);
-		return SDL_CreateRGBSurfaceFrom(eshm_segment_data_get(segment),
+		/* FIXME, replace this with a real name */
+		shid = "myname";
+		segment = eshm_segment_new(shid, bytes);
+		shdata = eshm_segment_data_get(segment);
+		if (!shdata)
+		{
+			printf("Cannot get the segment data %p\n", segment);
+			return NULL;
+		}
+		{
+			char *tmp;
+
+			printf("writing!!\n");
+			tmp = eshm_segment_data_get(segment);
+			*tmp = 1;
+		}
+		data = SDL_CreateRGBSurfaceFrom(eshm_segment_data_get(segment),
 				width, height, depth, pitch,
 				rm, gm, bm, am);
+		{
+			SDL *sdl;
+			SDL_Rect srect, drect;
+
+			srect.x = 0;
+			srect.y = 0;
+			srect.w = width;
+			srect.h = height;
+
+			drect.x = 0;
+			drect.y = 0;
+			drect.w = width;
+			drect.h = height;
+			sdl = equ_host_data_get(h);
+			printf("src %p dst %p\n", data, sdl->surface);
+			SDL_BlitSurface(data, &srect, sdl->surface, &drect);
+		}
+
 	}
+	else return NULL;
+
+	printf("data = %p\n", data);
+	return equ_surface_new(h, width, height, fmt, type, shid, data);
 }
 
-static void _host_surface_delete(Equ_Host *h, void *s)
+static void _host_surface_delete(Equ_Host *h, Equ_Surface *s)
 {
-	SDL_Surface *surface = s;
+	SDL_Surface *surface = equ_surface_data_get(s);
 
 	SDL_FreeSurface(surface);
 }

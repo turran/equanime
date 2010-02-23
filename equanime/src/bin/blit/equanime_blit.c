@@ -24,7 +24,7 @@ static void _surface_fill(Equ_Surface *s)
 	rect.h = 0;
 	/* create a simple pattern */
 	/* upload the surface data */
-	equ_surface_pixels_upload(eq, s, &data, &rect);
+	//equ_surface_pixels_upload(eq, s, &data, &rect);
 }
 
 static void _help(void)
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 	_surface_info(s);
 	_surface_fill(s);
 	/* put it on x,y */
-	equ_layer_surface_put(eq, l, s, x, y, &rect);
+	//equ_layer_surface_put(eq, l, s, x, y, &rect);
 	equ_sync(eq);
 end:
 	ecore_main_loop_begin();

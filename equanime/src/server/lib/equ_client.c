@@ -149,6 +149,7 @@ static Equ_Error _surface_get(Equ_Client *client, Equ_Message_Surface_Get *m,
 		return EQU_ERR_NEXIST;
 	}
 	r->id = equ_surface_id_get(s);
+	r->sh_id = equ_surface_shid_get(s);
 
 	return EQU_ERR_NONE;
 }

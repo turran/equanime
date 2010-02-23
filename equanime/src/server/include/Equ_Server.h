@@ -103,10 +103,10 @@ struct _Equ_Host_Backend
 	Eina_Bool (*init)(Equ_Host *, Equ_Server_Backend *sbackend, const char *options);
 	void (*shutdown)(Equ_Host *);
 	Equ_Option * (*options_get)(Equ_Host *h);
-	void * (*surface_new)(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type);
-	void (*surface_delete)(Equ_Host *h, void *s);
-	void (*surface_upload)(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect);
-	void (*surface_download)(Equ_Host *h, void *s, Equ_Surface_Data *data, Eina_Rectangle *rect);
+	Equ_Surface * (*surface_new)(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type);
+	void (*surface_delete)(Equ_Host *h, Equ_Surface *s);
+	void (*surface_upload)(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data *data, Eina_Rectangle *rect);
+	void (*surface_download)(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data *data, Eina_Rectangle *rect);
 };
 
 struct _Equ_Input_Backend
@@ -273,10 +273,7 @@ Equ_Layer * equ_layer_get(Equ_Common_Id id);
 
 Equ_Surface * equ_surface_get(Equ_Common_Id id);
 
-#if 0
-Equ_Surface * equ_surface_new(Equ_Pool *p, uint32_t w, uint32_t h, Equ_Format fmt, Equ_Surface_Type type);
-#endif
-
+Equ_Surface * equ_surface_new(Equ_Host *host, uint32_t w, uint32_t h, Equ_Format fmt, Equ_Surface_Type type, const char *shid, void *data);
 Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib, const char *name, void *data);
 
 Equ_Pool * equ_pool_new(Equ_Host *h, Equ_Pool_Backend *pb, const char *name, uint32_t mask);

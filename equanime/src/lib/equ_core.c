@@ -30,10 +30,12 @@ static int _server_data(void *data, int type, void *event)
 	Equanime *eq = data;
 	unsigned int m_length;
 
+	if (e->server != eq->svr)
+		return ECORE_CALLBACK_RENEW;
 	if (!eq->msg)
 	{
 		ERR("How do we receive a reply with no msg first??\n");
-		return 0;
+		return ECORE_CALLBACK_RENEW;
 	}
 	if (!eq->buffer)
 	{
@@ -49,12 +51,12 @@ static int _server_data(void *data, int type, void *event)
 		e->data = NULL;
 	}
 	if (eq->length < sizeof(Equ_Reply))
-		return 0;
+		return ECORE_CALLBACK_RENEW;
 
 	eq->reply = (Equ_Reply *)eq->buffer;
 	m_length = sizeof(Equ_Reply) + eq->reply->size;
 	if (eq->length < m_length)
-		return 0;
+		return ECORE_CALLBACK_RENEW;
 
 	/* ok we have a full message */
 	DBG("Reply received %d", eq->reply->id);
@@ -86,7 +88,7 @@ static int _server_data(void *data, int type, void *event)
 		eq->buffer = NULL;
 	}
 
-	return 0;
+	return ECORE_CALLBACK_RENEW;
 }
 
 static int _server_del(void *data, int type, void *event)
@@ -172,7 +174,7 @@ EAPI void equ_init(void)
 {
 	if (_init) return;
 
-	if (!eshm_init) return;
+	if (!eshm_init()) return;
 	_init++;
 	eina_init();
 	eet_init();

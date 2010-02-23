@@ -89,38 +89,22 @@ EAPI Equ_Pool * equ_host_pool_register(Equ_Host *h,
 EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type)
 {
-#if 0
-	Equ_Pool *p;
-	Eina_List *l;
-#endif
 	Equ_Surface *s = NULL;
 
-#if 0
-	EINA_LIST_FOREACH(host->pools, l, p)
-	{
-		s = equ_surface_new(p, w, h, fmt, type);
-		if (s) break;
-	}
-#else
 	if (host->backend->surface_new)
-	{
-		void *sd;
+		s = host->backend->surface_new(host, w, h, fmt, type);
 
-		sd = host->backend->surface_new(host, w, h, fmt, type);
-		s = equ_surface_new(host, sd, w, h, fmt, type);
-	}
-#endif
 	return s;
 }
 
-EAPI void equ_host_surface_upload(Equ_Host *h, void *s, Equ_Surface_Data *data,
+EAPI void equ_host_surface_upload(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data *data,
 		Eina_Rectangle *r)
 {
 	if (h->backend->surface_upload)
 		h->backend->surface_upload(h, s, data, r);
 }
 
-EAPI void equ_host_surface_download(Equ_Host *h, void *s, Equ_Surface_Data *data,
+EAPI void equ_host_surface_download(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data *data,
 		Eina_Rectangle *r)
 {
 	if (h->backend->surface_download)
