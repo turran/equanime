@@ -70,26 +70,31 @@ static void _module_shutdown(void)
 	eina_module_list_free(_modules);
 }
 
-int _client_add(void *data, int type, void *event)
+static int _client_add(void *data, int type, void *event)
 {
 	Equ_Client *client;
 	Ecore_Con_Event_Client_Add *e = event;
 
+	if (ecore_con_client_server_get(e->client) != _equd.srv)
+		return ECORE_CALLBACK_RENEW;
 	client = equ_client_new(e->client);
 	ecore_con_client_data_set(e->client, client);
-	return 0;
+	return ECORE_CALLBACK_RENEW;
 }
 
-int _client_del(void *data, int type, void *event)
+static int _client_del(void *data, int type, void *event)
 {
 	Equ_Client *client;
 	Ecore_Con_Event_Client_Add *e = event;
 
+	if (ecore_con_client_server_get(e->client) != _equd.srv)
+		return ECORE_CALLBACK_RENEW;
 	client = ecore_con_client_data_get(e->client);
 	free(client);
+	return ECORE_CALLBACK_RENEW;
 }
 
-int _client_data(void *data, int type, void *event)
+static int _client_data(void *data, int type, void *event)
 {
 	Ecore_Con_Event_Client_Data *cdata = event;
 	Equ_Client *c;
@@ -100,11 +105,11 @@ int _client_data(void *data, int type, void *event)
 	Equ_Error err;
 	Equanime *eq;
 
-	eq = data;
-	if (eq != &_equd) return 0;
-
+	printf("1 cdata %p\n", cdata->client);
+	if (ecore_con_client_server_get(cdata->client) != _equd.srv)
+		return ECORE_CALLBACK_RENEW;
 	c = ecore_con_client_data_get(cdata->client);
-	if (!c) return 0;
+	if (!c) return ECORE_CALLBACK_RENEW;
 	/* check if we got a full message */
 	if (!_equd.buffer)
 	{
@@ -112,21 +117,23 @@ int _client_data(void *data, int type, void *event)
 		_equd.length = cdata->size;
 		cdata->data = NULL;
 	}
-	else
+	else if (!cdata->data)
 	{
 		_equd.buffer = realloc(_equd.buffer, _equd.length + cdata->size);
 		memcpy(((unsigned char *)_equd.buffer) + _equd.length, cdata->data, cdata->size);
 		_equd.length += cdata->size;
 		cdata->data = NULL;
 	}
+	else
+		return ECORE_CALLBACK_RENEW;
 message:
 	if (_equd.length < sizeof(Equ_Message))
-		return 0;
+		return ECORE_CALLBACK_RENEW;
 	/* ok, we have at least a message header */
 	m = _equd.buffer;
 	m_length = sizeof(Equ_Message) + m->size;
 	if (_equd.length < m_length)
-		return 0;
+		return ECORE_CALLBACK_RENEW;
 	/* parse the header */
 	DBG("Message received of type %d with msg num %d of size %d", m->type, m->id, m->size);
 	if (m->type > EQU_MSG_TYPE_SURFACE_DOWNLOADR) {
@@ -143,7 +150,9 @@ message:
 		goto shift;
 	}
 	/* check for the reply */
+	printf("2 cdata %p\n", cdata->client);
 	err = equ_client_process(c, equ_message_name_get(m->type), body, &reply);
+	printf("3 cdata %p\n", cdata->client);
 shift:
 	if (equ_message_reply_has(m->type) == EINA_TRUE)
 	{
@@ -154,12 +163,13 @@ shift:
 		r.id = m->id;
 		r.error = err;
 		equ_message_reply_name_get(m->type, &rname);
-		DBG("Message encoded %d %d", rname, equ_message_name_get(m->type));
+		DBG("Encoding reply. type %d", m->type);
 		if (reply)
 			rbody = equ_message_encode(rname, reply, &r.size);
 		else
 			r.size = 0;
 		DBG("Sending reply %d %d %d", r.id, r.error, r.size);
+		printf("4 cdata %p\n", cdata->client);
 		ecore_con_client_send(cdata->client, &r, sizeof(Equ_Reply));
 		if (r.size)
 			ecore_con_client_send(cdata->client, rbody, r.size);
@@ -185,7 +195,7 @@ end:
 		free(_equd.buffer);
 		_equd.buffer = NULL;
 	}
-	return 0;
+	return ECORE_CALLBACK_RENEW;
 }
 
 static Eina_Bool _hosts_cb(Equ_Host *h, const char *name)

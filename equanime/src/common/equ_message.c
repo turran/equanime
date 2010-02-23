@@ -26,9 +26,8 @@
 					(char *)(&(___ett.member ## _count)) - (char *)(&(___ett)), /* 0,  */NULL, NULL); \
      }
 
-Eet_Data_Descriptor *_descriptors[EQU_MSG_NAMES];
-Eet_Data_Descriptor *_ddescriptors[EQU_DATAS];
-
+static Eet_Data_Descriptor *_descriptors[EQU_MSG_NAMES];
+static Eet_Data_Descriptor *_ddescriptors[EQU_DATAS];
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
