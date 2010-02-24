@@ -15,16 +15,22 @@ static void _surface_info(Equ_Surface *s)
 
 static void _surface_fill(Equ_Surface *s)
 {
-	Eina_Rectangle rect;
 	Equ_Surface_Data data;
+	int w, h;
+	char *tmp;
+	char *end;
+	size_t pitch;
 
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = 0;
-	rect.h = 0;
+	equ_surface_data_get(eq, s, &data);
+	equ_surface_size_get(eq, s, &w, &h);
+	pitch = equ_format_pitch_get(data.fmt, w);
+
 	/* create a simple pattern */
-	/* upload the surface data */
-	//equ_surface_pixels_upload(eq, s, &data, &rect);
+	tmp = data.data.rgb888.plane0;
+	end = tmp + (pitch * h);
+	printf("writing!! %p %p\n", tmp, end);
+	while (tmp < end)
+		*tmp++ = 0xff;
 }
 
 static void _help(void)
@@ -89,14 +95,13 @@ int main(int argc, char **argv)
 	equ_layer_status_get(eq, l, &status);
 	/* get a surface */
 	eina_rectangle_coords_from(&rect, 0, 0, width, height);
-	//s = equ_host_surface_get(eq, h, rect.w, rect.h, status.fmt, EQU_SURFACE_LOCAL);
 	s = equ_host_surface_get(eq, h, rect.w, rect.h, status.fmt, EQU_SURFACE_SHARED);
 	if (!s) goto end;
 
 	_surface_info(s);
 	_surface_fill(s);
 	/* put it on x,y */
-	//equ_layer_surface_put(eq, l, s, x, y, &rect);
+	equ_layer_surface_put(eq, l, s, x, y, &rect);
 	equ_sync(eq);
 end:
 	ecore_main_loop_begin();

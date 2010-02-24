@@ -79,7 +79,6 @@ static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
 	h = equ_layer_host_get(l);
 	sdl = equ_host_data_get(h);
 	src = equ_surface_data_get(s);
-	printf("layer data = %p\n", src);
 	srect.x = rect->x;
 	srect.y = rect->y;
 	srect.w = rect->w;
@@ -91,7 +90,6 @@ static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
 	drect.h = rect->h;
 
 	SDL_BlitSurface(src, &srect, sdl->surface, &drect);
-	SDL_FillRect(sdl->surface, &drect, 0xffff0000);
 	SDL_UpdateRect(sdl->surface, drect.x, drect.y, drect.w, drect.h);
 }
 
@@ -215,16 +213,10 @@ static Equ_Surface * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t hei
 			printf("Cannot get the segment data %p\n", segment);
 			return NULL;
 		}
-		{
-			char *tmp;
-
-			printf("writing!!\n");
-			tmp = eshm_segment_data_get(segment);
-			*tmp = 1;
-		}
-		data = SDL_CreateRGBSurfaceFrom(eshm_segment_data_get(segment),
+		data = SDL_CreateRGBSurfaceFrom(shdata,
 				width, height, depth, pitch,
 				rm, gm, bm, am);
+#if 0
 		{
 			SDL *sdl;
 			SDL_Rect srect, drect;
@@ -242,11 +234,10 @@ static Equ_Surface * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t hei
 			printf("src %p dst %p\n", data, sdl->surface);
 			SDL_BlitSurface(data, &srect, sdl->surface, &drect);
 		}
-
+#endif
 	}
 	else return NULL;
 
-	printf("data = %p\n", data);
 	return equ_surface_new(h, width, height, fmt, type, shid, data);
 }
 

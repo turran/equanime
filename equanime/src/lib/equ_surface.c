@@ -26,6 +26,7 @@ Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type, char *shid)
 {
 	Equ_Surface *s;
+	void *data = NULL;
 
 	s = calloc(1, sizeof(Equ_Surface));
 	s->id = id;
@@ -36,19 +37,19 @@ Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 	/* in case of local surface we should allocate the data ourselves */
 	if (s->type == EQU_SURFACE_LOCAL)
 	{
-		switch (fmt)
-		{
-			case EQU_FORMAT_RGB888:
-			s->data.data.rgb888.plane0 = calloc(w * h, sizeof(uint32_t));
-			break;
-		}
+		data = calloc(equ_format_size_get(fmt, w, h), sizeof(uint8_t));
 	}
 	else if (s->type == EQU_SURFACE_SHARED)
 	{
-		void *data;
-
 		s->segment = eshm_segment_get(shid, 0, EINA_FALSE);
 		data = eshm_segment_data_get(s->segment);
+	}
+	/* TODO add more formats */
+	switch (fmt)
+	{
+		case EQU_FORMAT_RGB888:
+		s->data.data.rgb888.plane0 = data;
+		break;
 	}
 
 	return s;
