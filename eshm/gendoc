@@ -1,0 +1,9 @@
+#!/bin/sh
+rm -rf ./doc/html ./doc/latex ./doc/man
+mkdir -p ./doc/html ./doc/latex ./doc/man 2>/dev/null
+doxygen
+#cp doc/img/*.png doc/html/
+rm -f eshm_docs.tar eshm_docs.tar.gz
+tar -cvf eshm_docs.tar doc/html doc/man doc/latex
+gzip -9f eshm_docs.tar
+exit 0

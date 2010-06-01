@@ -1,0 +1,6 @@
+Eshm is a library that helps on the creation and usage of shared memory segments
+It has a library and a daemon application. The communication between the library
+and the daemon is done through Ecore_IPC mechanism.
+
+Dependencies:
+

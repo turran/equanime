@@ -1,0 +1,117 @@
+
+
+Specification
+~~~~~~~~~~~~~
+Legend:
+s = signal
+m = method
+
+org.e.ipc.Reader
+~~~~~~~~~~~~~~~~
+(s) StartRead
+
+org.e.ipc.Writer
+~~~~~~~~~~~~~~~~
+(m - s?) RequestRead
+(m) AttachReader
+(m) ListReaders
+(s) EndWrite
+
+org.e.ipc.shm.Manager
+~~~~~~~~~~~~~~~~~~~~~
+signals when a new segment is created and deleted
+
+org.e.ipc.cache.Manager
+~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+Add to the specification
+~~~~~~~~~~~~~~~~~~~~~~~~
++ add/delete an object on the cache
++ request mime type for each object on the cache
++ set/get size of the cache
++ return the offset and size of the object on the cache
++ on init of the cache send the shmid of the memory where the data is/will be
++ list the number of elements the cache has ?
++ send the file path to the daemon to store it on the cache ?
++ set up file paths for searching files ?
+
+Use case
+~~~~~~~~
+
+Blocks
+~~~~~~
+
++-------+
+| Cache |
++-------+
+|  SHM  |
++-------+
+
++-------+  dbus  +--------+  dbus  +-------+
+| app 1 |--------| daemon |--------| app 2 |
++-------+        +--------+        +-------+
+
+The daemon is in charge of allocating the shm segments, manage them, load files
+for further storing on the cache, etc.
+What happens if we want to store data from other places (no file)? one option
+could be to request the size of the element to be inserted into the cache,
+the daemon returns the offset and you are free to write to it, using the
+org.e.Writer interface?
+A cache isnt a specific version of a shm approach???
+
+Objects
+=======
++ /org/e/cache/
+  Low level main cache daemon object, it should store the list of caches
+  an application requests.
+  IMPLEMENTS: cacheManager
+
++ /org/e/shm
+  Low level main shm daemon object ? (maybe we can integrate both into one)
+  IMPLEMENTS: shmManager
+
++ /org/e/cache/font
+  Example cache object of a client application (shm segment)
+
++ /org/e/cache/font/0
+  First cached font object
+
+Interfaces
+==========
+
+org.e.cacheManager
+~~~~~~~~~~~
+char* ListCaches(void)
+
+org.e.shmManager
+~~~~~~~~~
+Returns an array of segments, each segment is composed of an object path
+and an integer for its size.
+a(pq) ListSegments(void)
+
+Creates a new segment and attaches to it, if no name is passed, it will
+create a new dbus object with the name you pass or a /org/e/shm/%d in case
+it is NULL.
+int   NewSegment(int size, char *name)
+
+org.e.shmSegment
+~~~~~~~~~
+AppendPath(char *path)
+{[name, size, offset, bus]} ListElements()
+[name, bus, offset] NewElement(int size)
+[name, size, offset] NewElementFromFile(char *path)
+
+org.e.writer
+~~~~~~~~~~~~
+
+org.e.reader
+~~~~~~~~~~~~
+
+TODO
+====
+Metadata ?? (mime type, row stride, width, height, bpp, etc)
+As we will allocate/free chunks of memory, there might be some kind of
+memory management (to join chunks of memory, etc).
