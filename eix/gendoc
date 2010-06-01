@@ -1,0 +1,9 @@
+#!/bin/sh
+rm -rf ./doc/html ./doc/latex ./doc/man
+mkdir -p ./doc/html ./doc/latex ./doc/man 2>/dev/null
+doxygen
+#cp doc/img/*.png doc/html/
+rm -f eix_docs.tar eix_docs.tar.gz
+tar -cvf eix_docs.tar doc/html doc/man doc/latex
+gzip -9f eix_docs.tar
+exit 0
