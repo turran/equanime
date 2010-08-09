@@ -41,6 +41,8 @@ extern "C" {
 #define EIX_NAME "eixanime"
 #define EIX_PORT 0xea
 
+typedef struct _Eix_Client Eix_Client;
+
 /* protocol structures */
 typedef enum
 {

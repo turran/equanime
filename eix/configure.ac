@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT([eix], [0.0.1], [enlightenment-devel@lists.sourceforge.net])
+AC_INIT([eix], [0.0.1], [equanime@googlecode.com])
 AC_PREREQ([2.60])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
@@ -62,8 +62,8 @@ AC_C_BIGENDIAN
 
 ### Substitutions
 
-EIX_CFLAGS="$EINA_CFLAGS $ECORE_CFLAGS $ECORE_CON_CFLAGS"
-EIX_LIBS="$EINA_LIBS $ECORE_LIBS $ECORE_CON_LIBS"
+EIX_CFLAGS="$EINA_CFLAGS $ECORE_CFLAGS $ECORE_CON_CFLAGS $EET_CFLAGS"
+EIX_LIBS="$EINA_LIBS $ECORE_LIBS $ECORE_CON_LIBS $EET_LIBS"
 AC_SUBST(EIX_CFLAGS)
 AC_SUBST(EIX_LIBS)
 

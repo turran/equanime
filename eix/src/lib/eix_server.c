@@ -157,31 +157,6 @@ end:
 	return ECORE_CALLBACK_RENEW;
 }
 
-static Eina_Bool _hosts_cb(Eix_Host *h, const char *name)
-{
-	if (modules_list)
-		printf("%s\n", eix_host_name_get(h));
-	else if (!strcmp(eix_host_name_get(h), name))
-	{
-		if (options_help)
-		{
-			Eix_Option *op;
-			op = eix_host_options_get(h);
-			if (!op) return;
-			while (op->name != NULL)
-			{
-				printf("%s\t: %s (%s)\n", op->name, op->description, op->def);
-				op++;
-			}
-		}
-		else
-		{
-			eix_host_init(h, &_backend, options);
-		}
-	}
-}
-
-
 static void _server_init(void)
 {
 	Ecore_Con_Server *srv;
@@ -202,6 +177,4 @@ static void _server_shutdown(void)
 
 static void _server_setup(void)
 {
-	/* parse the cmd line options */
-	eix_hosts_get(_hosts_cb, module);
 }
