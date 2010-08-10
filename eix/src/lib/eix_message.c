@@ -23,7 +23,7 @@
      }
 
 static Eet_Data_Descriptor *_descriptors[EIX_MSG_NAMES];
-static Eina_Array *_descriptors = NULL;
+//static Eina_Array *_descriptors = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -83,5 +83,5 @@ int eix_message_register(Eet_Data_Descriptor *edd)
 {
 	static int _type = 1;
 
-	return type++;
+	return _type++;
 }

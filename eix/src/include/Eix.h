@@ -38,10 +38,58 @@
 extern "C" {
 #endif
 
-#define EIX_NAME "eixanime"
-#define EIX_PORT 0xea
-
 typedef struct _Eix_Client Eix_Client;
+typedef struct _Eix_Server Eix_Server;
+
+typedef enum
+{
+	EIX_MESSAGE_SYNC,
+	EIX_MESSAGE_SYNCR,
+	EIX_MESSAGE_LAST,
+} Eix_Message_Id;
+
+EAPI extern int EIX_EVENT_SERVER_ADD;
+EAPI extern int EIX_EVENT_SERVER_DEL;
+EAPI extern int EIX_EVENT_SERVER_DATA;
+EAPI extern int EIX_EVENT_CLIENT_ADD;
+EAPI extern int EIX_EVENT_CLIENT_DEL;
+EAPI extern int EIX_EVENT_CLIENT_DATA;
+
+typedef struct _Eix_Event_Server_Add
+{
+	Eix_Server *server;
+} Eix_Event_Server_Add;
+
+typedef struct _Eix_Event_Server_Del
+{
+	Eix_Server *server;
+} Eix_Event_Server_Del;
+
+typedef struct _Eix_Event_Server_Data
+{
+	Eix_Server *server;
+	unsigned int id; /* id of the message this reply replies to */
+	unsigned int error; /* in case of any error set by the daemon */
+	unsigned int size; /* size of the body */
+} Eix_Event_Server_Data;
+
+typedef struct _Eix_Event_Client_Add
+{
+	Eix_Client *client;
+} Eix_Event_Client_Add;
+
+typedef struct _Eix_Event_Client_Del
+{
+	Eix_Client *client;
+} Eix_Event_Client_Del;
+
+typedef struct _Eix_Event_Client_Data
+{
+	Eix_Client *client;
+	unsigned int id; /* id of the message */
+	//Eix_Message_Type type; /* type of message */
+	unsigned int size; /* size of the body */
+} Eix_Event_Client_Data;
 
 /* protocol structures */
 typedef enum
@@ -145,6 +193,9 @@ static inline Eina_Bool eix_message_reply_name_get(Eix_Message_Type t, Eix_Messa
 
 EAPI void eix_init(void);
 EAPI void eix_shutdown(void);
+EAPI Eix_Server * eix_connect(const char *name, int port);
+EAPI Eix_Server * eix_new(const char *name, int port);
+EAPI void eix_sync(Eix_Server *e);
 
 void * eix_message_encode(Eix_Message_Name name, const void *data, int *size);
 void * eix_message_decode(Eix_Message_Name name, const void *data, int size);
