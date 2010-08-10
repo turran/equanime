@@ -367,7 +367,8 @@ EAPI void eix_shutdown(void)
 		eina_shutdown();
 	}
 	_init--;
-}/**
+}
+/**
  * Connects to an Eix server
  * @param[in] name The name to use for the connection
  * @param[in] port The port to use for the connection
@@ -451,8 +452,10 @@ EAPI void eix_sync(Eix_Server *e)
 	free(r);
 }
 
-
-Eix_Error eix_client_message_send(Eix_Client *c, Eix_Message_Type type)
+EAPI void eix_server_message_add(Eix_Server *e, unsigned int id,
+		Eix_Message_Type type, Eet_Data_Descriptor *edd)
 {
+	/* add the descriptor to the server's message array/hash */
 
 }
+
