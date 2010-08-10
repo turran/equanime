@@ -11,9 +11,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#include "Eet.h"
+#include "Eix.h"
 #include "Ecore.h"
-#include "Ecore_Con.h"
 
 #define ERR(...) EINA_LOG_DOM_ERR(eshm_log_dom, __VA_ARGS__)
 #define INF(...) EINA_LOG_DOM_INFO(eshm_log_dom, __VA_ARGS__)

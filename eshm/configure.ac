@@ -40,8 +40,7 @@ AC_SUBST(create_shared_lib)
 
 PKG_CHECK_MODULES(ESHM, [
 ecore
-ecore-con
-eet
+eix
 eina-0
 ])
 
