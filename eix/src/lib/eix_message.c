@@ -23,6 +23,7 @@
      }
 
 static Eet_Data_Descriptor *_descriptors[EIX_MSG_NAMES];
+static Eina_Array *_descriptors = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -73,4 +74,14 @@ void * eix_message_encode(Eix_Message_Name name, const void *data, int *size)
 void * eix_message_decode(Eix_Message_Name name, const void *data, int size)
 {
 	return eet_data_descriptor_decode(_descriptors[name], data, size);
+}
+
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+int eix_message_register(Eet_Data_Descriptor *edd)
+{
+	static int _type = 1;
+
+	return type++;
 }
