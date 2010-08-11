@@ -64,6 +64,8 @@ struct _Eix_Client
 	Ecore_Con_Client *clnt;
 	void *buffer;
 	int length;
+	int events;
+	Eina_Bool delete_me;
 };
 
 static int _init = 0;
@@ -88,7 +90,7 @@ static inline Eina_Bool _client_server_exist(Ecore_Con_Client *c)
  ******************************************************************************/
 static inline Eina_Bool _has_reply(Eix_Message_Descriptor *desc)
 {
-	if (desc->reply_id) 
+	if (desc->reply_id)
 		return EINA_TRUE;
 	else
 		return EINA_FALSE;
@@ -110,11 +112,10 @@ static int _client_process(Eix_Client *c, unsigned int type, void *msg,
 	es = c->server;
 
 	if (es->process) err = es->process(c, type, msg, reply);
-	printf("err %d %p\n", err, reply);
 	return err;
 }
 
-static Eix_Message * eix_message_new(unsigned int type)
+static Eix_Message * _message_new(unsigned int type)
 {
 	static int id = 0;
 	Eix_Message *m;
@@ -136,11 +137,34 @@ static inline Eix_Message_Descriptor * _descriptor_get(Eix_Server *s, int type)
 /******************************************************************************
  *                            Ecore Con Callbacks                             *
  ******************************************************************************/
+static inline _client_event_free(Eix_Client *ec, void *ev)
+{
+	ec->events--;
+	if (ec->delete_me && !ec->events)
+		free(ec);
+	free(ev);
+}
+
+static void _client_add_free(void *data, void *ev)
+{
+	Eix_Event_Client_Add *event = ev;
+
+	_client_event_free(event->client, ev);
+}
+
+static void _client_del_free(void *data, void *ev)
+{
+	Eix_Event_Client_Del *event = ev;
+
+	_client_event_free(event->client, ev);
+}
+
 static Eina_Bool _client_add(void *data, int type, void *event)
 {
+	Ecore_Con_Event_Client_Add *e = event;
 	Eix_Client *ec;
 	Eix_Server *es;
-	Ecore_Con_Event_Client_Add *e = event;
+	Eix_Event_Client_Add *ev;
 
 	es = ecore_con_server_data_get(ecore_con_client_server_get(e->client));
 	if (!eina_list_data_find(_servers, es)) return ECORE_CALLBACK_RENEW;
@@ -149,18 +173,29 @@ static Eina_Bool _client_add(void *data, int type, void *event)
 	ec->server = es;
 	ec->clnt = e->client;
 	ecore_con_client_data_set(e->client, ec);
+	ec->events++;
+
+	ev = malloc(sizeof(Eix_Event_Client_Add));
+	ev->client = ec;
+	ecore_event_add(EIX_EVENT_CLIENT_ADD, ev, _client_add_free, NULL);
 
 	return ECORE_CALLBACK_RENEW;
 }
 
 static Eina_Bool _client_del(void *data, int type, void *event)
 {
-	Eix_Client *ec;
 	Ecore_Con_Event_Client_Add *e = event;
+	Eix_Event_Client_Del *ev;
+	Eix_Client *ec;
 
 	if (!_client_server_exist(e->client)) return ECORE_CALLBACK_RENEW;
 	ec = ecore_con_client_data_get(e->client);
-	free(ec);
+	ec->delete_me = EINA_TRUE;
+	ec->events++;
+
+	ev = malloc(sizeof(Eix_Event_Client_Del));
+	ev->client = ec;
+	ecore_event_add(EIX_EVENT_CLIENT_DEL, ev, _client_del_free, NULL);
 
 	return ECORE_CALLBACK_RENEW;
 }
@@ -316,12 +351,12 @@ static Eina_Bool _server_data(void *data, int type, void *event)
 		if (!desc)
 		{
 			ERR("Not found a valid message %d", es->msg->type);
-			goto end;			
+			goto end;
 		}
 		if (!_reply_type_get(desc, &rtype))
 		{
 			ERR("Not found a valid reply for %d", es->msg->type);
-			goto end;			
+			goto end;
 		}
 
 		desc = _descriptor_get(es, desc->reply_id);
@@ -565,7 +600,7 @@ EAPI Eix_Error eix_message_server_send(Eix_Server *es, int type,
 	desc = _descriptor_get(es, type);
 	if (!desc || !desc->edd) return EIX_ERR_CODEC;
 
-	m = eix_message_new(type);
+	m = _message_new(type);
 	body = eet_data_descriptor_encode(desc->edd, data, &m->size);
 	if (!body)
 		return EIX_ERR_CODEC;
@@ -613,6 +648,5 @@ EAPI void eix_server_message_add(Eix_Server *e,
 	mdesc->reply_id = reply_id;
 	mdesc->edd = edd;
 
-	printf("storing edd %p in %d\n", edd, id);
 	eina_hash_add(e->messages, (const void *)&id, mdesc);
 }
