@@ -24,7 +24,7 @@ extern int eshm_log_dom;
 #define ESHMD_NAME "eshmd"
 #define ESHMD_PORT 0x1b
 
-/* 
+/*
  * this errors are well known error number to retrieve the correct
  * error from the message, it is used only internally, for API errors
  * use TODO
@@ -53,6 +53,7 @@ typedef enum _Eshm_Reply_Type
 {
 	ESHM_REPLY_SEGMENT_NEW = ESHM_MSGS,
 	ESHM_REPLY_SEGMENT_GET,
+	ESHM_REPLY_SEGMENT_LOCK,
 	ESHM_REPLIES,
 } Eshm_Reply_Type;
 
@@ -94,9 +95,12 @@ typedef struct _Eshm_Reply_Segment_Get
 	size_t size;
 } Eshm_Reply_Segment_Get;
 
+typedef struct _Eshm_Reply_Segment_Lock
+{
+} Eshm_Reply_Segment_Lock;
 
 void eshm_message_init(void);
 void eshm_message_shutdown(void);
-Eshm_Error eshm_message_server_send(int type, void *data, double timeout, void **rdata);
+int eshm_message_server_send(int type, void *data, double timeout, void **rdata);
 
 #endif /*ESHM_PRIVATE_H_*/

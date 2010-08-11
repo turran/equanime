@@ -16,6 +16,7 @@ int main(int argc, char **argv)
 	/* if the segment already exists request it */
 	if (!s)
 	{
+		printf("can not create the segment requesting it\n");
 		s = eshm_segment_get("mysegment", 0, EINA_FALSE);
 		if (!s)
 		{

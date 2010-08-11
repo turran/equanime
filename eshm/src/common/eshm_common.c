@@ -40,6 +40,10 @@ static void _message_init(void)
 	_descriptors[INDEX(ESHM_MSG_SEGMENT_LOCK)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_Lock, "id", id, EET_T_INLINED_STRING);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_Lock, "write", write, EET_T_UCHAR);
+	/* segment lock reply */
+	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Reply_Segment_Lock", sizeof(Eshm_Reply_Segment_Lock));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[INDEX(ESHM_REPLY_SEGMENT_LOCK)] = edd;
 	/* segment unlock */
 	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Message_Segment_Unlock", sizeof(Eshm_Message_Segment_Unlock));
 	edd = eet_data_descriptor_stream_new(&eddc);
@@ -80,6 +84,9 @@ void eshm_common_server_setup(Eix_Server *s)
 			0);
 	eix_server_message_add(s, ESHM_MSG_SEGMENT_LOCK,
 			_descriptors[INDEX(ESHM_MSG_SEGMENT_LOCK)],
+			ESHM_REPLY_SEGMENT_LOCK);
+	eix_server_message_add(s, ESHM_REPLY_SEGMENT_LOCK,
+			_descriptors[INDEX(ESHM_REPLY_SEGMENT_LOCK)],
 			0);
 	eix_server_message_add(s, ESHM_MSG_SEGMENT_UNLOCK,
 			_descriptors[INDEX(ESHM_MSG_SEGMENT_UNLOCK)],

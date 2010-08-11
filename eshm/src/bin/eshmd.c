@@ -90,6 +90,7 @@ static Eshm_Error msg_segment_new(Eix_Client *c, Eshm_Message_Segment_New *sn, v
 	s->shmid = rsn->shmid;
 	s->ref++;
 	s->owner = c;
+	printf("client owner = %p\n", c);
 	eina_hash_add(_eshmd.hash, sn->id, s);
 
 	INF("New Segment created with id number %d", rsn->shmid);
@@ -136,6 +137,7 @@ static int msg_segment_lock(Eix_Client *c, Eshm_Message_Segment_Lock *m, void **
 	/* lock the segment */
 	INF("Locking the segment with id %s", m->id);
 	s = eina_hash_find(_eshmd.hash, m->id);
+	printf("lock client = %p %p\n", c, s->owner);
 	if (!s)
 		return ESHM_ERR_NEXIST;
 	else if (m->write && c != s->owner)
@@ -165,7 +167,7 @@ int _client_add(void *data, int type, void *event)
 
 	DBG("Client added %p", e->client);
 	c = calloc(1, sizeof(Eshmd_Client));
-	ecore_con_client_data_set(e->client, c);
+	//ecore_con_client_data_set(e->client, c);
 }
 
 int _client_del(void *data, int type, void *event)

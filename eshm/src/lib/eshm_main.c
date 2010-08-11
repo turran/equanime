@@ -36,10 +36,9 @@ int eshm_log_dom = -1;
  * @return
  *
  */
-Eshm_Error eshm_message_server_send(int type, void *data, double timeout, void **rdata)
+int eshm_message_server_send(int type, void *data, double timeout, void **rdata)
 {
-	printf("tryng to send message %d\n", type);
-	eix_message_server_send(_eshm.svr, type, data, timeout, rdata);
+	return eix_message_server_send(_eshm.svr, type, data, timeout, rdata);
 }
 
 /*============================================================================*

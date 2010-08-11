@@ -103,7 +103,6 @@ EAPI Eshm_Segment * eshm_segment_get(const char *id, size_t size, Eina_Bool crea
 
 	/* send the message to the daemon */
 	error = eshm_message_server_send(ESHM_MSG_SEGMENT_GET, &m, 0, (void **)&r);
-	printf("%d %p\n", error, r);
 	if (error)
 	{
 		if (!create && (error == ESHM_ERROR_NEXIST))
@@ -156,11 +155,12 @@ EAPI Eina_Bool eshm_segment_lock(Eshm_Segment *s, Eina_Bool write)
 	assert(s);
 	if (s->locked == EINA_TRUE)
 		return EINA_TRUE;
+	if (!write) return EINA_TRUE;
 
 	m.id = s->id;
 	m.write = write;
 	error = eshm_message_server_send(ESHM_MSG_SEGMENT_LOCK, &m, 0, NULL);
-
+	printf("locking with error = %d\n", error);
 	if (error)
 	{
 		_error_to_eina(error);
