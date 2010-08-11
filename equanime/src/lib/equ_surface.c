@@ -89,7 +89,7 @@ EAPI void equ_surface_pixels_upload(Equanime *e, Equ_Surface *s,
 	Equ_Surface_Data *data, Eina_Rectangle *r)
 {
 	Equ_Message_Surface_Upload m;
-	Equ_Error error;
+	int error;
 	int i;
 
 	if (!data) return;
@@ -134,7 +134,7 @@ EAPI void equ_surface_pixels_download(Equanime *e, Equ_Surface *s,
 {
 	Equ_Message_Surface_Download m;
 	Equ_Reply_Surface_Download *r = NULL;
-	Equ_Error error;
+	int error;
 
 	m.surface_id = s->id;
 	m.sx = rect->x;

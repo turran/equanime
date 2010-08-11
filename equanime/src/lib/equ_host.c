@@ -89,7 +89,7 @@ EAPI Equ_Surface * equ_host_surface_get(Equanime *e, Equ_Host *host, uint32_t w,
 {
 	Equ_Message_Surface_Get m;
 	Equ_Reply_Surface_Get *r = NULL;
-	Equ_Error error;
+	int error;
 	Equ_Surface *s;
 
 	m.host_id = host->id;
@@ -140,7 +140,7 @@ EAPI void equ_hosts_get(Equanime *e, Equ_Cb cb, void *cb_data)
 {
 	Equ_Message_Hosts_Get m;
 	Equ_Reply_Hosts_Get *r = NULL;
-	Equ_Error error;
+	int error;
 	Equ_Host *h;
 	int i;
 
@@ -171,7 +171,7 @@ EAPI void equ_host_controllers_get(Equanime *e, Equ_Host *h, Equ_Cb cb,
 {
 	Equ_Message_Controllers_Get m;
 	Equ_Reply_Controllers_Get *r = NULL;
-	Equ_Error error;
+	int error;
 	Equ_Controller *c;
 	int i;
 

@@ -280,7 +280,7 @@ Equ_Pool * equ_pool_new(Equ_Host *h, Equ_Pool_Backend *pb, const char *name, uin
 void * equ_pool_alloc(Equ_Pool *p, size_t bytes);
 
 Equ_Client * equ_client_new(Ecore_Con_Client *conn);
-Equ_Error equ_client_process(Equ_Client *c, Equ_Message_Name name, void *msg, void **rpely);
+int equ_client_process(Equ_Client *c, Equ_Message_Name name, void *msg, void **rpely);
 
 
 /* for now place hal info here */
