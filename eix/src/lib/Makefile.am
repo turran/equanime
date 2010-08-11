@@ -9,8 +9,7 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libeix.la
 
 libeix_la_SOURCES = \
-eix.c \
-eix_message.c
+eix.c
 
 libeix_la_LIBADD = \
 @EIX_LIBS@

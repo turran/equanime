@@ -3,32 +3,74 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Eix_Message_Description
-{
+#define ERR(...) EINA_LOG_DOM_ERR(_log, __VA_ARGS__)
+#define INF(...) EINA_LOG_DOM_INFO(_log, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(_log, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(_log, __VA_ARGS__)
 
-} Eix_Message_Description;
+/*
+ * A message is composed of:
+ * +----+------+------+-----------------
+ * | id | type | size |
+ * +----+------+------+-----------------
+ * <-----header------>.<-----body------>
+ */
+
+typedef struct _Eix_Message
+{
+	unsigned int id; /* id of the message */
+	unsigned int type; /* type of message */
+	unsigned int size; /* size of the body */
+} Eix_Message;
+
+/*
+ * A reply is composed of:
+ * +----+-------+------+-----------------
+ * | id | error | size |
+ * +----+-------+------+-----------------
+ * <------header------>.<-----body------>
+ */
+
+typedef struct _Eix_Reply
+{
+	unsigned int id; /* id of the message this reply replies to */
+	unsigned int error; /* in case of any error set by the daemon */
+	unsigned int size; /* size of the body */
+} Eix_Reply;
+
+typedef struct _Eix_Message_Descriptor
+{
+	unsigned int id;
+	unsigned int reply_id;
+	Eet_Data_Descriptor *edd;
+	Eet_Data_Descriptor *reply_edd;
+} Eix_Message_Descriptor;
 
 struct _Eix_Server
 {
 	Ecore_Con_Server *svr;
-	Eina_Array *messages; /* an array to store the message description */
+	Eina_Hash *messages; /* an array to store the message description */
 	Eix_Message *msg; /* last message sent */
 	Eix_Reply *reply; /* reply for the last message sent */
 	void *rbody; /* decoded body of the reply message */
 	unsigned char *buffer; /* buffer where the data received from server is stored */
 	unsigned int length; /* length of the buffer */
+	Eix_Server_Process process;
 };
 
 struct _Eix_Client
 {
+	Eix_Server *server;
 	Ecore_Con_Client *clnt;
 	void *buffer;
 	int length;
 };
 
 static int _init = 0;
+static int _log = -1;
 static Eina_List *_servers = NULL;
 static Ecore_Event_Handler *_handler[6];
+static Eet_Data_Descriptor *_descriptors[2];
 /******************************************************************************
  *                                  Helpers                                   *
  ******************************************************************************/
@@ -42,36 +84,76 @@ static inline Eina_Bool _client_server_exist(Ecore_Con_Client *c)
 	return !!_server_exist(ecore_con_client_server_get(c));
 }
 /******************************************************************************
+ *                               Message helpers                              *
+ ******************************************************************************/
+static inline Eina_Bool _has_reply(Eix_Message_Descriptor *desc)
+{
+	if (desc->reply_id) 
+		return EINA_TRUE;
+	else
+		return EINA_FALSE;
+}
+static inline Eina_Bool _reply_type_get(Eix_Message_Descriptor *desc, int *n)
+{
+	if (_has_reply(desc) == EINA_FALSE)
+		return EINA_FALSE;
+	*n = desc->reply_id;
+	return EINA_TRUE;
+}
+
+static int _client_process(Eix_Client *c, unsigned int type, void *msg,
+		void **reply)
+{
+	Eix_Server *es;
+	int err = EIX_ERR_NONE;
+
+	es = c->server;
+
+	if (es->process) err = es->process(c, type, msg, reply);
+	printf("err %d %p\n", err, reply);
+	return err;
+}
+
+static Eix_Message * eix_message_new(unsigned int type)
+{
+	static int id = 0;
+	Eix_Message *m;
+
+	m = malloc(sizeof(Eix_Message));
+	m->id = id;
+	m->type = type;
+	/* TODO this will cause an overflow sometime */
+	id++;
+
+	return m;
+}
+
+static inline Eix_Message_Descriptor * _descriptor_get(Eix_Server *s, int type)
+{
+	return eina_hash_find(s->messages, (const void *)&type);
+}
+
+/******************************************************************************
  *                            Ecore Con Callbacks                             *
  ******************************************************************************/
-static void _server_setup(Eix_Server *es, Ecore_Con_Server *svr)
-{
-	es->svr = svr;
-	es->messages = eina_array_new(10);
-	/* TODO add the messages */
-	_servers = eina_list_append(_servers, es);
-}
-
-static void _client_setup(Eix_Client *ec, Ecore_Con_Client *clnt)
-{
-	ec->clnt = clnt;
-	ecore_con_client_data_set(clnt, ec);
-}
-
-static int _client_add(void *data, int type, void *event)
+static Eina_Bool _client_add(void *data, int type, void *event)
 {
 	Eix_Client *ec;
+	Eix_Server *es;
 	Ecore_Con_Event_Client_Add *e = event;
 
-	if (!_client_server_exist(e->client)) return ECORE_CALLBACK_RENEW;
+	es = ecore_con_server_data_get(ecore_con_client_server_get(e->client));
+	if (!eina_list_data_find(_servers, es)) return ECORE_CALLBACK_RENEW;
 
 	ec = calloc(1, sizeof(Eix_Client));
-	_client_setup(ec, e->client);
+	ec->server = es;
+	ec->clnt = e->client;
+	ecore_con_client_data_set(e->client, ec);
 
 	return ECORE_CALLBACK_RENEW;
 }
 
-static int _client_del(void *data, int type, void *event)
+static Eina_Bool _client_del(void *data, int type, void *event)
 {
 	Eix_Client *ec;
 	Ecore_Con_Event_Client_Add *e = event;
@@ -83,19 +165,21 @@ static int _client_del(void *data, int type, void *event)
 	return ECORE_CALLBACK_RENEW;
 }
 
-static int _client_data(void *data, int type, void *event)
+static Eina_Bool _client_data(void *data, int type, void *event)
 {
+	Eix_Message_Descriptor *desc;
 	Ecore_Con_Event_Client_Data *e = event;
 	Eix_Client *ec;
+	Eix_Server *es;
 	Eix_Message *m;
 	void *body;
 	void *reply = NULL;
 	unsigned int m_length;
 	Eix_Error err;
 
-	if (!_client_server_exist(e->client)) return ECORE_CALLBACK_RENEW;
+	es = ecore_con_server_data_get(ecore_con_client_server_get(e->client));
+	if (!eina_list_data_find(_servers, es)) return ECORE_CALLBACK_RENEW;
 	ec = ecore_con_client_data_get(e->client);
-	if (!ec) return ECORE_CALLBACK_RENEW;
 
 	/* check if we got a full message */
 	if (!ec->buffer)
@@ -125,31 +209,37 @@ message:
 
 	/* parse the header */
 	DBG("Message received of type %d with msg num %d of size %d", m->type, m->id, m->size);
-
-	body = eix_message_decode(eix_message_name_get(m->type), (unsigned char *)m + sizeof(Eix_Message), m->size);
+	desc = _descriptor_get(es, m->type);
+	if (!desc)
+	{
+		ERR("Can not find a %d decoder", m->type);
+		err = EIX_ERR_CODEC;
+		goto shift;
+	}
+	body = eet_data_descriptor_decode(desc->edd, (unsigned char *)m + sizeof(Eix_Message), m->size);
 	if (!body)
 	{
-		ERR("Error Decoding\n");
-		/* TODO check if the message needed a reply and if so
-		 * send it the error number */
+		ERR("Error Decoding");
+		err = EIX_ERR_CODEC;
 		goto shift;
 	}
 	/* check for the reply */
-	/* TODO */
-	//err = eix_client_process(ec, eix_message_name_get(m->type), body, &reply);
+	err = _client_process(ec, m->type, body, &reply);
+	printf("erro = %d reply = %p\n", err, reply);
 shift:
-	if (eix_message_reply_has(m->type) == EINA_TRUE)
+	if (_has_reply(desc) == EINA_TRUE)
 	{
 		Eix_Reply r;
-		Eix_Message_Name rname;
 		void *rbody;
+		int rtype;
 
 		r.id = m->id;
 		r.error = err;
-		eix_message_reply_name_get(m->type, &rname);
+		_reply_type_get(desc, &rtype);
+		desc = _descriptor_get(es, rtype);
 		DBG("Encoding reply. type %d", m->type);
 		if (reply)
-			rbody = eix_message_encode(rname, reply, &r.size);
+			rbody = eet_data_descriptor_encode(desc->edd, reply, &r.size);
 		else
 			r.size = 0;
 		DBG("Sending reply %d %d %d", r.id, r.error, r.size);
@@ -181,11 +271,10 @@ end:
 	return ECORE_CALLBACK_RENEW;
 }
 
-static int _server_data(void *data, int type, void *event)
+static Eina_Bool _server_data(void *data, int type, void *event)
 {
 	Ecore_Con_Event_Server_Data *e = event;
 	Eix_Server *es;
-	Eix_Message_Name rname;
 	unsigned int m_length;
 
 	if (!_server_exist(e->server)) return ECORE_CALLBACK_RENEW;
@@ -220,9 +309,24 @@ static int _server_data(void *data, int type, void *event)
 	DBG("Reply received %d", es->reply->id);
 	if (es->reply->size)
 	{
-		eix_message_reply_name_get(es->msg->type, &rname);
-		DBG("Decoding data[%d] %d", rname, es->reply->size);
-		es->rbody = eix_message_decode(rname, es->buffer + sizeof(Eix_Reply), es->reply->size);
+		Eix_Message_Descriptor *desc;
+		int rtype;
+
+		desc = _descriptor_get(es, es->msg->type);
+		if (!desc)
+		{
+			ERR("Not found a valid message %d", es->msg->type);
+			goto end;			
+		}
+		if (!_reply_type_get(desc, &rtype))
+		{
+			ERR("Not found a valid reply for %d", es->msg->type);
+			goto end;			
+		}
+
+		desc = _descriptor_get(es, desc->reply_id);
+		DBG("Decoding data[%d] %d", rtype, es->reply->size);
+		es->rbody = eet_data_descriptor_decode(desc->edd, es->buffer + sizeof(Eix_Reply), es->reply->size);
 	}
 	/* copy the reply into a new buffer */
 	es->reply = malloc(sizeof(Eix_Reply));
@@ -242,6 +346,7 @@ static int _server_data(void *data, int type, void *event)
 	}
 	else
 	{
+end:
 		free(es->buffer);
 		es->buffer = NULL;
 	}
@@ -249,11 +354,16 @@ static int _server_data(void *data, int type, void *event)
 	return ECORE_CALLBACK_RENEW;
 }
 
-static int _server_del(void *data, int type, void *event)
+static Eina_Bool _server_del(void *data, int type, void *event)
 {
+	Ecore_Con_Event_Server_Del *e = event;
+	Eix_Server *es;
+
+	if (!_server_exist(e->server)) return ECORE_CALLBACK_RENEW;
+	es = ecore_con_server_data_get(e->server);
 }
 
-static int _timeout_cb(void *data)
+static Eina_Bool _timeout_cb(void *data)
 {
 	Eix_Server *es = data;
 
@@ -262,7 +372,8 @@ static int _timeout_cb(void *data)
 	return 0;
 }
 
-static Eix_Error _server_send(Eix_Server *e, Eix_Message *m, void *data,
+static Eix_Error _server_send(Eix_Server *e, Eix_Message_Descriptor *desc,
+		Eix_Message *m, void *data,
 		double timeout, void **rdata)
 {
 	Eix_Error error = EIX_ERR_NONE;
@@ -275,7 +386,7 @@ static Eix_Error _server_send(Eix_Server *e, Eix_Message *m, void *data,
 	ret = ecore_con_server_send(e->svr, m, sizeof(Eix_Message));
 	ret = ecore_con_server_send(e->svr, data, m->size);
 
-	if (eix_message_reply_has(m->type) == EINA_FALSE)
+	if (_has_reply(desc) == EINA_FALSE)
 		goto no_reply;
 
 	/* TODO register a timeout callback */
@@ -307,16 +418,13 @@ no_reply:
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-int eix_log = -1;
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
 int EIX_EVENT_SERVER_ADD;
 int EIX_EVENT_SERVER_DEL;
-int EIX_EVENT_SERVER_DATA;
 int EIX_EVENT_CLIENT_ADD;
 int EIX_EVENT_CLIENT_DEL;
-int EIX_EVENT_CLIENT_DATA;
 
 /**
  * Initialize the Eix library. You must call this function before any
@@ -324,6 +432,9 @@ int EIX_EVENT_CLIENT_DATA;
  */
 EAPI void eix_init(void)
 {
+	Eet_Data_Descriptor *edd;
+	Eet_Data_Descriptor_Class eddc;
+
 	if (_init) return;
 
 	_init++;
@@ -331,7 +442,7 @@ EAPI void eix_init(void)
 	eet_init();
 	ecore_init();
 	ecore_con_init();
-	eix_log = eina_log_domain_register("eix", NULL);
+	_log = eina_log_domain_register("eix", NULL);
 	_handler[0] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, NULL);
 	_handler[1] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL, _server_del, NULL);
 	_handler[2] = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_ADD, _client_add, NULL);
@@ -342,8 +453,16 @@ EAPI void eix_init(void)
 	EIX_EVENT_CLIENT_DEL = ecore_event_type_new();
 	EIX_EVENT_SERVER_ADD = ecore_event_type_new();
 	EIX_EVENT_SERVER_DEL = ecore_event_type_new();
-	EIX_EVENT_CLIENT_DATA = ecore_event_type_new();
-	EIX_EVENT_SERVER_DATA = ecore_event_type_new();
+
+	/* Core messages */
+	/* sync */
+	eet_eina_stream_data_descriptor_class_set(&eddc, "Eix_Message_Sync", sizeof(Eix_Message_Sync));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[0] = edd;
+	/* sync */
+	eet_eina_stream_data_descriptor_class_set(&eddc, "Eix_Reply_Sync", sizeof(Eix_Reply_Sync));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[1] = edd;
 }
 /**
  * Shutdowns the Eix library. Once you have finished using Equanime
@@ -356,11 +475,15 @@ EAPI void eix_shutdown(void)
 		int i;
 
 		/* TODO delete every server */
-		for (i = 0; i < 6; i++)
+		for (i = 0; i < 5; i++)
 		{
 			ecore_event_handler_del(_handler[i]);
 		}
-		eina_log_domain_unregister(eix_log);
+		for (i = 0; i < 2; i++)
+		{
+			eet_data_descriptor_free(_descriptors[i]);
+		}
+		eina_log_domain_unregister(_log);
 		ecore_con_shutdown();
 		ecore_shutdown();
 		eet_shutdown();
@@ -390,7 +513,11 @@ EAPI Eix_Server * eix_connect(const char *name, int port)
 		free(es);
 		return NULL;
 	}
-	_server_setup(es, svr);
+	es->svr = svr;
+	es->messages = eina_hash_int32_new(NULL);
+	eix_server_message_add(es, EIX_MESSAGE_SYNC, _descriptors[0], EIX_REPLY_SYNC); 
+	eix_server_message_add(es, EIX_REPLY_SYNC, _descriptors[1], 0); 
+	_servers = eina_list_append(_servers, es);
 
 	return es;
 }
@@ -399,7 +526,8 @@ EAPI Eix_Server * eix_connect(const char *name, int port)
  * @param[in] name The server's name
  * @param[in] port The server's port to use
  */
-EAPI Eix_Server * eix_new(const char *name, int port)
+EAPI Eix_Server * eix_new(const char *name, int port,
+		Eix_Server_Process process)
 {
 	Eix_Server *es;
 	Ecore_Con_Server *svr;
@@ -408,30 +536,41 @@ EAPI Eix_Server * eix_new(const char *name, int port)
 	if (!es) return NULL;
 	svr = ecore_con_server_add(ECORE_CON_LOCAL_USER,
 			name, port, es);
+
 	if (!svr)
 	{
 		free(es);
 		return NULL;
 	}
 
-	_server_setup(es, svr);
+	es->svr = svr;
+	es->messages = eina_hash_int32_new(NULL);
+	es->process = process;
+	eix_server_message_add(es, EIX_MESSAGE_SYNC, _descriptors[0], EIX_REPLY_SYNC); 
+	eix_server_message_add(es, EIX_REPLY_SYNC, _descriptors[1], 0); 
+	_servers = eina_list_append(_servers, es);
+
+	return es;
 }
 /**
  *
  */
-Eix_Error eix_message_server_send(Eix_Server *es, Eix_Message_Type type,
+EAPI Eix_Error eix_message_server_send(Eix_Server *es, int type,
 		void *data, double timeout, void **rdata)
 {
 	Eix_Message *m;
 	void *body;
+	Eix_Message_Descriptor *desc;
+
+	desc = _descriptor_get(es, type);
+	if (!desc || !desc->edd) return EIX_ERR_CODEC;
 
 	m = eix_message_new(type);
-	body = eix_message_encode(eix_message_name_get(m->type),
-		data, &m->size);
+	body = eet_data_descriptor_encode(desc->edd, data, &m->size);
 	if (!body)
 		return EIX_ERR_CODEC;
 
-	return _server_send(es, m, body, timeout, rdata);
+	return _server_send(es, desc, m, body, timeout, rdata);
 }
 
 /**
@@ -446,16 +585,34 @@ EAPI void eix_sync(Eix_Server *e)
 	Eix_Error error;
 
 	/* send the command to the server */
-	error = eix_message_server_send(e, EIX_MSG_TYPE_SYNC, &m, 0, (void **)&r);
+	error = eix_message_server_send(e, EIX_MESSAGE_SYNC, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
 	free(r);
 }
 
-EAPI void eix_server_message_add(Eix_Server *e, unsigned int id,
-		Eix_Message_Type type, Eet_Data_Descriptor *edd)
+/**
+ *
+ */
+EAPI void eix_server_message_add(Eix_Server *e,
+		unsigned int id, Eet_Data_Descriptor *edd,
+		unsigned int reply_id)
 {
-	/* add the descriptor to the server's message array/hash */
+	Eix_Message_Descriptor *mdesc;
 
+	if (!e || !edd) return;
+
+	mdesc = _descriptor_get(e, id);
+	if (mdesc)
+	{
+		WRN("Adding a message with the same id %d", id);
+		return;
+	}
+	mdesc = calloc(1, sizeof(Eix_Message_Descriptor));
+	mdesc->id = id;
+	mdesc->reply_id = reply_id;
+	mdesc->edd = edd;
+
+	printf("storing edd %p in %d\n", edd, id);
+	eina_hash_add(e->messages, (const void *)&id, mdesc);
 }
-

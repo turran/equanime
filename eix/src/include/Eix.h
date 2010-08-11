@@ -41,19 +41,13 @@ extern "C" {
 typedef struct _Eix_Client Eix_Client;
 typedef struct _Eix_Server Eix_Server;
 
-typedef enum
-{
-	EIX_MESSAGE_SYNC,
-	EIX_MESSAGE_SYNCR,
-	EIX_MESSAGE_LAST,
-} Eix_Message_Id;
+typedef int (*Eix_Server_Process)(Eix_Client *c, unsigned int id, void *msg,
+		void **reply);
 
 EAPI extern int EIX_EVENT_SERVER_ADD;
 EAPI extern int EIX_EVENT_SERVER_DEL;
-EAPI extern int EIX_EVENT_SERVER_DATA;
 EAPI extern int EIX_EVENT_CLIENT_ADD;
 EAPI extern int EIX_EVENT_CLIENT_DEL;
-EAPI extern int EIX_EVENT_CLIENT_DATA;
 
 typedef struct _Eix_Event_Server_Add
 {
@@ -65,14 +59,6 @@ typedef struct _Eix_Event_Server_Del
 	Eix_Server *server;
 } Eix_Event_Server_Del;
 
-typedef struct _Eix_Event_Server_Data
-{
-	Eix_Server *server;
-	unsigned int id; /* id of the message this reply replies to */
-	unsigned int error; /* in case of any error set by the daemon */
-	unsigned int size; /* size of the body */
-} Eix_Event_Server_Data;
-
 typedef struct _Eix_Event_Client_Add
 {
 	Eix_Client *client;
@@ -83,20 +69,17 @@ typedef struct _Eix_Event_Client_Del
 	Eix_Client *client;
 } Eix_Event_Client_Del;
 
-typedef struct _Eix_Event_Client_Data
+typedef enum _Eix_Message_Id
 {
-	Eix_Client *client;
-	unsigned int id; /* id of the message */
-	//Eix_Message_Type type; /* type of message */
-	unsigned int size; /* size of the body */
-} Eix_Event_Client_Data;
+	EIX_MESSAGE_SYNC,
+	EIX_MESSAGE_LAST,
+} Eix_Message_Id;
 
-/* protocol structures */
-typedef enum
+typedef enum _Eix_Reply_Id
 {
-	EIX_MSG_NO_REPLY,
-	EIX_MSG_REPLY,
-} Eix_Message_Reply;
+	EIX_REPLY_SYNC = EIX_MESSAGE_LAST,
+	EIX_REPLY_LAST,
+} Eix_Reply_Id;
 
 /*
  * this errors are well known error number to retrieve the correct
@@ -112,95 +95,25 @@ typedef enum
 	EIX_ERRORS,
 } Eix_Error;
 
-/* A reply should always be the same value as the message this reply replies to
- * plus one
- */
-typedef enum _Eix_Message_Name
-{
-	EIX_MSG_NAME_SYNC,
-	EIX_MSG_NAME_SYNCR,
-	EIX_MSG_NAMES
-} Eix_Message_Name;
-
-typedef enum _Eix_Message_Type
-{
-	EIX_MSG_TYPE_SYNC              = ((EIX_MSG_NAME_SYNC << 1) | EIX_MSG_REPLY),
-	EIX_MSG_TYPE_SYNCR             = ((EIX_MSG_NAME_SYNC << 1) | EIX_MSG_NO_REPLY),
-} Eix_Message_Type;
-
-/*
- * A message is composed of:
- * +----+------+------+-----------------
- * | id | type | size |
- * +----+------+------+-----------------
- * <-----header------>.<-----body------>
- */
-
-typedef struct _Eix_Message
-{
-	unsigned int id; /* id of the message */
-	Eix_Message_Type type; /* type of message */
-	unsigned int size; /* size of the body */
-} Eix_Message;
-
 typedef struct _Eix_Message_Sync
 {
 } Eix_Message_Sync;
-
-/*
- * A reply is composed of:
- * +----+-------+------+-----------------
- * | id | error | size |
- * +----+-------+------+-----------------
- * <------header------>.<-----body------>
- */
-
-typedef struct _Eix_Reply
-{
-	unsigned int id; /* id of the message this reply replies to */
-	unsigned int error; /* in case of any error set by the daemon */
-	unsigned int size; /* size of the body */
-} Eix_Reply;
 
 typedef struct _Eix_Reply_Sync
 {
 } Eix_Reply_Sync;
 
-static inline Eix_Message_Name eix_message_name_get(Eix_Message_Type t)
-{
-	return (t & ~1) >> 1;
-}
-
-static inline Eina_Bool eix_message_reply_has(Eix_Message_Type t)
-{
-	if (t & EIX_MSG_REPLY)
-		return EINA_TRUE;
-	else
-		return EINA_FALSE;
-}
-
-/**
- * Given a message type return the name of the reply. Note that the reply's
- * name is always the message plus one.
- */
-static inline Eina_Bool eix_message_reply_name_get(Eix_Message_Type t, Eix_Message_Name *n)
-{
-	if (eix_message_reply_has(t) == EINA_FALSE)
-		return EINA_FALSE;
-	*n = eix_message_name_get(t) + 1;
-	return EINA_TRUE;
-}
-
 EAPI void eix_init(void);
 EAPI void eix_shutdown(void);
 EAPI Eix_Server * eix_connect(const char *name, int port);
-EAPI Eix_Server * eix_new(const char *name, int port);
+EAPI Eix_Server * eix_new(const char *name, int port,
+		Eix_Server_Process process);
 EAPI void eix_sync(Eix_Server *e);
-
-void * eix_message_encode(Eix_Message_Name name, const void *data, int *size);
-void * eix_message_decode(Eix_Message_Name name, const void *data, int size);
-
-Eix_Message * eix_message_new(Eix_Message_Type type);
+EAPI void eix_server_message_add(Eix_Server *e,
+		unsigned int id, Eet_Data_Descriptor *edd,
+		unsigned int reply_id);
+EAPI Eix_Error eix_message_server_send(Eix_Server *es, int type,
+		void *data, double timeout, void **rdata);
 
 #ifdef __cplusplus
 }
