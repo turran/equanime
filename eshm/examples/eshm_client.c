@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	Eshm_Segment *s;
 	char *data;
 
-	eshm_init();
+	if (!eshm_init()) return 0;
 	printf("Requesting the segment 'mysegment'\n");
 	s = eshm_segment_new("mysegment", S_4M);
 	/* if the segment already exists request it */

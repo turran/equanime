@@ -58,7 +58,7 @@ EAPI Eshm_Segment * eshm_segment_new(const char *id, size_t size)
 	m.size = size;
 
 	/* send the message to the daemon */
-	error = eshm_message_server_send(ESHM_MSG_TYPE_SEGMENT_NEW, &m, 0, (void **)&r);
+	error = eshm_message_server_send(ESHM_MSG_SEGMENT_NEW, &m, 0, (void **)&r);
 	if (error)
 	{
 		_error_to_eina(error);
@@ -102,7 +102,8 @@ EAPI Eshm_Segment * eshm_segment_get(const char *id, size_t size, Eina_Bool crea
 	m.id = id;
 
 	/* send the message to the daemon */
-	error = eshm_message_server_send(ESHM_MSG_TYPE_SEGMENT_GET, &m, 0, (void **)&r);
+	error = eshm_message_server_send(ESHM_MSG_SEGMENT_GET, &m, 0, (void **)&r);
+	printf("%d %p\n", error, r);
 	if (error)
 	{
 		if (!create && (error == ESHM_ERROR_NEXIST))
@@ -141,7 +142,7 @@ EAPI void eshm_segment_delete(Eshm_Segment *s)
 	assert(s);
 	m.id = s->id;
 
-	eshm_message_server_send(ESHM_MSG_TYPE_SEGMENT_DELETE, &m, 0, NULL);
+	eshm_message_server_send(ESHM_MSG_SEGMENT_DELETE, &m, 0, NULL);
 	DBG("Segment with id \"%s\" deleted", s->id);
 }
 /**
@@ -158,7 +159,7 @@ EAPI Eina_Bool eshm_segment_lock(Eshm_Segment *s, Eina_Bool write)
 
 	m.id = s->id;
 	m.write = write;
-	error = eshm_message_server_send(ESHM_MSG_TYPE_SEGMENT_LOCK, &m, 0, NULL);
+	error = eshm_message_server_send(ESHM_MSG_SEGMENT_LOCK, &m, 0, NULL);
 
 	if (error)
 	{
@@ -185,7 +186,7 @@ EAPI void eshm_segment_unlock(Eshm_Segment *s)
 		return;
 
 	m.id = s->id;
-	eshm_message_server_send(ESHM_MSG_TYPE_SEGMENT_UNLOCK, &m, 0, NULL);
+	eshm_message_server_send(ESHM_MSG_SEGMENT_UNLOCK, &m, 0, NULL);
 	DBG("Segment with id \"%s\" unlocked\n", s->id);
 }
 /**

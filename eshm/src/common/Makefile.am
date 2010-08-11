@@ -10,7 +10,7 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libeshm_common.la
 
 libeshm_common_la_SOURCES = \
-eshm_message.c
+eshm_common.c
 
 libeshm_common_la_LIBADD = \
 @ESHM_LIBS@
