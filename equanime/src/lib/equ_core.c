@@ -238,7 +238,7 @@ EAPI void equ_sync(Equanime *e)
 	Equ_Error error;
 
 	/* send the command to the server */
-	error = equ_message_server_send(e, EQU_MSG_TYPE_SYNC, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_SYNC, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
 	free(r);

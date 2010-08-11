@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT(equanime, 0.0.3, enlightenment-devel@lists.sourceforge.net)
+AC_INIT(equanime, 0.0.4, enlightenment-devel@lists.sourceforge.net)
 AC_PREREQ(2.52)
 AC_CONFIG_SRCDIR(configure.ac)
 AC_CANONICAL_BUILD
@@ -39,12 +39,10 @@ AC_SUBST(create_shared_lib)
 
 # Common
 PKG_CHECK_MODULES(EINA, [eina-0 >= 0.0.1])
-PKG_CHECK_MODULES(EET, [eet >= 1.2.2])
 
 # Server modules
 PKG_CHECK_MODULES(ESHM, [eshm])
-PKG_CHECK_MODULES(ECORE, [ecore])
-PKG_CHECK_MODULES(ECORE_CON, [ecore-con])
+PKG_CHECK_MODULES(EIX, [eix])
 PKG_CHECK_MODULES(SDL, [sdl], [have_sdl=yes], [have_sdl=no])
 if test "x$have_sdl" = "xyes"; then
 	build_module_sdl=yes
@@ -54,8 +52,8 @@ else
 fi
 AM_CONDITIONAL(BUILD_MODULE_SDL, test "x$build_module_sdl" = "xyes")
 
-EQUANIME_COMMON_CFLAGS="$EINA_CFLAGS $EET_CFLAGS $ECORE_CFLAGS $ECORE_CON_CFLAGS $ESHM_CFLAGS"
-EQUANIME_COMMON_LIBS="$EINA_LIBS $EET_LIBS $ECORE_LIBS $ECORE_CON_LIBS $ESHM_LIBS"
+EQUANIME_COMMON_CFLAGS="$EINA_CFLAGS $EIX_CFLAGS $ESHM_CFLAGS"
+EQUANIME_COMMON_LIBS="$EINA_LIBS $EIX_LIBS $ESHM_LIBS"
 AC_SUBST(EQUANIME_COMMON_CFLAGS)
 AC_SUBST(EQUANIME_COMMON_LIBS)
 

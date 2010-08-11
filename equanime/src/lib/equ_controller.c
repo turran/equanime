@@ -80,13 +80,13 @@ EAPI void equ_controller_layers_get(Equanime *e, Equ_Controller *c, Equ_Cb cb, v
 {
 	Equ_Message_Layers_Get m;
 	Equ_Reply_Layers_Get *r = NULL;
-	Equ_Error error;
+	int error;
 	Equ_Layer *l;
 	int i;
 
 	/* send the command to the server */
 	m.controller_id = c->id;
-	error = equ_message_server_send(e, EQU_MSG_TYPE_LAYERS_GET, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_LAYERS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
 	for (i = 0; i < r->layers_count; i++)

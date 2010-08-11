@@ -1,6 +1,8 @@
 #ifndef _EQU_COMMON_H
 #define _EQU_COMMON_H
 
+#include "Eix.h"
+
 #define EQUANIME_NAME "equanime"
 #define EQUANIME_PORT 0xea
 
@@ -68,91 +70,31 @@ typedef enum
 	EQU_DATAS
 } Equ_Data;
 
-/* protocol structures */
-typedef enum
+typedef enum _Equ_Message
 {
-	EQU_MSG_NO_REPLY,
-	EQU_MSG_REPLY,
-} Equ_Message_Reply;
-
-/*
- * this errors are well known error number to retrieve the correct
- * error from the message, it is used only internally, for API errors
- * use TODO
- */
-typedef enum
-{
-	EQU_ERR_NONE,
-	EQU_ERR_NEXIST,  /* a request for some element that doesnt exist */
-	EQU_ERR_CODEC,   /* bad encoding or decoding */
-	EQU_ERR_TIMEOUT, /* timeout error */
-	EQU_ERRORS,
-} Equ_Error;
-
-/* A reply should always be the same value as the message this reply replies to
- * plus one
- */
-typedef enum _Equ_Message_Name
-{
-	EQU_MSG_NAME_SYNC,
-	EQU_MSG_NAME_SYNCR,
-	EQU_MSG_NAME_HOSTS_GET,
-	EQU_MSG_NAME_HOSTS_GETR,
-	EQU_MSG_NAME_CONTROLLERS_GET,
-	EQU_MSG_NAME_CONTROLLERS_GETR,
-	EQU_MSG_NAME_LAYERS_GET,
-	EQU_MSG_NAME_LAYERS_GETR,
-	EQU_MSG_NAME_LAYER_CAPS_GET,
-	EQU_MSG_NAME_LAYER_CAPS_GETR,
-
-	EQU_MSG_NAME_LAYER_STATUS_GET,
-	EQU_MSG_NAME_LAYER_STATUS_GETR,
-	EQU_MSG_NAME_SURFACE_GET,
-	EQU_MSG_NAME_SURFACE_GETR,
-	EQU_MSG_NAME_SURFACE_PUT,
-	EQU_MSG_NAME_SURFACE_UPLOAD,
-	EQU_MSG_NAME_SURFACE_DOWNLOAD,
-	EQU_MSG_NAME_SURFACE_DOWNLOADR,
-	EQU_MSG_NAMES
-} Equ_Message_Name;
-
-typedef enum _Equ_Message_Type
-{
-	EQU_MSG_TYPE_SYNC              = ((EQU_MSG_NAME_SYNC << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_SYNCR             = ((EQU_MSG_NAME_SYNC << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_HOSTS_GET         = ((EQU_MSG_NAME_HOSTS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_HOSTS_GETR        = ((EQU_MSG_NAME_HOSTS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_CONTROLLERS_GET   = ((EQU_MSG_NAME_CONTROLLERS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_CONTROLLERS_GETR  = ((EQU_MSG_NAME_CONTROLLERS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_LAYERS_GET        = ((EQU_MSG_NAME_LAYERS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_LAYERS_GETR       = ((EQU_MSG_NAME_LAYERS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_LAYER_CAPS_GET    = ((EQU_MSG_NAME_LAYER_CAPS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_LAYER_CAPS_GETR   = ((EQU_MSG_NAME_LAYER_CAPS_GETR << 1) | EQU_MSG_NO_REPLY),
-
-	EQU_MSG_TYPE_LAYER_STATUS_GET  = ((EQU_MSG_NAME_LAYER_STATUS_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_LAYER_STATUS_GETR = ((EQU_MSG_NAME_LAYER_STATUS_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_SURFACE_GET       = ((EQU_MSG_NAME_SURFACE_GET << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_SURFACE_GETR      = ((EQU_MSG_NAME_SURFACE_GETR << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_SURFACE_PUT       = ((EQU_MSG_NAME_SURFACE_PUT << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_SURFACE_UPLOAD    = ((EQU_MSG_NAME_SURFACE_UPLOAD << 1) | EQU_MSG_NO_REPLY),
-	EQU_MSG_TYPE_SURFACE_DOWNLOAD  = ((EQU_MSG_NAME_SURFACE_DOWNLOAD << 1) | EQU_MSG_REPLY),
-	EQU_MSG_TYPE_SURFACE_DOWNLOADR = ((EQU_MSG_NAME_SURFACE_DOWNLOADR << 1) | EQU_MSG_NO_REPLY),
-} Equ_Message_Type;
-
-/*
- * A message is composed of:
- * +----+------+------+-----------------
- * | id | type | size |
- * +----+------+------+-----------------
- * <-----header------>.<-----body------>
- */
-
-typedef struct _Equ_Message
-{
-	unsigned int id; /* id of the message */
-	Equ_Message_Type type; /* type of message */
-	unsigned int size; /* size of the body */
+	EQU_MSG_HOSTS_GET = EIX_REPLY_LAST,
+	EQU_MSG_CONTROLLERS_GET,
+	EQU_MSG_LAYERS_GET,
+	EQU_MSG_LAYER_CAPS_GET,
+	EQU_MSG_LAYER_STATUS_GET,
+	EQU_MSG_SURFACE_GET,
+	EQU_MSG_SURFACE_PUT,
+	EQU_MSG_SURFACE_UPLOAD,
+	EQU_MSG_SURFACE_DOWNLOAD,
+	EQU_MSG_LAST,
 } Equ_Message;
+
+typedef enum _Equ_Reply
+{
+	EQU_REPLY_HOSTS_GET = EQU_MSG_LAST,
+	EQU_REPLY_CONTROLLERS_GET,
+	EQU_REPLY_LAYERS_GET,
+	EQU_REPLY_LAYER_CAPS_GET,
+	EQU_REPLY_LAYER_STATUS_GET,
+	EQU_REPLY_SURFACE_GET,
+	EQU_REPLY_SURFACE_DOWNLOAD,
+	EQU_REPLY_LAST,
+} Equ_Reply;
 
 typedef struct _Equ_Message_Sync
 {
@@ -223,21 +165,6 @@ typedef struct _Equ_Message_Surface_Download
 	int sh;
 } Equ_Message_Surface_Download;
 
-/*
- * A reply is composed of:
- * +----+-------+------+-----------------
- * | id | error | size |
- * +----+-------+------+-----------------
- * <------header------>.<-----body------>
- */
-
-typedef struct _Equ_Reply
-{
-	unsigned int id; /* id of the message this reply replies to */
-	unsigned int error; /* in case of any error set by the daemon */
-	unsigned int size; /* size of the body */
-} Equ_Reply;
-
 typedef struct _Equ_Reply_Sync
 {
 } Equ_Reply_Sync;
@@ -282,36 +209,7 @@ typedef struct _Equ_Reply_Surface_Download
 	int pixels_size;
 } Equ_Reply_Surface_Download;
 
-static inline Equ_Message_Name equ_message_name_get(Equ_Message_Type t)
-{
-	return (t & ~1) >> 1;
-}
-
-static inline Eina_Bool equ_message_reply_has(Equ_Message_Type t)
-{
-	if (t & EQU_MSG_REPLY)
-		return EINA_TRUE;
-	else
-		return EINA_FALSE;
-}
-
-/**
- * Given a message type return the name of the reply. Note that the reply's
- * name is always the message plus one.
- */
-static inline Eina_Bool equ_message_reply_name_get(Equ_Message_Type t, Equ_Message_Name *n)
-{
-	if (equ_message_reply_has(t) == EINA_FALSE)
-		return EINA_FALSE;
-	*n = equ_message_name_get(t) + 1;
-	return EINA_TRUE;
-}
-
 void equ_message_init(void);
 void equ_message_shutdown(void);
-
-void * equ_message_encode(Equ_Message_Name name, const void *data, int *size);
-void * equ_message_decode(Equ_Message_Name name, const void *data, int size);
-Equ_Message * equ_message_new(Equ_Message_Type type);
 
 #endif /*_EQU_COMMON_H*/

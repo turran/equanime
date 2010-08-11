@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "Eshm.h"
+#include "Eix.h"
 #include "equ_common.h"
 
 #define ERR(...) EINA_LOG_DOM_ERR(equ_log, __VA_ARGS__)
@@ -12,7 +13,7 @@
 #define DBG(...) EINA_LOG_DOM_DBG(equ_log, __VA_ARGS__)
 
 extern equ_log;
-Equ_Error equ_message_server_send(Equanime *e, Equ_Message_Type type,
+int equ_message_server_send(Equanime *e, unsigned int type,
 		void *data, double timeout, void **rdata);
 /**
  *

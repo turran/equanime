@@ -119,7 +119,7 @@ EAPI void equ_surface_pixels_upload(Equanime *e, Equ_Surface *s,
 	m.sy = r->y;
 	m.sw = r->w;
 	m.sh = r->h;
-	error = equ_message_server_send(e, EQU_MSG_TYPE_SURFACE_UPLOAD, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_SURFACE_UPLOAD, &m, 0, (void **)&r);
 }
 
 /**
@@ -143,7 +143,7 @@ EAPI void equ_surface_pixels_download(Equanime *e, Equ_Surface *s,
 	m.sh = rect->h;
 
 	/* TODO in case of a local | shared buffer just read directly */
-	error = equ_message_server_send(e, EQU_MSG_TYPE_SURFACE_DOWNLOAD, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_SURFACE_DOWNLOAD, &m, 0, (void **)&r);
 	if (error) return;
 
 	/* de-serialize the raw pixels into the surface data */

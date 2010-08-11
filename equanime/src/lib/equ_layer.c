@@ -79,7 +79,7 @@ EAPI void equ_layer_caps_get(Equanime *e, Equ_Layer *l, Equ_Layer_Caps *caps)
 
 	/* send the command to the server */
 	m.layer_id = l->info.id;
-	error = equ_message_server_send(e, EQU_MSG_TYPE_LAYER_CAPS_GET, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_LAYER_CAPS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	*caps = r->caps;
 
@@ -101,7 +101,7 @@ EAPI void equ_layer_status_get(Equanime *e, Equ_Layer *l, Equ_Layer_Status *stat
 
 	/* send the command to the server */
 	m.layer_id = l->info.id;
-	error = equ_message_server_send(e, EQU_MSG_TYPE_LAYER_STATUS_GET, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_LAYER_STATUS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	*status = r->status;
 
@@ -131,7 +131,7 @@ EAPI void equ_layer_surface_put(Equanime *e, Equ_Layer *l, Equ_Surface *s,
 	m.cy = src->y;
 	m.cw = src->w;
 	m.ch = src->h;
-	error = equ_message_server_send(e, EQU_MSG_TYPE_SURFACE_PUT, &m, 0, NULL);
+	error = equ_message_server_send(e, EQU_MSG_SURFACE_PUT, &m, 0, NULL);
 }
 
 /**

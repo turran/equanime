@@ -98,7 +98,7 @@ EAPI Equ_Surface * equ_host_surface_get(Equanime *e, Equ_Host *host, uint32_t w,
 	m.fmt = fmt;
 	m.type = type;
 
-	error = equ_message_server_send(e, EQU_MSG_TYPE_SURFACE_GET, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_SURFACE_GET, &m, 0, (void **)&r);
 	if (error) return NULL;
 
 	s = equ_surface_new(r->id, w, h, fmt, type, r->sh_id);
@@ -145,7 +145,7 @@ EAPI void equ_hosts_get(Equanime *e, Equ_Cb cb, void *cb_data)
 	int i;
 
 	/* send the command to the server */
-	error = equ_message_server_send(e, EQU_MSG_TYPE_HOSTS_GET, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_HOSTS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
 	for (i = 0; i < r->hosts_count; i++)
@@ -177,7 +177,7 @@ EAPI void equ_host_controllers_get(Equanime *e, Equ_Host *h, Equ_Cb cb,
 
 	/* send the command to the server */
 	m.host_id = h->id;
-	error = equ_message_server_send(e, EQU_MSG_TYPE_CONTROLLERS_GET, &m, 0, (void **)&r);
+	error = equ_message_server_send(e, EQU_MSG_CONTROLLERS_GET, &m, 0, (void **)&r);
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
 	for (i = 0; i < r->controllers_count; i++)
