@@ -187,7 +187,7 @@ EAPI void eshm_segment_unlock(Eshm_Segment *s)
 
 	m.id = s->id;
 	eshm_message_server_send(ESHM_MSG_SEGMENT_UNLOCK, &m, 0, NULL);
-	DBG("Segment with id \"%s\" unlocked\n", s->id);
+	DBG("Segment with id \"%s\" unlocked", s->id);
 }
 /**
  * Gets the memory pointer associated with this segment
