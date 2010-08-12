@@ -2,7 +2,6 @@
 
 #include "Equ_Server.h"
 #include "Ecore.h"
-#include "Ecore_Con.h"
 #include "Eshm.h"
 
 #define ERR(...) EINA_LOG_DOM_ERR(_log_dom, __VA_ARGS__)
@@ -10,16 +9,8 @@
 #define WRN(...) EINA_LOG_DOM_WARN(_log_dom, __VA_ARGS__)
 #define DBG(...) EINA_LOG_DOM_DBG(_log_dom, __VA_ARGS__)
 
-typedef struct _Equanime
-{
-	Eina_Array *modules;
-	Ecore_Con_Server *srv;
-	void *buffer;
-	int length;
-} Equanime;
-
+static Eix_Server *srv = NULL;
 static Eina_Array *_modules = NULL;
-static Equanime _equd;
 static int _log_dom = -1;
 char *options = NULL;
 char *module = NULL;
@@ -73,131 +64,34 @@ static void _module_shutdown(void)
 static int _client_add(void *data, int type, void *event)
 {
 	Equ_Client *client;
-	Ecore_Con_Event_Client_Add *e = event;
+	Eix_Event_Client_Add *e = event;
 
-	if (ecore_con_client_server_get(e->client) != _equd.srv)
+	if (eix_client_server_get(e->client) != srv)
 		return ECORE_CALLBACK_RENEW;
 	client = equ_client_new(e->client);
-	ecore_con_client_data_set(e->client, client);
+	eix_client_data_set(e->client, client);
 	return ECORE_CALLBACK_RENEW;
 }
 
 static int _client_del(void *data, int type, void *event)
 {
 	Equ_Client *client;
-	Ecore_Con_Event_Client_Add *e = event;
+	Eix_Event_Client_Add *e = event;
 
-	if (ecore_con_client_server_get(e->client) != _equd.srv)
+	if (eix_client_server_get(e->client) != srv)
 		return ECORE_CALLBACK_RENEW;
-	client = ecore_con_client_data_get(e->client);
+	client = eix_client_data_get(e->client);
 	free(client);
 	return ECORE_CALLBACK_RENEW;
 }
 
-static int _client_data(void *data, int type, void *event)
+static int _server_process(Eix_Client *c, unsigned int type, void *msg,
+		void **reply)
 {
-	Ecore_Con_Event_Client_Data *cdata = event;
-	Equ_Client *c;
-	Equ_Message *m;
-	void *body;
-	void *reply = NULL;
-	unsigned int m_length;
-	Equ_Error err;
-	Equanime *eq;
-	/* FIXME */
-	Ecore_Con_Client *cl = cdata->client; /* workaround for the event loop */
+	Equ_Client *ec;
 
-	printf("1 cdata %p %p\n", cl, cdata->client);
-	if (ecore_con_client_server_get(cdata->client) != _equd.srv)
-		return ECORE_CALLBACK_RENEW;
-	c = ecore_con_client_data_get(cdata->client);
-	if (!c) return ECORE_CALLBACK_RENEW;
-	/* check if we got a full message */
-	if (!_equd.buffer)
-	{
-		_equd.buffer = cdata->data;
-		_equd.length = cdata->size;
-		cdata->data = NULL;
-	}
-	else if (cdata->data)
-	{
-		_equd.buffer = realloc(_equd.buffer, _equd.length + cdata->size);
-		memcpy(((unsigned char *)_equd.buffer) + _equd.length, cdata->data, cdata->size);
-		_equd.length += cdata->size;
-		cdata->data = NULL;
-	}
-	else
-		return ECORE_CALLBACK_RENEW;
-message:
-	if (_equd.length < sizeof(Equ_Message))
-		return ECORE_CALLBACK_RENEW;
-	/* ok, we have at least a message header */
-	m = _equd.buffer;
-	m_length = sizeof(Equ_Message) + m->size;
-	if (_equd.length < m_length)
-		return ECORE_CALLBACK_RENEW;
-	/* parse the header */
-	DBG("Message received of type %d with msg num %d of size %d", m->type, m->id, m->size);
-	if (m->type > EQU_MSG_TYPE_SURFACE_DOWNLOADR) {
-		ERR("Invalid message type %d", m->type);
-		goto end;
-	}
-
-	body = equ_message_decode(equ_message_name_get(m->type), (unsigned char *)m + sizeof(Equ_Message), m->size);
-	if (!body)
-	{
-		ERR("Error Decoding\n");
-		/* TODO check if the message needed a reply and if so
-		 * send it the error number */
-		goto shift;
-	}
-	/* check for the reply */
-	printf("2 cdata %p %p\n", cl, cdata->client);
-	err = equ_client_process(c, equ_message_name_get(m->type), body, &reply);
-	printf("3 cdata %p %p\n", cl, cdata->client);
-shift:
-	if (equ_message_reply_has(m->type) == EINA_TRUE)
-	{
-		Equ_Reply r;
-		Equ_Message_Name rname;
-		void *rbody;
-
-		r.id = m->id;
-		r.error = err;
-		equ_message_reply_name_get(m->type, &rname);
-		DBG("Encoding reply. type %d", m->type);
-		if (reply)
-			rbody = equ_message_encode(rname, reply, &r.size);
-		else
-			r.size = 0;
-		DBG("Sending reply %d %d %d", r.id, r.error, r.size);
-		printf("4 cdata %p %p\n", cl, cdata->client);
-		ecore_con_client_send(cl, &r, sizeof(Equ_Reply));
-		if (r.size)
-			ecore_con_client_send(cl, rbody, r.size);
-	}
-end:
-	/* free in case we have served a complete message */
-	if (_equd.length > m_length)
-	{
-		unsigned char *tmp;
-		unsigned int n_length;
-
-		tmp = _equd.buffer;
-		n_length = _equd.length - m_length;
-
-		_equd.buffer = malloc(n_length);
-		_equd.length = n_length;
-		memcpy(_equd.buffer, tmp + m_length, n_length);
-		free(tmp);
-		goto message;
-	}
-	else
-	{
-		free(_equd.buffer);
-		_equd.buffer = NULL;
-	}
-	return ECORE_CALLBACK_RENEW;
+	ec = eix_client_data_get(c);
+	return equ_client_process(ec, type, msg, reply);
 }
 
 static Eina_Bool _hosts_cb(Equ_Host *h, const char *name)
@@ -227,20 +121,16 @@ static Eina_Bool _hosts_cb(Equ_Host *h, const char *name)
 
 static void _server_init(void)
 {
-	Ecore_Con_Server *srv;
-
-	_equd.srv = ecore_con_server_add(ECORE_CON_LOCAL_USER,
-			EQUANIME_NAME, EQUANIME_PORT, NULL);
-	ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_ADD, _client_add, NULL);
-	ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DEL, _client_del, NULL);
-	ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, _client_data, &_equd);
-	_equd.buffer = NULL;
+	srv = eix_new(EQUANIME_NAME, EQUANIME_PORT, _server_process);
+	equ_common_server_setup(srv);
+	ecore_event_handler_add(EIX_EVENT_CLIENT_ADD, _client_add, NULL);
+	ecore_event_handler_add(EIX_EVENT_CLIENT_DEL, _client_del, NULL);
 	_log_dom = eina_log_domain_register("equd", NULL);
 }
 
 static void _server_shutdown(void)
 {
-	ecore_con_server_del(_equd.srv);
+	eix_server_del(srv);
 }
 
 static void _server_setup(void)
@@ -306,10 +196,7 @@ int main(int argc, char **argv)
 	/* initialize every system */
 	if (!eshm_init())
 		return 0;
-	eina_init();
-	ecore_init();
-	ecore_con_init();
-	equ_message_init();
+	equ_common_init();
 	_module_init();
 	_server_init();
 	/* setup the system */
@@ -322,10 +209,7 @@ int main(int argc, char **argv)
 module_exit:
 	_server_shutdown();
 	_module_shutdown();
-	equ_message_shutdown();
-	ecore_con_shutdown();
-	ecore_shutdown();
-	eina_shutdown();
+	equ_common_shutdown();
 
 	return 0;
 

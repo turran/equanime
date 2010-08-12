@@ -260,6 +260,7 @@ Equ_Host_Backend _hbackend = {
 
 static Eina_Bool module_init(void)
 {
+	printf("attempting to install the sdl module\n");
 	equ_host_register("sdl", &_hbackend);
 	return EINA_TRUE;
 }

@@ -279,8 +279,8 @@ Equ_Input * equ_input_new(Equ_Controller *c, Equ_Input_Backend *ib, const char *
 Equ_Pool * equ_pool_new(Equ_Host *h, Equ_Pool_Backend *pb, const char *name, uint32_t mask);
 void * equ_pool_alloc(Equ_Pool *p, size_t bytes);
 
-Equ_Client * equ_client_new(Ecore_Con_Client *conn);
-int equ_client_process(Equ_Client *c, Equ_Message_Name name, void *msg, void **rpely);
+Equ_Client * equ_client_new(Eix_Client *ec);
+int equ_client_process(Equ_Client *c, unsigned int type, void *msg, void **rpely);
 
 
 /* for now place hal info here */

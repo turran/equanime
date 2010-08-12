@@ -6,12 +6,20 @@
 #define EQUANIME_NAME "equanime"
 #define EQUANIME_PORT 0xea
 
+#define EQU_MSGS_NUM (EQU_MSG_LAST - EIX_REPLY_LAST)
+#define EQU_INDEX(n) (n - EIX_REPLY_LAST)
 /*
  * TODO
  * - Add a way to send messages from the server to the client that are *not* replies
  */
 
 typedef int Equ_Common_Id;
+
+typedef enum _Equ_Error
+{
+	EQU_ERR_NEXIST = EIX_ERRORS,
+	EQU_ERRORS,
+} Equ_Error;
 
 /* common data definitions */
 typedef struct _Equ_Common_Host

@@ -43,6 +43,7 @@ EAPI Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 		_hosts = eina_hash_int32_new(NULL);
 	}
 
+	printf("registering a new host\n");
 	h = calloc(1, sizeof(Equ_Host));
 	h->name = strdup(name);
 	h->backend = hb;
@@ -138,6 +139,7 @@ EAPI void equ_hosts_get(Equ_Cb cb, void *cb_data)
 	Eina_Iterator *it;
 	Equ_Host *host;
 
+	if (!_hosts) return;
 	it = eina_hash_iterator_data_new(_hosts);
 	while (eina_iterator_next(it, (void **)&host))
 	{

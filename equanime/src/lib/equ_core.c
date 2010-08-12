@@ -38,11 +38,7 @@ EAPI void equ_init(void)
 
 	if (!eshm_init()) return;
 	_init++;
-	eina_init();
-	eet_init();
-	ecore_init();
-	ecore_con_init();
-	equ_message_init();
+	equ_common_init();
 	equ_log = eina_log_domain_register("equ", NULL);
 }
 /**
@@ -54,11 +50,7 @@ EAPI void equ_shutdown(void)
 	if (_init == 1)
 	{
 		eina_log_domain_unregister(equ_log);
-		equ_message_shutdown();
-		ecore_con_shutdown();
-		ecore_shutdown();
-		eet_shutdown();
-		eina_shutdown();
+		equ_common_shutdown();
 		eshm_shutdown();
 	}
 	_init--;
@@ -72,15 +64,17 @@ EAPI void equ_shutdown(void)
 EAPI Equanime * equ_new(int port)
 {
 	Equanime *eq;
-	Eix_Server *svr;
+	Eix_Server *es;
 
 	/* try to connect to the server */
-	svr = eix_connect(EQUANIME_NAME, port);
+	es = eix_connect(EQUANIME_NAME, port);
+	equ_common_server_setup(es);
+	
 
-	if (!svr) return NULL;
+	if (!es) return NULL;
 
 	eq = calloc(1, sizeof(Equanime));
-	eq->svr = svr;
+	eq->svr = es;
 	//ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL, _server_del, eq);
 
 	return eq;

@@ -130,6 +130,8 @@ int main(void)
 
 	equ_init();
 	eq = equ_new(0xea);
+	if (!eq) return 1;
+
 	equ_hosts_get(eq, (Equ_Cb)_host_cb, &num_host);
 	equ_shutdown();
 
