@@ -56,6 +56,10 @@ struct _Eix_Server
 	unsigned char *buffer; /* buffer where the data received from server is stored */
 	unsigned int length; /* length of the buffer */
 	Eix_Server_Process process;
+	Eina_List *clients;
+	int events;
+	Eina_Bool delete_me;
+	void *data;
 };
 
 struct _Eix_Client
@@ -66,6 +70,7 @@ struct _Eix_Client
 	int length;
 	int events;
 	Eina_Bool delete_me;
+	void *data;
 };
 
 static int _init = 0;
@@ -145,6 +150,14 @@ static inline _client_event_free(Eix_Client *ec, void *ev)
 	free(ev);
 }
 
+static inline _server_event_free(Eix_Server *es, void *ev)
+{
+	es->events--;
+	if (es->delete_me && !es->events)
+		free(es);
+	free(ev);
+}
+
 static void _client_add_free(void *data, void *ev)
 {
 	Eix_Event_Client_Add *event = ev;
@@ -157,6 +170,20 @@ static void _client_del_free(void *data, void *ev)
 	Eix_Event_Client_Del *event = ev;
 
 	_client_event_free(event->client, ev);
+}
+
+static void _server_add_free(void *data, void *ev)
+{
+	Eix_Event_Server_Add *event = ev;
+
+	_server_event_free(event->server, ev);
+}
+
+static void _server_del_free(void *data, void *ev)
+{
+	Eix_Event_Server_Del *event = ev;
+
+	_server_event_free(event->server, ev);
 }
 
 static Eina_Bool _client_add(void *data, int type, void *event)
@@ -272,11 +299,19 @@ shift:
 		r.error = err;
 		_reply_type_get(desc, &rtype);
 		desc = _descriptor_get(es, rtype);
+		if (!desc)
+		{
+			r.error = EIX_ERR_CODEC;
+			/* TODO what happens with reply itself */
+			r.size = 0;
+			goto reply_end;
+		}
 		DBG("Encoding reply. type %d", m->type);
 		if (reply)
 			rbody = eet_data_descriptor_encode(desc->edd, reply, &r.size);
 		else
 			r.size = 0;
+reply_end:
 		DBG("Sending reply %d %d %d", r.id, r.error, r.size);
 		ecore_con_client_send(e->client, &r, sizeof(Eix_Reply));
 		if (r.size)
@@ -303,6 +338,23 @@ end:
 		free(ec->buffer);
 		ec->buffer = NULL;
 	}
+	return ECORE_CALLBACK_RENEW;
+}
+
+static Eina_Bool _server_add(void *data, int type, void *event)
+{
+	Ecore_Con_Event_Server_Add *e = event;
+	Eix_Server *es;
+	Eix_Event_Server_Add *ev;
+
+	if (!_server_exist(e->server)) return ECORE_CALLBACK_RENEW;
+	es = ecore_con_server_data_get(e->server);
+	es->events++;
+
+	ev = malloc(sizeof(Eix_Event_Server_Add));
+	ev->server = es;
+	ecore_event_add(EIX_EVENT_SERVER_ADD, ev, _server_add_free, NULL);
+
 	return ECORE_CALLBACK_RENEW;
 }
 
@@ -392,10 +444,18 @@ end:
 static Eina_Bool _server_del(void *data, int type, void *event)
 {
 	Ecore_Con_Event_Server_Del *e = event;
+	Eix_Event_Server_Del *ev;
 	Eix_Server *es;
 
 	if (!_server_exist(e->server)) return ECORE_CALLBACK_RENEW;
 	es = ecore_con_server_data_get(e->server);
+	
+	es->delete_me = EINA_TRUE;
+	es->events++;
+
+	ev = malloc(sizeof(Eix_Event_Server_Del));
+	ev->server = es;
+	ecore_event_add(EIX_EVENT_SERVER_DEL, ev, _server_del_free, NULL);
 }
 
 static Eina_Bool _timeout_cb(void *data)
@@ -478,11 +538,13 @@ EAPI void eix_init(void)
 	ecore_init();
 	ecore_con_init();
 	_log = eina_log_domain_register("eix", NULL);
-	_handler[0] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, NULL);
-	_handler[1] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL, _server_del, NULL);
-	_handler[2] = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_ADD, _client_add, NULL);
-	_handler[3] = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DEL, _client_del, NULL);
-	_handler[4] = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, _client_data, NULL);
+	printf("log = %d\n", _log);
+	_handler[0] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_add, NULL);
+	_handler[1] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, NULL);
+	_handler[2] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL, _server_del, NULL);
+	_handler[3] = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_ADD, _client_add, NULL);
+	_handler[4] = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DEL, _client_del, NULL);
+	_handler[5] = ecore_event_handler_add(ECORE_CON_EVENT_CLIENT_DATA, _client_data, NULL);
 
 	EIX_EVENT_CLIENT_ADD = ecore_event_type_new();
 	EIX_EVENT_CLIENT_DEL = ecore_event_type_new();
@@ -510,7 +572,7 @@ EAPI void eix_shutdown(void)
 		int i;
 
 		/* TODO delete every server */
-		for (i = 0; i < 5; i++)
+		for (i = 0; i < 6; i++)
 		{
 			ecore_event_handler_del(_handler[i]);
 		}
@@ -624,6 +686,84 @@ EAPI void eix_sync(Eix_Server *e)
 	if (error) return;
 	/* allocate all the hosts and give them back to the user */
 	free(r);
+}
+
+/**
+ *
+ */
+EAPI void eix_client_data_set(Eix_Client *c, void *data)
+{
+	c->data = data;
+}
+
+/**
+ *
+ */
+EAPI void * eix_client_data_get(Eix_Client *c)
+{
+	return c->data;
+}
+
+EAPI void eix_server_data_set(Eix_Server *s, void *data)
+{
+	s->data = data;
+}
+
+/**
+ *
+ */
+EAPI void * eix_server_data_get(Eix_Server *s)
+{
+	return s->data;
+}
+
+/**
+ *
+ */
+EAPI void eix_client_del(Eix_Client *c)
+{
+	if (c->delete_me) return;
+
+	c->delete_me = 1;
+	if (!c->events)
+	{
+		ecore_con_client_del(c->clnt);
+		c->server->clients = eina_list_remove(c->server->clients, c);
+
+		if (c->buffer) free(c->buffer);
+		free(c);
+	}
+}
+
+/**
+ *
+ */
+EAPI Eix_Server * eix_client_server_get(Eix_Client *c)
+{
+	return c->server;
+}
+
+/**
+ *
+ */
+EAPI void eix_server_del(Eix_Server *s)
+{
+	if (s->delete_me) return;
+
+	s->delete_me = 1;
+	if (!s->events)
+	{
+		Eix_Client *c;
+
+		EINA_LIST_FREE(s->clients, c)
+			eix_client_del(c);
+
+		ecore_con_server_del(s->svr);
+		_servers = eina_list_remove(_servers, s);
+
+		if (s->buffer) free(s->buffer);
+		free(s);
+	}
 }
 
 /**
