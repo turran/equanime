@@ -461,7 +461,7 @@ static Eina_Bool _server_del(void *data, int type, void *event)
 
 	if (!_server_exist(e->server)) return ECORE_CALLBACK_RENEW;
 	es = ecore_con_server_data_get(e->server);
-	
+
 	es->delete_me = EINA_TRUE;
 	es->events++;
 
@@ -503,7 +503,6 @@ static Eix_Error _server_send(Eix_Server *e, Eix_Message_Descriptor *desc,
 {
 	Eix_Error error = EIX_ERR_NONE;
 	Ecore_Idler *idler;
-	//Ecore_Timer *timer;
 	int ret;
 
 	e->msg = m;
@@ -581,11 +580,11 @@ EAPI void eix_init(void)
 
 	/* Core messages */
 	/* sync */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eix_Message_Sync", sizeof(Eix_Message_Sync));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eix_Message_Sync", sizeof(Eix_Message_Sync));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[0] = edd;
 	/* sync */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eix_Reply_Sync", sizeof(Eix_Reply_Sync));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eix_Reply_Sync", sizeof(Eix_Reply_Sync));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[1] = edd;
 }
