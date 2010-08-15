@@ -4,14 +4,11 @@
 #include "Ecore.h"
 #include "Eshm.h"
 
-#define ERR(...) EINA_LOG_DOM_ERR(_log_dom, __VA_ARGS__)
-#define INF(...) EINA_LOG_DOM_INFO(_log_dom, __VA_ARGS__)
-#define WRN(...) EINA_LOG_DOM_WARN(_log_dom, __VA_ARGS__)
-#define DBG(...) EINA_LOG_DOM_DBG(_log_dom, __VA_ARGS__)
+#define EQU_LOG_DOM _log_dom
+static int _log_dom = -1;
 
 static Eix_Server *srv = NULL;
 static Eina_Array *_modules = NULL;
-static int _log_dom = -1;
 char *options = NULL;
 char *module = NULL;
 Eina_Bool options_help = EINA_FALSE;

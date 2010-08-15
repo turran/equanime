@@ -3,6 +3,9 @@
 
 #include "Ecore.h"
 
+#define EQU_LOG_DOM _log_dom
+static int _log_dom = -1;
+
 /* The SDL module has only one controller and
  * one output
  */
@@ -260,13 +263,15 @@ Equ_Host_Backend _hbackend = {
 
 static Eina_Bool module_init(void)
 {
-	printf("attempting to install the sdl module\n");
+	_log_dom = eina_log_domain_register("Equ_SDL", NULL);
+	DBG("Initializing");
 	equ_host_register("sdl", &_hbackend);
 	return EINA_TRUE;
 }
 
 static void module_shutdown(void)
 {
+	DBG("Shutting down");
 }
 
 EINA_MODULE_INIT(module_init);
