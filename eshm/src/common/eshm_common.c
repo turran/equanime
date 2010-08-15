@@ -10,47 +10,48 @@ static void _message_init(void)
 {
 	Eet_Data_Descriptor *edd;
 	Eet_Data_Descriptor_Class eddc;
+	Eina_Bool ret;
 	/* create all the messages' data descriptors */
 
 	/* segment new */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Message_Segment_New", sizeof(Eshm_Message_Segment_New));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Message_Segment_New", sizeof(Eshm_Message_Segment_New));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_MSG_SEGMENT_NEW)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_New, "id", id, EET_T_INLINED_STRING);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_New, "size", size, EET_T_UINT);
 	/* segment new reply */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Reply_Segment_New", sizeof(Eshm_Reply_Segment_New));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Reply_Segment_New", sizeof(Eshm_Reply_Segment_New));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_REPLY_SEGMENT_NEW)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Reply_Segment_New, "shmid", shmid, EET_T_UINT);
 	/* segment get */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Message_Segment_Get", sizeof(Eshm_Message_Segment_Get));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Message_Segment_Get", sizeof(Eshm_Message_Segment_Get));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_MSG_SEGMENT_GET)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_Get, "id", id, EET_T_INLINED_STRING);
 	/* segment get reply */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Reply_Segment_Get", sizeof(Eshm_Reply_Segment_Get));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Reply_Segment_Get", sizeof(Eshm_Reply_Segment_Get));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_REPLY_SEGMENT_GET)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Reply_Segment_Get, "shmid", shmid, EET_T_UINT);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Reply_Segment_Get, "size", size, EET_T_UINT);
 	/* segment lock */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Message_Segment_Lock", sizeof(Eshm_Message_Segment_Lock));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Message_Segment_Lock", sizeof(Eshm_Message_Segment_Lock));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_MSG_SEGMENT_LOCK)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_Lock, "id", id, EET_T_INLINED_STRING);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_Lock, "write", write, EET_T_UCHAR);
 	/* segment lock reply */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Reply_Segment_Lock", sizeof(Eshm_Reply_Segment_Lock));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Reply_Segment_Lock", sizeof(Eshm_Reply_Segment_Lock));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_REPLY_SEGMENT_LOCK)] = edd;
 	/* segment unlock */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Message_Segment_Unlock", sizeof(Eshm_Message_Segment_Unlock));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Message_Segment_Unlock", sizeof(Eshm_Message_Segment_Unlock));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_MSG_SEGMENT_UNLOCK)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_Unlock, "id", id, EET_T_INLINED_STRING);
 	/* segment delete */
-	eet_eina_stream_data_descriptor_class_set(&eddc, "Eshm_Message_Segment_Delete", sizeof(Eshm_Message_Segment_Delete));
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Eshm_Message_Segment_Delete", sizeof(Eshm_Message_Segment_Delete));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[INDEX(ESHM_MSG_SEGMENT_DELETE)] = edd;
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Eshm_Message_Segment_Delete, "id", id, EET_T_INLINED_STRING);

@@ -60,7 +60,6 @@ static Eshm_Error msg_segment_new(Eix_Client *c, Eshm_Message_Segment_New *sn, v
 	struct shmid_ds ds;
 	key_t key;
 
-	printf("segment new\n");
 	INF("Requesting a new segment with id %s", sn->id);
 
 	/* check if the segment already exists on the hash of segments */
@@ -90,12 +89,10 @@ static Eshm_Error msg_segment_new(Eix_Client *c, Eshm_Message_Segment_New *sn, v
 	s->shmid = rsn->shmid;
 	s->ref++;
 	s->owner = c;
-	printf("client owner = %p\n", c);
 	eina_hash_add(_eshmd.hash, sn->id, s);
 
 	INF("New Segment created with id number %d", rsn->shmid);
 
-	printf("ok! %p\n", reply);
 	return EIX_ERR_NONE;
 }
 
@@ -137,7 +134,6 @@ static int msg_segment_lock(Eix_Client *c, Eshm_Message_Segment_Lock *m, void **
 	/* lock the segment */
 	INF("Locking the segment with id %s", m->id);
 	s = eina_hash_find(_eshmd.hash, m->id);
-	printf("lock client = %p %p\n", c, s->owner);
 	if (!s)
 		return ESHM_ERR_NEXIST;
 	else if (m->write && c != s->owner)
@@ -184,7 +180,6 @@ static int _server_process(Eix_Client *c, unsigned int type, void *msg,
 		void **reply)
 {
 	int err = EIX_ERR_NONE;
-	printf("processing msg %d\n", type);
 	switch (type)
 	{
 		case ESHM_MSG_SEGMENT_NEW:
@@ -258,13 +253,16 @@ int main(int argc, char **argv)
 			goto err_log;
 		eina_log_print_cb_set(eina_log_print_cb_file, f);
 	}
+	else
+	{
+		eina_log_domain_level_set("eshmd", 5);
+	}
 	_eshmd.buffer = NULL;
 	_eshmd.srv = eix_new(ESHMD_NAME, ESHMD_PORT, _server_process);
 	eshm_common_server_setup(_eshmd.srv);
 	if (!_eshmd.srv)
 	{
 		ERR("Can't create the server");
-		printf("cannot\n");
 		goto err_server;
 	}
 	_eshmd.hash = eina_hash_string_superfast_new(NULL);
