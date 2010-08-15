@@ -11,6 +11,7 @@ static Eix_Server *srv = NULL;
 static Eina_Array *_modules = NULL;
 char *options = NULL;
 char *module = NULL;
+int debug = 0;
 Eina_Bool options_help = EINA_FALSE;
 Eina_Bool modules_list = EINA_FALSE;
 
@@ -23,6 +24,7 @@ static void _help(void)
 	printf("-n                      : Dont detach from the console\n");
 	printf("-o <options>            : Module options\n");
 	printf("                          Use 'help' to list the module's options\n");
+	printf("-d                      : Enable debug\n");
 	printf("-h                      : This help screen\n");
 }
 
@@ -123,6 +125,11 @@ static void _server_init(void)
 	ecore_event_handler_add(EIX_EVENT_CLIENT_ADD, _client_add, NULL);
 	ecore_event_handler_add(EIX_EVENT_CLIENT_DEL, _client_del, NULL);
 	_log_dom = eina_log_domain_register("equd", NULL);
+	if (debug)
+	{
+		eina_log_domain_level_set("eshm", 5);
+		eina_log_domain_level_set("equd", 5);
+	}
 }
 
 static void _server_shutdown(void)
@@ -181,6 +188,10 @@ int main(int argc, char **argv)
 				/* the module to use */
 				case 'm':
 				parameter = 1;
+				break;
+
+				case 'd':
+				debug = 1;
 				break;
 
 				default:
