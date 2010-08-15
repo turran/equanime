@@ -60,6 +60,7 @@ struct _Eix_Server
 	int events;
 	Eina_Bool delete_me;
 	void *data;
+	Ecore_Timer *timer;
 };
 
 struct _Eix_Client
@@ -112,12 +113,19 @@ static int _client_process(Eix_Client *c, unsigned int type, void *msg,
 		void **reply)
 {
 	Eix_Server *es;
-	int err = EIX_ERR_NONE;
 
 	es = c->server;
+	if (!es || !es->process) return EIX_ERR_NONE;
 
-	if (es->process) err = es->process(c, type, msg, reply);
-	return err;
+	if (type < EIX_MESSAGE_LAST)
+	{
+        	Eix_Reply_Sync *r;
+
+		/* TODO whenever we implement async replies, we should flush all the pending events */
+		r = *reply = calloc(1, sizeof(Eix_Reply_Sync));
+		return EIX_ERR_NONE;
+	}
+	else return es->process(c, type, msg, reply);
 }
 
 static Eix_Message * _message_new(unsigned int type)
@@ -202,6 +210,7 @@ static Eina_Bool _client_add(void *data, int type, void *event)
 	ecore_con_client_data_set(e->client, ec);
 	ec->events++;
 
+	DBG("New client %p connected to server %p", ec, es);
 	ev = malloc(sizeof(Eix_Event_Client_Add));
 	ev->client = ec;
 	ecore_event_add(EIX_EVENT_CLIENT_ADD, ev, _client_add_free, NULL);
@@ -220,6 +229,7 @@ static Eina_Bool _client_del(void *data, int type, void *event)
 	ec->delete_me = EINA_TRUE;
 	ec->events++;
 
+	DBG("Client %p deleted from server %p", ec, ec->server);
 	ev = malloc(sizeof(Eix_Event_Client_Del));
 	ev->client = ec;
 	ecore_event_add(EIX_EVENT_CLIENT_DEL, ev, _client_del_free, NULL);
@@ -243,6 +253,7 @@ static Eina_Bool _client_data(void *data, int type, void *event)
 	if (!eina_list_data_find(_servers, es)) return ECORE_CALLBACK_RENEW;
 	ec = ecore_con_client_data_get(e->client);
 
+	DBG("Client %p sent data to server %p", ec, es);
 	/* check if we got a full message */
 	if (!ec->buffer)
 	{
@@ -287,7 +298,6 @@ message:
 	}
 	/* check for the reply */
 	err = _client_process(ec, m->type, body, &reply);
-	printf("erro = %d reply = %p\n", err, reply);
 shift:
 	if (_has_reply(desc) == EINA_TRUE)
 	{
@@ -351,6 +361,7 @@ static Eina_Bool _server_add(void *data, int type, void *event)
 	es = ecore_con_server_data_get(e->server);
 	es->events++;
 
+	DBG("Server %p added", es);
 	ev = malloc(sizeof(Eix_Event_Server_Add));
 	ev->server = es;
 	ecore_event_add(EIX_EVENT_SERVER_ADD, ev, _server_add_free, NULL);
@@ -366,6 +377,7 @@ static Eina_Bool _server_data(void *data, int type, void *event)
 
 	if (!_server_exist(e->server)) return ECORE_CALLBACK_RENEW;
 	es = ecore_con_server_data_get(e->server);
+	DBG("Server %p received data", es);
 	if (!es->msg)
 	{
 		ERR("How do we receive a reply with no msg first??\n");
@@ -453,6 +465,7 @@ static Eina_Bool _server_del(void *data, int type, void *event)
 	es->delete_me = EINA_TRUE;
 	es->events++;
 
+	DBG("Server %p deleted", es);
 	ev = malloc(sizeof(Eix_Event_Server_Del));
 	ev->server = es;
 	ecore_event_add(EIX_EVENT_SERVER_DEL, ev, _server_del_free, NULL);
@@ -462,9 +475,26 @@ static Eina_Bool _timeout_cb(void *data)
 {
 	Eix_Server *es = data;
 
-	printf("timer!!!\n");
-	/* TODO set the reply to an error */
-	return 0;
+	ecore_main_loop_quit();
+
+	return ECORE_CALLBACK_CANCEL;
+}
+
+static Eina_Bool _idler_cb(void *data)
+{
+	Eix_Server *e = (Eix_Server *)data;
+
+	if (e->reply)
+	{
+		if (e->timer)
+		{
+			ecore_timer_del(e->timer);
+			e->timer = NULL;
+		}
+		ecore_main_loop_quit();
+		return ECORE_CALLBACK_CANCEL;
+	}
+	return ECORE_CALLBACK_RENEW;
 }
 
 static Eix_Error _server_send(Eix_Server *e, Eix_Message_Descriptor *desc,
@@ -472,11 +502,11 @@ static Eix_Error _server_send(Eix_Server *e, Eix_Message_Descriptor *desc,
 		double timeout, void **rdata)
 {
 	Eix_Error error = EIX_ERR_NONE;
-	Ecore_Timer *timer;
+	Ecore_Idler *idler;
+	//Ecore_Timer *timer;
 	int ret;
 
 	e->msg = m;
-
 	DBG("Sending message of type %d and id %d", m->type, m->id);
 	ret = ecore_con_server_send(e->svr, m, sizeof(Eix_Message));
 	ret = ecore_con_server_send(e->svr, data, m->size);
@@ -484,17 +514,16 @@ static Eix_Error _server_send(Eix_Server *e, Eix_Message_Descriptor *desc,
 	if (_has_reply(desc) == EINA_FALSE)
 		goto no_reply;
 
-	/* TODO register a timeout callback */
-	if (timeout)
-		timer = ecore_timer_add(timeout, _timeout_cb, e);
+	idler = ecore_idler_add(_idler_cb, e);
+	if (timeout) e->timer = ecore_timer_add(timeout, _timeout_cb, e);
 	/* wait for the response */
-	while (!e->reply)
-	{
-		ecore_main_loop_iterate();
-	}
-	if (timeout)
-		ecore_timer_del(timer);
+	ecore_main_loop_begin();
 
+	if (!e->reply)
+	{
+		error = EIX_ERR_TIMEOUT;
+		goto no_reply;
+	}
 	DBG("Finished lock reply of type %d", e->reply->id);
 
 	error = e->reply->error;
@@ -538,7 +567,6 @@ EAPI void eix_init(void)
 	ecore_init();
 	ecore_con_init();
 	_log = eina_log_domain_register("eix", NULL);
-	printf("log = %d\n", _log);
 	_handler[0] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_add, NULL);
 	_handler[1] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DATA, _server_data, NULL);
 	_handler[2] = ecore_event_handler_add(ECORE_CON_EVENT_SERVER_DEL, _server_del, NULL);
@@ -684,7 +712,6 @@ EAPI void eix_sync(Eix_Server *e)
 	/* send the command to the server */
 	error = eix_message_server_send(e, EIX_MESSAGE_SYNC, &m, 0, (void **)&r);
 	if (error) return;
-	/* allocate all the hosts and give them back to the user */
 	free(r);
 }
 
