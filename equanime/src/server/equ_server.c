@@ -41,25 +41,6 @@ static Equ_Server_Backend _backend = {
 	.quit = _quit,
 };
 
-static void _module_init(void)
-{
-	char *mpath;
-	char *path;
-
-	path = getenv("EQUANIME_DIR");
-	if (!path)
-	{
-		path = strdup("/usr/local/lib/equanime");
-	}
-	_modules = eina_module_list_get(_modules, path, 1, NULL, NULL);
-	eina_module_list_load(_modules);
-}
-
-static void _module_shutdown(void)
-{
-	eina_module_list_free(_modules);
-}
-
 static int _client_add(void *data, int type, void *event)
 {
 	Equ_Client *client;
@@ -128,6 +109,7 @@ static void _server_init(void)
 	if (debug)
 	{
 		eina_log_domain_level_set("eshm", 5);
+		eina_log_domain_level_set("equ", 5);
 		eina_log_domain_level_set("equd", 5);
 	}
 }
@@ -202,10 +184,7 @@ int main(int argc, char **argv)
 			goto cmd_error;
 	}
 	/* initialize every system */
-	if (!eshm_init())
-		return 0;
-	equ_common_init();
-	_module_init();
+	if (!equ_init()) return 0;
 	_server_init();
 	/* setup the system */
 	_server_setup();
@@ -216,8 +195,7 @@ int main(int argc, char **argv)
 	/* shutdown every system */
 module_exit:
 	_server_shutdown();
-	_module_shutdown();
-	equ_common_shutdown();
+	equ_shutdown();
 
 	return 0;
 

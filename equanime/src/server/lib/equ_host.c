@@ -1,4 +1,5 @@
 #include "Equ_Server.h"
+#include "equ_server_private.h"
 #include <string.h>
 /**
  * A host is just the main element that owns a controller, different
@@ -7,6 +8,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define EQU_LOG_DOM equ_log
+
 struct _Equ_Host
 {
 	Equ_Common_Id id;
@@ -43,7 +46,7 @@ EAPI Eina_Bool equ_host_register(const char *name, Equ_Host_Backend *hb)
 		_hosts = eina_hash_int32_new(NULL);
 	}
 
-	printf("registering a new host\n");
+	DBG("Registering %s host", name);
 	h = calloc(1, sizeof(Equ_Host));
 	h->name = strdup(name);
 	h->backend = hb;
@@ -91,13 +94,27 @@ EAPI Equ_Surface * equ_host_surface_get(Equ_Host *host, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type)
 {
 	Equ_Surface *s = NULL;
+	Equ_Common_Surface common;
+	void *data;
+
+	memset(&common, 0, sizeof(Equ_Common_Surface));
+	common.w = w;
+	common.h = h;
+	common.fmt = fmt;
+	common.type = type;
 
 	if (host->backend->surface_new)
-		s = host->backend->surface_new(host, w, h, fmt, type);
+		data = host->backend->surface_new(host, &common);
+	if (!data) return NULL;
 
+	s = equ_surface_new(host, &common, data);
+
+	/* cleanup the common struct in case the backend has filled it */
+	if (common.shid) free(common.shid);
 	return s;
 }
 
+#if 0
 EAPI void equ_host_surface_upload(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data *data,
 		Eina_Rectangle *r)
 {
@@ -111,6 +128,7 @@ EAPI void equ_host_surface_download(Equ_Host *h, Equ_Surface *s, Equ_Surface_Dat
 	if (h->backend->surface_download)
 		h->backend->surface_download(h, s, data, r);
 }
+#endif
 
 EAPI void equ_host_controllers_get(Equ_Host *h, Equ_Cb cb, void *cb_data)
 {

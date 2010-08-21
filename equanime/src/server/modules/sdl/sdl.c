@@ -1,4 +1,5 @@
 #include "Equ_Server.h"
+#include "equ_server_private.h"
 #include "SDL.h"
 
 #include "Ecore.h"
@@ -54,7 +55,17 @@ static Equ_Controller_Backend _cbackend = {
 	.output_set = _controller_output_set,
 };
 
-static int _events_cb(void *data)
+
+static inline void _info_to_status(SDL *sdl, Equ_Layer_Status *status)
+{
+	memset(status, 0, sizeof(Equ_Layer_Status));
+
+	status->w = sdl->width;
+	status->h = sdl->height;
+	status->fmt = EQU_FORMAT_RGB888;
+}
+
+static Eina_Bool _events_cb(void *data)
 {
 	SDL_Event event;
 	SDL *sdl = data;
@@ -66,9 +77,20 @@ static int _events_cb(void *data)
 			case SDL_QUIT:
 			sdl->server->quit();
 			break;
+
+			case SDL_VIDEORESIZE:
+			{
+				Equ_Layer_Status status;
+
+				sdl->width = event.resize.w;
+				sdl->height = event.resize.h;
+				_info_to_status(sdl, &status);
+				equ_layer_status_update(sdl->layer, &status);
+			}
+			break;
 		}
 	}
-	return 1;
+	return ECORE_CALLBACK_RENEW;
 }
 
 static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
@@ -106,12 +128,12 @@ static inline void _layer_setup(SDL *sdl)
 	Equ_Layer_Caps caps;
 	Equ_Layer_Status status;
 
+	memset(&caps, 0, sizeof(Equ_Layer_Caps));
+
 	if (sdl->resizable)
 		caps.flags_mask = EQU_LAYER_SIZE;
 
-	status.w = sdl->width;
-	status.h = sdl->height;
-	status.fmt = EQU_FORMAT_RGB888;
+	_info_to_status(sdl, &status);
 
 	sdl->layer = equ_controller_layer_register(sdl->controller,
 			"layer0", &_lbackend, &caps, &status);
@@ -145,6 +167,7 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 	/* setup the timer callback to check for events */
 	sdl->server = sbackend;
 	sdl->timer = ecore_timer_add(0.005, _events_cb, sdl);
+	/* layer setup */
 	_layer_setup(sdl);
 	equ_host_data_set(h, sdl);
 
@@ -183,65 +206,33 @@ static void _host_surface_download(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data
 	/* unlock the surface */
 }
 
-static Equ_Surface * _host_surface_new(Equ_Host *h, uint32_t width, uint32_t height, Equ_Format fmt, Equ_Surface_Type type)
+static void * _host_surface_new(Equ_Host *h, Equ_Common_Surface *common)
 {
+	SDL *sdl;
 	Uint32 rm, gm, bm, am;
 	int depth;
 	int pitch;
 	Equ_Surface *s;
 	void *data = NULL;
-	char *shid = NULL;
+	void *shdata = NULL;
+	size_t bytes;
 
-	depth = equ_format_depth_get(fmt);
-	pitch = equ_format_pitch_get(fmt, width);
-	equ_format_components_masks(fmt, &rm, &gm, &bm, &am, NULL, NULL, NULL);
-	if (type == EQU_SURFACE_REMOTE)
+	sdl = equ_host_data_get(h);
+	depth = equ_format_depth_get(common->fmt);
+
+	shdata = equ_surface_eshm_alloc(common);
+	if (!shdata)
 	{
-		Uint32 flags = SDL_SWSURFACE;
-		data = SDL_CreateRGBSurface(flags, width, height, depth, rm, gm, bm, am);
+		ERR("Cannot allocate %d", bytes);
+		return NULL;
 	}
-	else if (type  == EQU_SURFACE_SHARED)
-	{
-		Eshm_Segment *segment;
-		size_t bytes;
-		void *shdata;
+	pitch = equ_format_pitch_get(common->fmt, common->w);
+	equ_format_components_masks(common->fmt, &rm, &gm, &bm, &am, NULL, NULL, NULL);
+	data = SDL_CreateRGBSurfaceFrom(shdata,
+			common->w, common->h, depth, pitch,
+			rm, gm, bm, am);
 
-		bytes = equ_format_size_get(fmt, width, height);
-		/* FIXME, replace this with a real name */
-		shid = "myname";
-		segment = eshm_segment_new(shid, bytes);
-		shdata = eshm_segment_data_get(segment);
-		if (!shdata)
-		{
-			printf("Cannot get the segment data %p\n", segment);
-			return NULL;
-		}
-		data = SDL_CreateRGBSurfaceFrom(shdata,
-				width, height, depth, pitch,
-				rm, gm, bm, am);
-#if 0
-		{
-			SDL *sdl;
-			SDL_Rect srect, drect;
-
-			srect.x = 0;
-			srect.y = 0;
-			srect.w = width;
-			srect.h = height;
-
-			drect.x = 0;
-			drect.y = 0;
-			drect.w = width;
-			drect.h = height;
-			sdl = equ_host_data_get(h);
-			printf("src %p dst %p\n", data, sdl->surface);
-			SDL_BlitSurface(data, &srect, sdl->surface, &drect);
-		}
-#endif
-	}
-	else return NULL;
-
-	return equ_surface_new(h, width, height, fmt, type, shid, data);
+	return data;
 }
 
 static void _host_surface_delete(Equ_Host *h, Equ_Surface *s)

@@ -39,7 +39,7 @@ esac
 AC_SUBST(create_shared_lib)
 
 # Common
-PKG_CHECK_MODULES(EINA, [eina-0 >= 0.0.1])
+PKG_CHECK_MODULES(EINA, [eina >= 1.0.0])
 
 # Server modules
 PKG_CHECK_MODULES(ESHM, [eshm])

@@ -25,8 +25,24 @@ struct _Equ_Surface
 Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type, char *shid)
 {
+	Eshm_Segment *segment;
 	Equ_Surface *s;
 	void *data = NULL;
+
+	switch (type)
+	{
+		case EQU_SURFACE_SYSTEM:
+		segment = eshm_segment_get(shid, 0, EINA_FALSE);
+		printf("segment = %p %s\n", segment, shid);
+		if (!segment) return NULL;
+		data = eshm_segment_data_get(segment);
+		break;
+
+		case EQU_SURFACE_HOST:
+		/* TODO handle the mmaped area */
+		return NULL;
+		break;
+	}
 
 	s = calloc(1, sizeof(Equ_Surface));
 	s->id = id;
@@ -34,16 +50,6 @@ Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 	s->h = h;
 	s->type = type;
 	s->data.fmt = fmt;
-	/* in case of local surface we should allocate the data ourselves */
-	if (s->type == EQU_SURFACE_LOCAL)
-	{
-		data = calloc(equ_format_size_get(fmt, w, h), sizeof(uint8_t));
-	}
-	else if (s->type == EQU_SURFACE_SHARED)
-	{
-		s->segment = eshm_segment_get(shid, 0, EINA_FALSE);
-		data = eshm_segment_data_get(s->segment);
-	}
 	/* TODO add more formats */
 	switch (fmt)
 	{
@@ -77,7 +83,7 @@ EAPI Equ_Surface_Type equ_surface_type_get(Equanime *e, const Equ_Surface *s)
 {
 	return s->type;
 }
-
+#if 0
 /**
  * Upload pixels into a surface
  * @param[in] e The Equanime connection
@@ -165,6 +171,7 @@ EAPI void equ_surface_pixels_download(Equanime *e, Equ_Surface *s,
 	}
 	free(r);
 }
+#endif
 
 /**
  * Gets the locally modifiable surface data.
@@ -177,10 +184,7 @@ EAPI Eina_Bool equ_surface_data_get(Equanime *e, Equ_Surface *s, Equ_Surface_Dat
 {
 	if (!d)
 		return EINA_FALSE;
-	if (s->type == EQU_SURFACE_REMOTE)
-		return EINA_FALSE;
 
 	*d = s->data;
 	return EINA_TRUE;
 }
-

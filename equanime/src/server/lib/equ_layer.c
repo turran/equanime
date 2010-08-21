@@ -60,6 +60,11 @@ void * equ_layer_data_get(Equ_Layer *l)
 {
 	return l->data;
 }
+
+void equ_layer_status_update(Equ_Layer *l, Equ_Layer_Status *status)
+{
+	if (status) l->status = *status;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

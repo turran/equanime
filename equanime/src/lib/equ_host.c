@@ -102,7 +102,6 @@ EAPI Equ_Surface * equ_host_surface_get(Equanime *e, Equ_Host *host, uint32_t w,
 	if (error) return NULL;
 
 	s = equ_surface_new(r->id, w, h, fmt, type, r->sh_id);
-
 	free(r);
 
 	return s;

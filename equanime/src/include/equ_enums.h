@@ -38,9 +38,8 @@ typedef enum _Equ_Format
  */
 typedef enum _Equ_Surface_Type
 {
-	EQU_SURFACE_LOCAL,  /**< Client side surface */
-	EQU_SURFACE_REMOTE, /**< Server side surface */
-	EQU_SURFACE_SHARED, /**< Shared between the client and the server */
+	EQU_SURFACE_SYSTEM, /**< Surface allocated on the system memory */
+	EQU_SURFACE_HOST, /**< Surface allocated on the host memory */
 } Equ_Surface_Type;
 
 

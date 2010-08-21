@@ -26,24 +26,26 @@ Equ_Pool * equ_pool_new(Equ_Host *h, Equ_Pool_Backend *pb,
 	return p;
 }
 
-EAPI void * equ_pool_alloc(Equ_Pool *p, size_t bytes)
+void * equ_pool_alloc(Equ_Pool *p, size_t bytes)
 {
 	return p->backend->alloc(p, bytes);
 }
 
-EAPI void equ_pool_free(Equ_Pool *p, void *data)
+void equ_pool_free(Equ_Pool *p, void *data)
 {
 	p->backend->free(p, data);
 }
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
-EAPI void equ_pool_data_set(Equ_Pool *p, void *data)
+
+void equ_pool_data_set(Equ_Pool *p, void *data)
 {
 	p->data = data;
 }
 
-EAPI void * equ_pool_data_get(Equ_Pool *p, void *data)
+void * equ_pool_data_get(Equ_Pool *p)
 {
 	return p->data;
 }
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+

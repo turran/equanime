@@ -24,6 +24,7 @@ equ_input.c \
 equ_mode.c \
 equ_option.c \
 equ_pool.c \
+equ_pool_eshm.c \
 equ_region.c \
 equ_scaler.c \
 equ_surface.c

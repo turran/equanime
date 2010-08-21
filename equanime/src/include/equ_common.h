@@ -40,6 +40,16 @@ typedef struct _Equ_Layer_Info
 	char *name;
 } Equ_Layer_Info;
 
+typedef struct _Equ_Common_Surface
+{
+	Equ_Common_Id id;
+	uint32_t w;
+	uint32_t h;
+	char *shid;
+	Equ_Surface_Type type;
+	Equ_Format fmt;
+} Equ_Common_Surface;
+
 typedef struct _Equ_Layer_Caps
 {
 	uint32_t fmt_mask;
