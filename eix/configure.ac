@@ -34,10 +34,10 @@ AC_PROG_CC
 
 
 ### Checks for libraries
-PKG_CHECK_MODULES(EINA, [eina-0 >= 0.0.1])
+PKG_CHECK_MODULES(EINA, [eina >= 1.0.0])
 PKG_CHECK_MODULES(EET, [eet >= 1.2.2])
-PKG_CHECK_MODULES(ECORE, [ecore])
-PKG_CHECK_MODULES(ECORE_CON, [ecore-con])
+PKG_CHECK_MODULES(ECORE, [ecore >= 1.0.0])
+PKG_CHECK_MODULES(ECORE_CON, [ecore-con >= 1.0.0])
 
 ### Checks for header files
 
