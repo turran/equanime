@@ -39,9 +39,9 @@ esac
 AC_SUBST(create_shared_lib)
 
 PKG_CHECK_MODULES(ESHM, [
-ecore
+ecore >= 1.0.0
 eix
-eina-0
+eina >= 1.0.0
 ])
 
 build_example="yes"

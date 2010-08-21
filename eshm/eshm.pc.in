@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: Eshm
 Description: Eshm
-Requires:
+Requires: eix
 Version: @VERSION@
 Libs: -L${libdir} -leshm
 Cflags: -I${includedir}
