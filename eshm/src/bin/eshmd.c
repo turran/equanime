@@ -1,3 +1,4 @@
+#include "Ecore.h"
 #include "Eshm.h"
 #include "eshm_private.h"
 
@@ -6,12 +7,14 @@
 /* TODO
  * handle command line parameters, to daemonize or not, etc
  * Use eina error info/error handling
+ * Add a way to dump the segments allocated, etc
  *
  */
 
 /* TODO check if this structure can be shared with the one at the library */
 typedef struct _Eshmd_Segment
 {
+	char *id;
 	int shmid;
 	int ref;
 	Eina_Bool locked; /* TODO differentiate between a read lock and a write lock */
@@ -39,7 +42,7 @@ int eshm_log_dom = -1;
 
 static key_t _key_new(void)
 {
-	static num;
+	static unsigned int num = 0;
 	char path[PATH_MAX];
 	char *tmp;
 
@@ -48,20 +51,58 @@ static key_t _key_new(void)
 	{
 		tmp = strdup("/tmp");
 	}
-	snprintf(path, PATH_MAX, "%s/eshmd%d", tmp, num);
+	snprintf(path, PATH_MAX, "%s/eshmd%d", tmp, num++);
 	return ftok(path, 'e');
+}
+
+static void _dump_segments(void)
+{
+	Eina_List *l;
+	Eshmd_Client *client;
+
+	printf("Clients:\n");
+	EINA_LIST_FOREACH(_eshmd.clients, l, client)
+	{
+		printf("%p\n", client);
+	}
+}
+
+static Eina_Bool _user_signal(void *data, int type, void *event)
+{
+	_dump_segments();
+	return ECORE_CALLBACK_RENEW;
+}
+
+static inline void _segment_unref(Eshmd_Segment *segment)
+{
+	segment->ref--;
+	/* delete the segment */
+	if (!segment->ref)
+	{
+		eina_hash_del(_eshmd.hash, segment->id, segment);
+		shmctl(segment->shmid, IPC_RMID, NULL);
+		free(segment->id);
+		free(segment);
+	}
+}
+
+static inline void _segment_ref(Eshmd_Segment *segment)
+{
+	segment->ref++;
 }
 
 /* Protocol message handlers */
 static Eshm_Error msg_segment_new(Eix_Client *c, Eshm_Message_Segment_New *sn, void **reply)
 {
 	Eshmd_Segment *s;
+	Eshmd_Client *ec;
 	Eshm_Reply_Segment_New *rsn;
 	struct shmid_ds ds;
 	key_t key;
 
 	INF("Requesting a new segment with id %s", sn->id);
 
+	ec = eix_client_data_get(c);
 	/* check if the segment already exists on the hash of segments */
 	s = eina_hash_find(_eshmd.hash, sn->id);
 	if (s)
@@ -85,10 +126,14 @@ static Eshm_Error msg_segment_new(Eix_Client *c, Eshm_Message_Segment_New *sn, v
 	shmctl(rsn->shmid, IPC_SET, &ds);
 
 	s = calloc(1, sizeof(Eshmd_Segment));
+	s->id = strdup(sn->id);
 	s->size = sn->size;
 	s->shmid = rsn->shmid;
-	s->ref++;
 	s->owner = c;
+	_segment_ref(s);
+	
+	/* store the segments */
+	ec->segments = eina_list_append(ec->segments, s);
 	eina_hash_add(_eshmd.hash, sn->id, s);
 
 	INF("New Segment created with id number %d", rsn->shmid);
@@ -99,10 +144,12 @@ static Eshm_Error msg_segment_new(Eix_Client *c, Eshm_Message_Segment_New *sn, v
 static Eshm_Error msg_segment_get(Eix_Client *c, Eshm_Message_Segment_Get *sn, void **reply)
 {
 	Eshmd_Segment *s;
+	Eshmd_Client *ec;
 	Eshm_Reply_Segment_Get *rsn;
 
 	INF("Requesting segment of name %s", sn->id);
 
+	ec = eix_client_data_get(c);
 	/* check if the segment already exists on the hash of segments */
 	s = eina_hash_find(_eshmd.hash, sn->id);
 	if (!s)
@@ -110,7 +157,10 @@ static Eshm_Error msg_segment_get(Eix_Client *c, Eshm_Message_Segment_Get *sn, v
 		WRN("Segment not found");
 		return ESHM_ERR_NEXIST;
 	}
-	s->ref++;
+	_segment_ref(s);
+
+	/* store the segments */
+	ec->segments = eina_list_append(ec->segments, s);
 	/* get a new segment */
 	*reply = calloc(1, sizeof(Eshm_Reply_Segment_New));
 	rsn = *reply;
@@ -120,10 +170,25 @@ static Eshm_Error msg_segment_get(Eix_Client *c, Eshm_Message_Segment_Get *sn, v
 	return EIX_ERR_NONE;
 }
 
-static int msg_segment_delete(Eix_Client *c, Eshm_Message_Segment_Delete *m, void **reply)
+static int msg_segment_delete(Eix_Client *c, Eshm_Message_Segment_Delete *sd, void **reply)
 {
-	/* decrement the segment reference count */
-	/* delete the segment */
+	Eshmd_Segment *s;
+	Eshmd_Client *ec;
+
+	INF("Deleting segment of name %s", sd->id);
+
+	ec = eix_client_data_get(c);
+	/* check if the segment already exists on the hash of segments */
+	s = eina_hash_find(_eshmd.hash, sd->id);
+	if (!s)
+	{
+		WRN("Segment not found");
+		return ESHM_ERR_NEXIST;
+	}
+	_segment_unref(s);
+	/* remove the segments */
+	ec->segments = eina_list_remove(ec->segments, s);
+
 	return EIX_ERR_NONE;
 }
 
@@ -150,30 +215,38 @@ static int msg_segment_unlock(Eix_Client *c, Eshm_Message_Segment_Unlock *m, voi
 	return EIX_ERR_NONE;
 }
 
-static void help(void)
-{
-	printf("-d debug\n");
-	printf("-b background\n");
-}
-
-int _client_add(void *data, int type, void *event)
+static Eina_Bool _client_add(void *data, int type, void *event)
 {
 	Eix_Event_Client_Add *e = event;
 	Eshmd_Client *c;
 
 	DBG("Client added %p", e->client);
 	c = calloc(1, sizeof(Eshmd_Client));
-	//ecore_con_client_data_set(e->client, c);
+	eix_client_data_set(e->client, c);
+	_eshmd.clients = eina_list_append(_eshmd.clients, c);
+	return ECORE_CALLBACK_RENEW;
 }
 
-int _client_del(void *data, int type, void *event)
+static Eina_Bool _client_del(void *data, int type, void *event)
 {
 	Eix_Event_Client_Add *e = event;
 	Eshmd_Client *c;
+	Eshmd_Segment *segment;
+	Eina_List *l, *l_next;
 
 	DBG("Client deleted %p", e->client);
-	//c = ecore_con_client_data_get(e->client);
-	/* TODO unref all the segments */
+	c = eix_client_data_get(e->client);
+	_eshmd.clients = eina_list_remove(_eshmd.clients, c);
+	/* unref all the segments */
+	EINA_LIST_FOREACH_SAFE(c->segments, l, l_next, segment)
+	{
+		_segment_unref(segment);
+		c->segments = eina_list_remove_list(c->segments, l);
+	}
+	/* delete the list */
+	eina_list_free(c->segments);
+	free(c);
+	return ECORE_CALLBACK_RENEW;
 }
 
 static int _server_process(Eix_Client *c, unsigned int type, void *msg,
@@ -200,6 +273,12 @@ static int _server_process(Eix_Client *c, unsigned int type, void *msg,
 			break;
 	}
 	return err;
+}
+
+static void help(void)
+{
+	printf("-d debug\n");
+	printf("-b background\n");
 }
 
 int main(int argc, char **argv)
@@ -268,6 +347,7 @@ int main(int argc, char **argv)
 	_eshmd.hash = eina_hash_string_superfast_new(NULL);
 	ecore_event_handler_add(EIX_EVENT_CLIENT_ADD, _client_add, NULL);
 	ecore_event_handler_add(EIX_EVENT_CLIENT_DEL, _client_del, NULL);
+	ecore_event_handler_add(ECORE_EVENT_SIGNAL_USER, _user_signal, NULL);
 
 	ecore_main_loop_begin();
 
