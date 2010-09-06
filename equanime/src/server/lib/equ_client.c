@@ -194,6 +194,20 @@ static Equ_Error _layer_surface_put(Equ_Client *client, Equ_Message_Surface_Put 
 	return EIX_ERR_NONE;
 }
 
+static Equ_Error _surface_delete(Equ_Client *client, Equ_Message_Surface_Delete *m,
+		void **reply)
+{
+	Equ_Surface *s;
+
+	s = equ_surface_get(m->surface_id);
+	if (!s)
+	{
+		return EQU_ERR_NEXIST;
+	}
+	equ_surface_delete(s);
+	return EIX_ERR_NONE;
+}
+
 static Equanime_Message_Cb _cbs[EQU_MSGS_NUM] = {
 	[EQU_INDEX(EQU_MSG_HOSTS_GET)] = (Equanime_Message_Cb)_hosts_get,
 	[EQU_INDEX(EQU_MSG_CONTROLLERS_GET)] = (Equanime_Message_Cb)_controllers_get,
@@ -204,6 +218,7 @@ static Equanime_Message_Cb _cbs[EQU_MSGS_NUM] = {
 	[EQU_INDEX(EQU_MSG_SURFACE_PUT)] = (Equanime_Message_Cb)_layer_surface_put,
 	[EQU_INDEX(EQU_MSG_SURFACE_DOWNLOAD)] = (Equanime_Message_Cb)_surface_download,
 	[EQU_INDEX(EQU_MSG_SURFACE_UPLOAD)] = (Equanime_Message_Cb)_surface_upload,
+	[EQU_INDEX(EQU_MSG_SURFACE_DELETE)] = (Equanime_Message_Cb)_surface_delete,
 };
 /*============================================================================*
  *                                 Global                                     *

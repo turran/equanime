@@ -40,6 +40,7 @@ EAPI void equ_format_components_masks(Equ_Format fmt,
 		*r = 0xff0000;
 		*g = 0x00ff00;
 		*b = 0x0000ff;
+		*a = 0;
 		break;
 
 		case EQU_FORMAT_ARGB8888:
@@ -53,6 +54,7 @@ EAPI void equ_format_components_masks(Equ_Format fmt,
 		*r = 0x0000f800;
 		*g = 0x000007e0;
 		*b = 0x0000001f;
+		*a = 0;
 		break;
 	}
 }

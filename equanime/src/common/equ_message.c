@@ -141,6 +141,11 @@ static void _message_init(void)
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Surface_Get, "id", id, EET_T_UINT);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Surface_Get, "sh_id", sh_id, EET_T_STRING);
 	_descriptors[EQU_INDEX(EQU_REPLY_SURFACE_GET)] = edd;
+
+	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Equ_Message_Surface_Delete", sizeof(Equ_Message_Surface_Delete));
+	edd = eet_data_descriptor_stream_new(&eddc);
+	_descriptors[EQU_INDEX(EQU_MSG_SURFACE_DELETE)] = edd;
+	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Message_Surface_Delete, "surface_id", surface_id, EET_T_UINT);
 }
 
 static void _message_shutdown(void)
@@ -169,8 +174,10 @@ void equ_common_server_setup(Eix_Server *s)
 	ADD(EQU_MSG_LAYER_STATUS_GET, EQU_REPLY_LAYER_STATUS_GET);
 	ADD(EQU_MSG_SURFACE_GET, EQU_REPLY_SURFACE_GET);
 	ADD(EQU_MSG_SURFACE_PUT, 0);
+	/* FIXME do something with upload/download */
 	ADD(EQU_MSG_SURFACE_UPLOAD, 0);
 	ADD(EQU_MSG_SURFACE_DOWNLOAD, 0);
+	ADD(EQU_MSG_SURFACE_DELETE, 0);
 }
 
 void equ_common_init(void)

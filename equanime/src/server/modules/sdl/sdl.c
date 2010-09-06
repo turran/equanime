@@ -20,6 +20,7 @@ typedef struct _SDL
 	Ecore_Timer *timer;
 	/* options */
 	Eina_Bool resizable;
+	Eina_Bool alpha;
 	int width;
 	int height;
 } SDL;
@@ -32,6 +33,7 @@ typedef struct _Surface
 
 static Equ_Option _options[] = {
 	{ "0", "resizable", "Make the SDL window resizable"},
+	{ "0", "alpha", "Enable alpha"},
 	{ "320", "width", "Width of the window"},
 	{ "240", "height", "Height of the window"},
 	NULL,
@@ -62,7 +64,10 @@ static inline void _info_to_status(SDL *sdl, Equ_Layer_Status *status)
 
 	status->w = sdl->width;
 	status->h = sdl->height;
-	status->fmt = EQU_FORMAT_RGB888;
+	if (sdl->alpha)
+		status->fmt = EQU_FORMAT_ARGB8888;
+	else
+		status->fmt = EQU_FORMAT_RGB888;
 }
 
 static Eina_Bool _events_cb(void *data)
@@ -144,6 +149,7 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 {
 	SDL *sdl;
 	Uint32 flags = 0;
+	int depth = 24;
 	SDL_Surface *s;
 
 	sdl = malloc(sizeof(SDL));
@@ -154,11 +160,15 @@ static Eina_Bool _host_init(Equ_Host *h, Equ_Server_Backend *sbackend,
 	/* parse the options */
 	equ_option_parse(&_options[0], (char *)options, EQU_OPTION_BOOL,
 			&sdl->resizable);
+	equ_option_parse(&_options[1], (char *)options, EQU_OPTION_BOOL,
+			&sdl->alpha);
 	if (sdl->resizable)
 		flags |= SDL_RESIZABLE;
+	if (sdl->alpha)
+		depth = 32;
 	/* initialize sdl */
 	SDL_Init(SDL_INIT_VIDEO);
-	sdl->surface = SDL_SetVideoMode(sdl->width, sdl->height, 32, flags);
+	sdl->surface = SDL_SetVideoMode(sdl->width, sdl->height, depth, flags);
 	sdl->controller = equ_host_controller_register(h,
 			"controller0", &_cbackend);
 	sdl->output = equ_controller_output_register(sdl->controller,
@@ -228,6 +238,7 @@ static void * _host_surface_new(Equ_Host *h, Equ_Common_Surface *common)
 	}
 	pitch = equ_format_pitch_get(common->fmt, common->w);
 	equ_format_components_masks(common->fmt, &rm, &gm, &bm, &am, NULL, NULL, NULL);
+	printf("mask = %08x %08x %08x %08x\n", rm, gm, bm, am);
 	data = SDL_CreateRGBSurfaceFrom(shdata,
 			common->w, common->h, depth, pitch,
 			rm, gm, bm, am);

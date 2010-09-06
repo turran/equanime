@@ -99,6 +99,7 @@ typedef enum _Equ_Message
 	EQU_MSG_SURFACE_PUT,
 	EQU_MSG_SURFACE_UPLOAD,
 	EQU_MSG_SURFACE_DOWNLOAD,
+	EQU_MSG_SURFACE_DELETE,
 	EQU_MSG_LAST,
 } Equ_Message;
 
@@ -182,6 +183,11 @@ typedef struct _Equ_Message_Surface_Download
 	int sw;
 	int sh;
 } Equ_Message_Surface_Download;
+
+typedef struct _Equ_Message_Surface_Delete
+{
+	Equ_Common_Id surface_id;
+} Equ_Message_Surface_Delete;
 
 typedef struct _Equ_Reply_Sync
 {

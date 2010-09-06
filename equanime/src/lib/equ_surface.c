@@ -25,7 +25,7 @@ struct _Equ_Surface
 Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 		Equ_Format fmt, Equ_Surface_Type type, char *shid)
 {
-	Eshm_Segment *segment;
+	Eshm_Segment *segment = NULL;
 	Equ_Surface *s;
 	void *data = NULL;
 
@@ -49,12 +49,17 @@ Equ_Surface * equ_surface_new(Equ_Common_Id id, uint32_t w, uint32_t h,
 	s->w = w;
 	s->h = h;
 	s->type = type;
+	s->segment = segment;
 	s->data.fmt = fmt;
 	/* TODO add more formats */
 	switch (fmt)
 	{
 		case EQU_FORMAT_RGB888:
 		s->data.data.rgb888.plane0 = data;
+		break;
+
+		case EQU_FORMAT_ARGB8888:
+		s->data.data.argb8888.plane0 = data;
 		break;
 	}
 
@@ -186,5 +191,34 @@ EAPI Eina_Bool equ_surface_data_get(Equanime *e, Equ_Surface *s, Equ_Surface_Dat
 		return EINA_FALSE;
 
 	*d = s->data;
+	return EINA_TRUE;
+}
+
+/**
+ *
+ */
+EAPI Eina_Bool equ_surface_delete(Equanime *e, Equ_Surface *s)
+{
+	Equ_Message_Surface_Delete m;
+	int error;
+
+	m.surface_id = s->id;
+	error = equ_message_server_send(e, EQU_MSG_SURFACE_DELETE, &m, 0, NULL);
+	if (error)
+	{
+		return EINA_FALSE;
+	}
+	switch (s->type)
+	{
+		case EQU_SURFACE_SYSTEM:
+		eshm_segment_delete(s->segment);
+		break;
+
+		case EQU_SURFACE_HOST:
+		/* TODO handle the mmaped area */
+		return NULL;
+		break;
+	}
+	free(s);
 	return EINA_TRUE;
 }
