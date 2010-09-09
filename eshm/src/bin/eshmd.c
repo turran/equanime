@@ -63,7 +63,15 @@ static void _dump_segments(void)
 	printf("Clients:\n");
 	EINA_LIST_FOREACH(_eshmd.clients, l, client)
 	{
+		Eina_List *l2;
+		Eshmd_Segment *segment;
+		int i = 0;
+
 		printf("%p\n", client);
+		EINA_LIST_FOREACH(client->segments, l2, segment)
+		{
+			printf("[%d] %s %d\n", i++, segment->id, segment->size);
+		}
 	}
 }
 
@@ -75,6 +83,7 @@ static Eina_Bool _user_signal(void *data, int type, void *event)
 
 static inline void _segment_unref(Eshmd_Segment *segment)
 {
+	DBG("Unreffing the segment %d -> %d", segment->ref, segment->ref - 1);
 	segment->ref--;
 	/* delete the segment */
 	if (!segment->ref)
@@ -88,6 +97,7 @@ static inline void _segment_unref(Eshmd_Segment *segment)
 
 static inline void _segment_ref(Eshmd_Segment *segment)
 {
+	DBG("Reffing the segment %d -> %d", segment->ref, segment->ref + 1);
 	segment->ref++;
 }
 
@@ -268,6 +278,7 @@ static int _server_process(Eix_Client *c, unsigned int type, void *msg,
 			err = msg_segment_get(c, msg, reply);
 			break;
 		case ESHM_MSG_SEGMENT_DELETE:
+			err = msg_segment_delete(c, msg, reply);
 			break;
 		default:
 			break;
