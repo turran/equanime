@@ -42,19 +42,14 @@ Equ_Surface * equ_surface_new(Equ_Host *host, Equ_Common_Surface *common,
 	return s;
 }
 
-EAPI void * equ_surface_data_get(Equ_Surface *s)
+void * equ_surface_data_get(Equ_Surface *s)
 {
 	return s->data;
 }
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI void equ_surface_delete(Equ_Surface *s)
-{
-	/* TODO free very data's plane */
-	//equ_pool_free(s->pool, s->data);
-	free(s);
-}
 
 EAPI Equ_Common_Id equ_surface_id_get(Equ_Surface *s)
 {
@@ -102,3 +97,12 @@ EAPI void equ_surface_pixels_download(Equ_Surface *s,
 	equ_host_surface_download(s->host, s, data, rect);
 #endif
 }
+
+EAPI void equ_surface_delete(Equ_Surface *s)
+{
+	equ_host_surface_delete(s->host, s);
+	eina_hash_del(_surfaces, &s->common.id, s);
+	if (s->common.shid) free(s->common.shid);
+	free(s);
+}
+

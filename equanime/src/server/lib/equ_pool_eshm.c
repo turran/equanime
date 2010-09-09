@@ -4,11 +4,10 @@
  *                                  Local                                     *
  *============================================================================*/
 static int _last;
-static Eina_Hash *_segments = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void * equ_surface_eshm_alloc(Equ_Common_Surface *common)
+Eshm_Segment * equ_surface_eshm_alloc(Equ_Common_Surface *common)
 {
 	Eshm_Segment *segment;
 	void *data;
@@ -19,22 +18,14 @@ void * equ_surface_eshm_alloc(Equ_Common_Surface *common)
 	snprintf(id, 16, "equeshm%08x", _last++);
 	segment = eshm_segment_new(id, bytes);
 	if (!segment) return NULL;
-
-	if (!_segments) _segments = eina_hash_pointer_new(NULL);
-	data = eshm_segment_data_get(segment);
-	eina_hash_add(_segments, data, segment);
-
 	common->shid = strdup(id);
 
-	return data;
+	return segment;
 }
 
-void equ_surface_eshm_free(void *data)
+void equ_surface_eshm_free(Eshm_Segment *segment)
 {
-	Eshm_Segment *segment;
-
-	segment = eina_hash_find(_segments, data);
-	//eshm_segment_free(segment);
+	eshm_segment_delete(segment);
 }
 /*============================================================================*
  *                                   API                                      *

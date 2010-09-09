@@ -29,10 +29,10 @@ static Equ_Common_Id _ids = 0;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void equ_host_surface_delete(Equ_Host *h, void *sd)
+void equ_host_surface_delete(Equ_Host *host, Equ_Surface *s)
 {
-	if (h->backend->surface_delete)
-		h->backend->surface_delete(h, sd);
+	if (host->backend->surface_delete)
+		host->backend->surface_delete(host, s);
 }
 /*============================================================================*
  *                                   API                                      *

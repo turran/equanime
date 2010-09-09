@@ -141,7 +141,7 @@ static void _message_init(void)
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Surface_Get, "id", id, EET_T_UINT);
 	EET_DATA_DESCRIPTOR_ADD_BASIC(edd, Equ_Reply_Surface_Get, "sh_id", sh_id, EET_T_STRING);
 	_descriptors[EQU_INDEX(EQU_REPLY_SURFACE_GET)] = edd;
-
+	/* surface delete */
 	eet_eina_stream_data_descriptor_class_set(&eddc, sizeof(eddc), "Equ_Message_Surface_Delete", sizeof(Equ_Message_Surface_Delete));
 	edd = eet_data_descriptor_stream_new(&eddc);
 	_descriptors[EQU_INDEX(EQU_MSG_SURFACE_DELETE)] = edd;

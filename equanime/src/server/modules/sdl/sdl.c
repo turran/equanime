@@ -101,14 +101,14 @@ static Eina_Bool _events_cb(void *data)
 static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
 		Eina_Rectangle *rect)
 {
+	Surface *surface;
 	SDL *sdl;
-	SDL_Surface *src;
 	Equ_Host *h;
 	SDL_Rect srect, drect;
 
 	h = equ_layer_host_get(l);
 	sdl = equ_host_data_get(h);
-	src = equ_surface_data_get(s);
+	surface = equ_surface_data_get(s);
 	srect.x = rect->x;
 	srect.y = rect->y;
 	srect.w = rect->w;
@@ -119,7 +119,7 @@ static void _layer_surface_put(Equ_Layer *l, Equ_Surface *s, int x, int y,
 	drect.w = rect->w;
 	drect.h = rect->h;
 
-	SDL_BlitSurface(src, &srect, sdl->surface, &drect);
+	SDL_BlitSurface(surface->surface, &srect, sdl->surface, &drect);
 	SDL_UpdateRect(sdl->surface, drect.x, drect.y, drect.w, drect.h);
 }
 
@@ -218,11 +218,13 @@ static void _host_surface_download(Equ_Host *h, Equ_Surface *s, Equ_Surface_Data
 
 static void * _host_surface_new(Equ_Host *h, Equ_Common_Surface *common)
 {
+	Surface *s;
+	Eshm_Segment *segment;
 	SDL *sdl;
+	SDL_Surface *surface;
 	Uint32 rm, gm, bm, am;
 	int depth;
 	int pitch;
-	Equ_Surface *s;
 	void *data = NULL;
 	void *shdata = NULL;
 	size_t bytes;
@@ -230,27 +232,33 @@ static void * _host_surface_new(Equ_Host *h, Equ_Common_Surface *common)
 	sdl = equ_host_data_get(h);
 	depth = equ_format_depth_get(common->fmt);
 
-	shdata = equ_surface_eshm_alloc(common);
-	if (!shdata)
+	segment = equ_surface_eshm_alloc(common);
+	if (!segment)
 	{
 		ERR("Cannot allocate %d", bytes);
 		return NULL;
 	}
+
+	shdata = eshm_segment_data_get(segment);
 	pitch = equ_format_pitch_get(common->fmt, common->w);
 	equ_format_components_masks(common->fmt, &rm, &gm, &bm, &am, NULL, NULL, NULL);
-	printf("mask = %08x %08x %08x %08x\n", rm, gm, bm, am);
-	data = SDL_CreateRGBSurfaceFrom(shdata,
+	surface = SDL_CreateRGBSurfaceFrom(shdata,
 			common->w, common->h, depth, pitch,
 			rm, gm, bm, am);
 
-	return data;
+	s = malloc(sizeof(Surface));
+	s->segment = segment;
+	s->surface = surface;
+
+	return s;
 }
 
 static void _host_surface_delete(Equ_Host *h, Equ_Surface *s)
 {
-	SDL_Surface *surface = equ_surface_data_get(s);
+	Surface *surface = equ_surface_data_get(s);
 
-	SDL_FreeSurface(surface);
+	equ_surface_eshm_free(surface->segment);
+	SDL_FreeSurface(surface->surface);
 }
 
 Equ_Host_Backend _hbackend = {
