@@ -21,17 +21,26 @@ static void _bool_get(Equ_Option *o, const char *value,
 		printf("wrong bool!!!\n");
 }
 
+static void _int_get(Equ_Option *o, const char *value,
+		int *dst)
+{
+	*dst = strtol(value, NULL, 10);
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
 EAPI void equ_option_parse(Equ_Option *option, char *parse,
 		Equ_Option_Type val, void *dest)
 {
+	char *tmp;
 	char *op;
 	/* FIXME we could already transform the parse string instead
 	 * of parsing for every option
 	 */
-	op = strtok(parse, ",");
+
+	tmp = strdup(parse);
+	op = strtok(tmp, ",");
 	if (!op) op = parse;
 	for (; op; op = strtok(NULL, ","))
 	{
@@ -52,8 +61,13 @@ EAPI void equ_option_parse(Equ_Option *option, char *parse,
 			_bool_get(option, value, (Eina_Bool *)dest);
 			break;
 
+			case EQU_OPTION_INT:
+			_int_get(option, value, (int *)dest);
+			break;
+
 			default:
 			break;
 		}
 	}
+	free(tmp);
 }
