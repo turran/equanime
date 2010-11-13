@@ -1,0 +1,2 @@
++ Add the API to retreive memory surfaces from the controller, something like
+  a surface allocator.
