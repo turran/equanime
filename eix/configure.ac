@@ -76,6 +76,7 @@ eix.pc
 src/Makefile
 src/include/Makefile
 src/lib/Makefile
+src/bin/Makefile
 ],[
 ])
 
