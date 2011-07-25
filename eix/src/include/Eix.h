@@ -112,7 +112,7 @@ EAPI void eix_sync(Eix_Server *e);
 EAPI void eix_server_message_add(Eix_Server *e,
 		unsigned int id, Eet_Data_Descriptor *edd,
 		unsigned int reply_id);
-EAPI Eix_Error eix_message_server_send(Eix_Server *es, int type,
+EAPI Eix_Error eix_server_message_send(Eix_Server *es, int type,
 		void *data, double timeout, void **rdata);
 
 EAPI void eix_client_data_set(Eix_Client *c, void *data);

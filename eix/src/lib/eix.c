@@ -1,3 +1,20 @@
+/* EIX - IPC system
+ * Copyright (C) 2008-2011 Jorge Luis Zapata
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "Eix.h"
 #include "eix_private.h"
 /*============================================================================*
@@ -676,26 +693,6 @@ EAPI Eix_Server * eix_new(const char *name, int port,
 
 	return es;
 }
-/**
- *
- */
-EAPI Eix_Error eix_message_server_send(Eix_Server *es, int type,
-		void *data, double timeout, void **rdata)
-{
-	Eix_Message *m;
-	void *body;
-	Eix_Message_Descriptor *desc;
-
-	desc = _descriptor_get(es, type);
-	if (!desc || !desc->edd) return EIX_ERR_CODEC;
-
-	m = _message_new(type);
-	body = eet_data_descriptor_encode(desc->edd, data, &m->size);
-	if (!body)
-		return EIX_ERR_CODEC;
-
-	return _server_send(es, desc, m, body, timeout, rdata);
-}
 
 /**
  * Flushes every message and waits until the server
@@ -709,7 +706,7 @@ EAPI void eix_sync(Eix_Server *e)
 	Eix_Error error;
 
 	/* send the command to the server */
-	error = eix_message_server_send(e, EIX_MESSAGE_SYNC, &m, 0, (void **)&r);
+	error = eix_server_message_send(e, EIX_MESSAGE_SYNC, &m, 0, (void **)&r);
 	if (error) return;
 	free(r);
 }
@@ -816,3 +813,26 @@ EAPI void eix_server_message_add(Eix_Server *e,
 
 	eina_hash_add(e->messages, (const void *)&id, mdesc);
 }
+
+/**
+ *
+ */
+EAPI Eix_Error eix_server_message_send(Eix_Server *es, int type,
+		void *data, double timeout, void **rdata)
+{
+	Eix_Message *m;
+	void *body;
+	Eix_Message_Descriptor *desc;
+
+	desc = _descriptor_get(es, type);
+	if (!desc || !desc->edd) return EIX_ERR_CODEC;
+
+	m = _message_new(type);
+	body = eet_data_descriptor_encode(desc->edd, data, &m->size);
+	if (!body)
+		return EIX_ERR_CODEC;
+
+	return _server_send(es, desc, m, body, timeout, rdata);
+}
+
+

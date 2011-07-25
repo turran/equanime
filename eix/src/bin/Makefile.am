@@ -3,7 +3,7 @@ MAINTAINERCLEANFILES = Makefile.in
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
-@EIX_LIB_CFLAGS@
+@EIX_CFLAGS@
 
 bin_PROGRAMS = eix_parser
 
@@ -16,5 +16,5 @@ eix_parser.c
 #parse.o: parse.y
 
 eix_parser_LDADD = \
-$(top_builddir)/src/lib/libequanime.la \
-@EIX_LIB_LIBS@
+$(top_builddir)/src/lib/libeix.la \
+@EIX_LIBS@

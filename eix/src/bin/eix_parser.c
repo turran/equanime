@@ -21,5 +21,8 @@
 
 int main(int argc, char **argv)
 {
-
+	char *s_header;
+	char *s_source;
+	FILE *f_header;
+	FILE *f_source;
 }
