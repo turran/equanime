@@ -32,7 +32,7 @@ int eshm_log_dom = -1;
  */
 int eshm_message_server_send(int type, void *data, double timeout, void **rdata)
 {
-	return eix_message_server_send(_eshm.svr, type, data, timeout, rdata);
+	return eix_server_message_send(_eshm.svr, type, data, timeout, rdata);
 }
 
 /*============================================================================*
