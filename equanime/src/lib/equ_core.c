@@ -23,7 +23,7 @@ int equ_log = -1;
 int equ_message_server_send(Equanime *e, unsigned int type,
 		void *data, double timeout, void **rdata)
 {
-	return eix_message_server_send(e->svr, type, data, timeout, rdata);
+	return eix_server_message_send(e->svr, type, data, timeout, rdata);
 }
 /*============================================================================*
  *                                   API                                      *
