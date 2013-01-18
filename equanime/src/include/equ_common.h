@@ -6,8 +6,6 @@
 #define EQUANIME_NAME "equanime"
 #define EQUANIME_PORT 0xea
 
-#define EQU_MSGS_NUM (EQU_MSG_LAST - EIX_REPLY_LAST)
-#define EQU_INDEX(n) (n - EIX_REPLY_LAST)
 /*
  * TODO
  * - Add a way to send messages from the server to the client that are *not* replies
@@ -88,32 +86,25 @@ typedef enum
 	EQU_DATAS
 } Equ_Data;
 
-typedef enum _Equ_Message
-{
-	EQU_MSG_HOSTS_GET = EIX_REPLY_LAST,
-	EQU_MSG_CONTROLLERS_GET,
-	EQU_MSG_LAYERS_GET,
-	EQU_MSG_LAYER_CAPS_GET,
-	EQU_MSG_LAYER_STATUS_GET,
-	EQU_MSG_SURFACE_GET,
-	EQU_MSG_SURFACE_PUT,
-	EQU_MSG_SURFACE_UPLOAD,
-	EQU_MSG_SURFACE_DOWNLOAD,
-	EQU_MSG_SURFACE_DELETE,
-	EQU_MSG_LAST,
-} Equ_Message;
+extern Eix_Message *EQU_MSG_HOSTS_GET;
+extern Eix_Message *EQU_MSG_CONTROLLERS_GET;
+extern Eix_Message *EQU_MSG_LAYERS_GET;
+extern Eix_Message *EQU_MSG_LAYER_CAPS_GET;
+extern Eix_Message *EQU_MSG_LAYER_STATUS_GET;
+extern Eix_Message *EQU_MSG_SURFACE_GET;
+extern Eix_Message *EQU_MSG_SURFACE_PUT;
+extern Eix_Message *EQU_MSG_SURFACE_UPLOAD;
+extern Eix_Message *EQU_MSG_SURFACE_DOWNLOAD;
+extern Eix_Message *EQU_MSG_SURFACE_DELETE;
 
-typedef enum _Equ_Reply
-{
-	EQU_REPLY_HOSTS_GET = EQU_MSG_LAST,
-	EQU_REPLY_CONTROLLERS_GET,
-	EQU_REPLY_LAYERS_GET,
-	EQU_REPLY_LAYER_CAPS_GET,
-	EQU_REPLY_LAYER_STATUS_GET,
-	EQU_REPLY_SURFACE_GET,
-	EQU_REPLY_SURFACE_DOWNLOAD,
-	EQU_REPLY_LAST,
-} Equ_Reply;
+extern Eix_Message *EQU_REPLY_HOSTS_GET;
+extern Eix_Message *EQU_REPLY_CONTROLLERS_GET;
+extern Eix_Message *EQU_REPLY_LAYERS_GET;
+extern Eix_Message *EQU_REPLY_LAYER_CAPS_GET;
+extern Eix_Message *EQU_REPLY_LAYER_STATUS_GET;
+extern Eix_Message *EQU_REPLY_SURFACE_GET;
+extern Eix_Message *EQU_REPLY_SURFACE_DOWNLOAD;
+extern Eix_Message *EQU_REPLY_LAST;
 
 typedef struct _Equ_Message_Sync
 {
