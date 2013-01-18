@@ -1,0 +1,18 @@
+Now that enesim is near a release, eix is fixed now to work without ecore
+and we have eshm with posix segments working nice too it is about time to
+retake this development as it was one of the first ones, and I still want
+to finish it.
+
+The idea is to have:
+A server and a client library
+A library for equanime itself. The server should link against it. This is done
+because at the end it might be interesting to have a way for users to use the lib
+directly
+
+For backends we need
+1. FB
+2. SDL
+3. X?
+4. finally the embedded devices
+
+All the logic is almost there, but needs to get in sync with newer code
