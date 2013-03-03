@@ -1,0 +1,39 @@
+namespace "equanime" : 0 {
+	/* data types */
+	struct "host" {
+		int "id";
+		string "name";
+	};
+
+	struct "controller" {
+		int "id";
+		string "name";
+	};
+
+	struct "layer" {
+		int "id";
+		string "name";
+	};
+
+	/* messages */
+	struct "hosts_get" {
+	};
+
+	struct "hosts_get_reply" {
+		[host] "hosts";
+	};
+
+	struct "controllers_get" {
+	};
+
+	struct "controllers_get_reply" {
+		[controller] "controllers";
+	};
+
+	struct "layers_get" {
+	};
+
+	struct "layers_get_reply" {
+		[layer] "layers";
+	};
+};
